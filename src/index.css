@@ -1,0 +1,135 @@
+@import "tailwindcss";
+
+@theme {
+  /* ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+     PALETA BASE — Colores del sistema
+  ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ */
+
+  /* Primario — Azul corporativo */
+  --color-primary-50:  #eff6ff;
+  --color-primary-100: #dbeafe;
+  --color-primary-200: #bfdbfe;
+  --color-primary-300: #93c5fd;
+  --color-primary-400: #60a5fa;
+  --color-primary-500: #3b82f6;
+  --color-primary-600: #2563eb;
+  --color-primary-700: #1d4ed8;
+  --color-primary-800: #1e40af;
+  --color-primary-900: #1e3a8a;
+
+  /* Éxito */
+  --color-success-500: #22c55e;
+  --color-success-600: #16a34a;
+
+  /* Advertencia */
+  --color-warning-500: #f59e0b;
+  --color-warning-600: #d97706;
+
+  /* Peligro */
+  --color-danger-500:  #ef4444;
+  --color-danger-600:  #dc2626;
+
+  /* Neutrales */
+  --color-neutral-50:  #f8fafc;
+  --color-neutral-100: #f1f5f9;
+  --color-neutral-200: #e2e8f0;
+  --color-neutral-300: #cbd5e1;
+  --color-neutral-400: #94a3b8;
+  --color-neutral-500: #64748b;
+  --color-neutral-600: #475569;
+  --color-neutral-700: #334155;
+  --color-neutral-800: #1e293b;
+  --color-neutral-900: #0f172a;
+
+  /* ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+     TOKENS SEMÁNTICOS — Light Mode (default)
+     Estos son los que usan los componentes.
+     NUNCA uses colores base directamente.
+  ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ */
+
+  /* Superficies */
+  --color-bg-base:      #ffffff;
+  --color-bg-subtle:    #f8fafc;
+  --color-bg-overlay:   #f1f5f9;
+  --color-bg-sidebar:   #0f172a;
+
+  /* Bordes */
+  --color-border:       #e2e8f0;
+  --color-border-focus: #3b82f6;
+
+  /* Textos */
+  --color-text-primary:   #0f172a;
+  --color-text-secondary: #64748b;
+  --color-text-disabled:  #94a3b8;
+  --color-text-inverse:   #ffffff;
+
+  /* Tipografía */
+  --font-sans:  'Inter', system-ui, -apple-system, sans-serif;
+  --font-mono:  'JetBrains Mono', 'Fira Code', monospace;
+
+  /* Radios */
+  --radius-sm:    0.25rem;
+  --radius-md:    0.5rem;
+  --radius-lg:    0.75rem;
+  --radius-xl:    1rem;
+  --radius-card:  0.75rem;
+
+  /* Sombras */
+  --shadow-card: 0 1px 3px 0 rgb(0 0 0 / 0.1), 0 1px 2px -1px rgb(0 0 0 / 0.1);
+  --shadow-modal: 0 20px 25px -5px rgb(0 0 0 / 0.1);
+
+  /* Transiciones */
+  --transition-base: 150ms ease-in-out;
+}
+
+/* ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+   DARK MODE — Solo sobreescribe tokens semánticos
+   La paleta base NO cambia, solo su uso.
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ */
+.dark {
+  
+  --color-bg-base:      #0f172a;
+  --color-bg-subtle:    #1e293b;
+  --color-bg-overlay:   #334155;
+  --color-bg-sidebar:   #020617;
+
+  --color-border:       #334155;
+  --color-border-focus: #60a5fa;
+
+  --color-text-primary:   #f8fafc;
+  --color-text-secondary: #94a3b8;
+  --color-text-disabled:  #475569;
+  --color-text-inverse:   #0f172a;
+
+  --shadow-card:  0 1px 3px 0 rgb(0 0 0 / 0.4);
+  --shadow-modal: 0 20px 25px -5px rgb(0 0 0 / 0.5);
+}
+
+/* ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+   ESTILOS BASE GLOBALES
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ */
+*, *::before, *::after {
+  box-sizing: border-box; /* Evita que el padding y border afecten al tamaño total de los elementos*/
+}
+
+html {
+  font-family: var(--font-sans);
+  -webkit-font-smoothing: antialiased;
+}
+/*el webkit-font-smoothing es una propiedad CSS que mejora la apariencia de las fuentes en navegadores basados en WebKit, como Chrome y Safari. Al habilitar esta propiedad, las fuentes se renderizan de manera más suave y clara, lo que mejora la legibilidad y la estética del texto en la página web.*/
+
+body {
+  background-color: var(--color-bg-base);
+  color: var(--color-text-primary);
+  transition: background-color var(--transition-base),
+              color var(--transition-base);
+}
+
+/* Scrollbar personalizado */
+::-webkit-scrollbar       { width: 6px; height: 6px; }
+::-webkit-scrollbar-track { background: var(--color-bg-subtle); }
+::-webkit-scrollbar-thumb {
+  background: var(--color-border);
+  border-radius: 999px;
+}
+::-webkit-scrollbar-thumb:hover { background: var(--color-text-disabled); }
