@@ -83,9 +83,19 @@ apiClient.interceptors.response.use(
 
   async (error: AxiosError) => {
     const status = error.response?.status;
+    const requestUrl = error.config?.url ?? "";
+    const isLoginRequest = requestUrl.includes("/auth/login");
 
     /* 401 — Sesión expirada */
     if (status === 401) {
+      /**
+       * En login con credenciales incorrectas NO redirigimos,
+       * dejamos que el módulo de auth muestre el toast local.
+       */
+      if (isLoginRequest) {
+        return Promise.reject(error);
+      }
+
       /**
        * En Paso 6 aquí irá la lógica de Refresh Token.
        * Si el refresh falla → logout y redirect a login.

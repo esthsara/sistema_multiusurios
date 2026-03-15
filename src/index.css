@@ -89,6 +89,7 @@
 .dark {
   
   --color-bg-base:      #0f172a;
+  --color-bg-base-white:      #e8ebf3;
   --color-bg-subtle:    #1e293b;
   --color-bg-overlay:   #334155;
   --color-bg-sidebar:   #020617;

@@ -27,6 +27,34 @@ export const useAuthActions = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [user, setUser] = useState<AuthUser | null>(null);
 
+  const getLoginErrorMessage = (error: {
+    status?: number;
+    message?: string;
+    errors?: Record<string, string[]>;
+  }) => {
+    // Mensaje esperado cuando las credenciales no son válidas
+    if (error.status === 401 || error.status === 422) {
+      return "Usuario o contraseña incorrectos";
+    }
+
+    // Evita mostrar errores SQL internos del backend en UI
+    const rawMessage = error.message?.toLowerCase() ?? "";
+    if (
+      rawMessage.includes("sqlstate") ||
+      rawMessage.includes("integrity constraint") ||
+      rawMessage.includes("entidad_id")
+    ) {
+      return "Usuario o contraseña incorrectos";
+    }
+
+    if (error.errors) {
+      const first = Object.values(error.errors)[0]?.[0];
+      if (first) return first;
+    }
+
+    return error.message ?? "Error al iniciar sesión";
+  };
+
   const login = async (dto: LoginDto) => {
     setIsLoading(true);
     try {
@@ -35,9 +63,6 @@ export const useAuthActions = () => {
 
       // Extrae el plainTextToken sin importar la estructura
       const plainToken = extractPlainToken(access_token);
-
-      // Normaliza el usuario con el adapter
-      const authUser = adaptBackendUser(backendUser, session_id);
 
       /**
        * Guarda el token temporalmente en sessionStorage.
@@ -57,18 +82,12 @@ export const useAuthActions = () => {
       toast.success(`Bienvenido, ${fullUser.persona.nombreCompleto}`);
       navigate(APP_ROUTES.DASHBOARD.HOME);
     } catch (error) {
-      // El error ya fue parseado en el servicio
-      // Si tiene errores de validación los mostramos
       const apiError = error as {
+        status?: number;
         errors?: Record<string, string[]>;
         message?: string;
       };
-      if (apiError.errors) {
-        const first = Object.values(apiError.errors)[0]?.[0];
-        toast.error(first ?? "Credenciales incorrectas");
-      } else {
-        toast.error(apiError.message ?? "Error al iniciar sesión");
-      }
+      toast.error(getLoginErrorMessage(apiError));
     } finally {
       setIsLoading(false);
     }
