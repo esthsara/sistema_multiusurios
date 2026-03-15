@@ -1,79 +1,205 @@
 // src/shared/types/auth.types.ts
 
-/**
- * Permisos en formato "recurso.accion" — igual que Laravel-Permission.
- * Template Literal Type: garantiza el formato correcto en compilación.
- * ¿Por qué? Si escribes 'personas-ver' TypeScript te avisa del error.
- */
-export type PermissionString =
-  | "personas.ver"
-  | "personas.crear"
-  | "personas.editar"
-  | "personas.eliminar"
-  | "sucursales.ver"
-  | "sucursales.crear"
-  | "sucursales.editar"
-  | "sucursales.eliminar"
-  | "usuarios.ver"
-  | "usuarios.crear"
-  | "usuarios.editar"
-  | "usuarios.eliminar"
-  | "roles.ver"
-  | "roles.crear"
-  | "roles.editar"
-  | "roles.eliminar"
-  | "auditoria.ver";
+export type TipoPersona = 'FISICA' | 'MORAL'
+export type EstadoPersona = "ACTIVO" | "INACTIVO" | "BLOQUEADO"
+export type RoleName = string
 
 /**
- * Roles del sistema — Union Type.
- * Beneficio: autocompletado en todo el proyecto.
+ *listamos permisos conocidos para tener autocompletado y evitar errores de typo y tambien los permitimos como string dinamico para que el sistema sea flexible y no dependa de una lista fija en el frontend.
  */
-export type RoleName = "super-admin" | "admin" | "editor" | "viewer";
+type KnownPermission =
+  | 'personas.ver'    | 'personas.crear'    | 'personas.editar'    | 'personas.eliminar'
+  | 'sucursales.ver'  | 'sucursales.crear'  | 'sucursales.editar'  | 'sucursales.eliminar'
+  | 'usuarios.ver'    | 'usuarios.crear'    | 'usuarios.editar'    | 'usuarios.eliminar'
+  | 'roles.ver'       | 'roles.crear'       | 'roles.editar'       | 'roles.eliminar'
+  | 'auditoria.ver'
 
-export interface Role {
-  id: number;
-  name: RoleName;
-  permissions: PermissionString[];
+type DynamicPermission = string & {}
+export type PermissionString = KnownPermission | DynamicPermission
+
+
+
+export interface BackendPersona {
+  id:                      number
+  tipo_persona:            TipoPersona
+  nombre:                  string | null
+  apellido:                string | null
+  razon_social:            string | null
+  identificacion_principal: string
+  fecha_nacimiento:        string | null
+  genero:                  string | null
+  foto_path:               string | null
+  estado:                  EstadoPersona
+  created_at:              string
+  updated_at:              string
+  deleted_at:              string | null
 }
 
+export interface BackendSucursal {
+  id:     number
+  nombre: string
+  clave:  string
+}
+
+export interface BackendRole {
+  id:          number
+  name:        RoleName
+  permissions: PermissionString[]
+}
+
+
+export interface BackendUser {
+  id:                number
+  persona_id:        number
+  email:             string
+  username:          string
+  current_branch_id: number | null
+  activo:            boolean
+  created_at:        string
+  updated_at:        string
+  deleted_at:        string | null
+  current_branch:    BackendSucursal | null
+  persona:           BackendPersona
+  sucursales:        BackendSucursal[]
+  roles:             BackendRole[]
+  /**
+   * El backend devuelve 'permisos', no 'permissions'.
+   */
+  permisos:          PermissionString[]
+  contexto?: {
+    tipo:             string
+    business_actual:  number | null
+    business_ids:     number[]
+  }
+}
+
+/**
+ * AccessTokenObject — Estructura del token en /auth/login
+ * El register devuelve string, el login devuelve este objeto.
+ */
+export interface AccessTokenObject {
+  accessToken: {
+    id:              number
+    name:            string
+    abilities:       string[]
+    expires_at:      string | null
+    tokenable_id:    number
+    tokenable_type:  string
+    created_at:      string
+    updated_at:      string
+  }
+  plainTextToken: string
+}
+
+/* ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+   TIPOS NORMALIZADOS — Lo que usa
+   el frontend internamente (post-adapter)
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ */
+
+/**
+ * Persona normalizada — campos calculados incluidos.
+ * 'nombreCompleto' es derivado según tipo_persona.
+ */
 export interface Persona {
-  id: number;
-  tipo: "fisica" | "moral";
-  nombre: string;
-  rfc?: string;
-}
-
-/**
- * AuthUser — La entidad central del sistema.
- * Extiende Persona con credenciales, roles y sucursales.
- *
- * ¿Por qué no un User simple?
- * Porque según el contexto, un Usuario ES una Persona con credenciales.
- * Esto refleja el modelo de dominio real.
- */
-export interface AuthUser {
-  id: number;
-  email: string;
-  persona: Persona;
-  roles: Role[];
-  permissions: PermissionString[]; // Permisos directos + heredados de roles
-  sucursales: Sucursal[];
-  sucursalActiva: Sucursal;
+  id:                      number
+  tipoPersona:             TipoPersona
+  nombre:                  string | null
+  apellido:                string | null
+  razonSocial:             string | null
+  identificacionPrincipal: string
+  fechaNacimiento:         string | null
+  genero:                  string | null
+  fotoPatch:               string | null
+  estado:                  EstadoPersona
+  nombreCompleto:          string   // calculado en el adapter
 }
 
 export interface Sucursal {
-  id: number;
-  nombre: string;
-  clave: string;
+  id:     number
+  nombre: string
+  clave:  string
+}
+
+export interface Role {
+  id:          number
+  name:        RoleName
+  permisos:    PermissionString[]
 }
 
 /**
- * AuthState — El estado completo de autenticación.
- * Genérico implícito: null significa "no autenticado".
+ * AuthUser — La entidad central normalizada.
+ * Lo que usa TODO el frontend después del adapter.
+ * Nunca usa BackendUser directamente fuera del adapter.
+ */
+export interface AuthUser {
+  id:             number
+  email:          string
+  username:       string
+  activo:         boolean
+  persona:        Persona
+  roles:          Role[]
+  permisos:       PermissionString[]
+  sucursales:     Sucursal[]
+  sucursalActiva: Sucursal | null
+  sessionId:      number | null
+  contexto?: {
+    tipo:           string
+    businessActual: number | null
+    businessIds:    number[]
+  }
+}
+
+/**
+ * AuthState — Estado completo de autenticación en Zustand.
  */
 export interface AuthState {
-  user: AuthUser | null;
-  accessToken: string | null;
-  isAuthenticated: boolean;
-  isLoading: boolean;
+  user:            AuthUser | null
+  accessToken:     string | null
+  isAuthenticated: boolean
+  isLoading:       boolean
+}
+
+/* ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+   DTOs — Lo que enviamos al backend
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ */
+
+export interface LoginDto {
+  /**
+   * 'login' — acepta email o username según el backend.
+   * No llamamos al campo 'email' porque el backend
+   * explícitamente lo llama 'login'.
+   */
+  login:    string
+  password: string
+}
+
+export interface RegisterFisicaDto {
+  tipo_persona:             'FISICA'
+  nombre:                   string
+  apellido:                 string
+  identificacion_principal: string
+  email:                    string
+  username:                 string
+  password:                 string
+  password_confirmation:    string
+  terms_accepted:           boolean
+}
+
+export interface RegisterMoralDto {
+  tipo_persona:             'MORAL'
+  razon_social:             string
+  identificacion_principal: string
+  email:                    string
+  username:                 string
+  password:                 string
+  password_confirmation:    string
+  terms_accepted:           boolean
+}
+
+export type RegisterDto = RegisterFisicaDto | RegisterMoralDto
+
+export interface ChangePasswordDto {
+  current_password:      string
+  password:              string
+  password_confirmation: string
 }
