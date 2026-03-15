@@ -1,14 +1,7 @@
 // src/shared/constants/routes.constants.ts
-
-/**
- * APP_ROUTES — Objeto de rutas tipado.
- * 'as const' hace cada string un literal type,
- * así el autocompletado es exacto en todo el proyecto.
- */
 export const APP_ROUTES = {
   ROOT: "/",
   LOGIN: "/login",
-
   DASHBOARD: {
     ROOT: "/dashboard",
     HOME: "/dashboard/home",
@@ -26,6 +19,10 @@ export const APP_ROUTES = {
       NUEVO: "/dashboard/usuarios/nuevo",
     },
     ROLES: "/dashboard/roles",
+    PERMISOS: "/dashboard/permisos",
+    MATRIZ: "/dashboard/matriz-rol-permiso",
+    SESIONES: "/dashboard/sesiones",
+    ASIGNACIONES: "/dashboard/asignaciones",
     AUDITORIA: "/dashboard/auditoria",
   },
 } as const;
