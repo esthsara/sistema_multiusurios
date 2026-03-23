@@ -1,4 +1,5 @@
 // src/features/auth/adapters/auth.adapter.ts
+// Este archivo contiene funciones para adaptar los datos del backend a la forma que usamos en el frontend.
 import type {
   BackendUser,
   BackendPersona,

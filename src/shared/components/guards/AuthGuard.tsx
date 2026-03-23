@@ -5,9 +5,7 @@ import { APP_ROUTES } from "@/shared/constants/routes.constants";
 
 /**
  * AuthGuard — Protege rutas que requieren autenticación.
- *
- * useLocation: captura la ruta actual para redirigir
- * de vuelta después del login (UX profesional).
+ * useLocation: captura la ruta actual para redirigir al login y luego volver a la ruta original.
  */
 export const AuthGuard = () => {
   const { isAuthenticated, isLoading } = useAuth();
@@ -25,6 +23,7 @@ export const AuthGuard = () => {
                         border-t-transparent"
         />
       </div>
+      /*Cambiar spiner aqui*/
     );
   }
 

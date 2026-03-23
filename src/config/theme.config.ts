@@ -2,12 +2,7 @@
 import type { ThemeConfig } from "antd";
 
 /**
- * Tokens de Ant Design sincronizados con nuestros CSS tokens.
- *
- * ¿Por qué ThemeConfig y no un objeto genérico?
- * ThemeConfig es el tipo oficial de Ant Design que garantiza
- * que solo pasamos propiedades válidas al ConfigProvider.
- * Si Ant Design cambia una propiedad, TypeScript nos avisa.
+colores de los items de ant desing
  */
 
 const baseTokens: ThemeConfig["token"] = {
@@ -34,9 +29,9 @@ export const lightTheme: ThemeConfig = {
   },
   components: {
     Layout: {
-      siderBg: "#0f172a",
-      triggerBg: "#1e293b",
-      triggerColor: "#f8fafc",
+      siderBg: "#021024",
+      triggerBg: "#1e293b",/*boton para el sidebar */
+      triggerColor: "#f8fafc",/*icono del sidebar */
     },
     Menu: {
       darkItemBg: "#0f172a",

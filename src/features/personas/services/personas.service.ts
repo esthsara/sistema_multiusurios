@@ -24,6 +24,7 @@ interface CreatePersonaDto {
  * ¿Por qué un objeto en lugar de funciones sueltas?
  * Agrupa lógicamente todo lo de personas.
  * personasService.getAll() es más legible que getPersonas()
+ * 
  */
 export const personasService = {
   getAll: (params?: RequestParams) =>

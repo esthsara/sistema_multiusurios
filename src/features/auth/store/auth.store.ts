@@ -16,7 +16,6 @@ import type {
   RoleName,
 } from "@/shared/types/auth.types";
 
-
 /* ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
    TIPOS DEL STORE
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ */
@@ -45,8 +44,6 @@ interface AuthActions {
   _setUser: (user: AuthUser | null, token: string | null) => void;
   _reset: () => void;
 }
-
-
 
 /**
  * AuthStore — Intersección de State + Actions.
@@ -78,16 +75,37 @@ export const useAuthStore = create<AuthStore>()(
 
       _setUser: (user, accessToken) =>
         set(
-          {
-            user,
-            accessToken,
-            isAuthenticated: !!user && !!accessToken,
+          () => {
+            /**
+             * Puente temporal para el interceptor de Axios,
+             * que actualmente lee el token desde sessionStorage.
+             */
+            if (accessToken) {
+              sessionStorage.setItem("access_token", accessToken);
+            } else {
+              sessionStorage.removeItem("access_token");
+            }
+
+            return {
+              user,
+              accessToken,
+              isAuthenticated: !!user && !!accessToken,
+            };
           },
           false,
           "auth/setUser",
         ),
 
-      _reset: () => set(initialState, false, "auth/reset"),
+      _reset: () =>
+        set(
+          () => {
+            sessionStorage.removeItem("access_token");
+            sessionStorage.removeItem("sucursal_activa_id");
+            return initialState;
+          },
+          false,
+          "auth/reset",
+        ),
 
       /* ── Login ── */
 
@@ -151,7 +169,6 @@ export const useAuthStore = create<AuthStore>()(
            * sin importar el estado del servidor.
            */
         } finally {
-          sessionStorage.removeItem("sucursal_activa_id");
           get()._reset();
           get()._setLoading(false);
         }
@@ -174,6 +191,17 @@ export const useAuthStore = create<AuthStore>()(
        * Si responde 401 → limpia estado → AuthGuard redirige a login
        */
       initializeAuth: async () => {
+        /**
+         * Si no hay token, no tiene sentido consultar /auth/me.
+         * Esto evita bucles de llamadas cuando el usuario no está autenticado.
+         */
+        const token =
+          get().accessToken ?? sessionStorage.getItem("access_token");
+        if (!token) {
+          get()._reset();
+          return;
+        }
+
         get()._setLoading(true);
         try {
           const meResponse = await authService.me();
@@ -184,7 +212,7 @@ export const useAuthStore = create<AuthStore>()(
            * En una implementación con httpOnly cookies, este paso
            * no sería necesario porque la cookie se envía automáticamente.
            */
-          const storedToken = sessionStorage.getItem("access_token");
+          const storedToken = token;
 
           if (storedToken) {
             const fullUser = adaptBackendUser(backendUser, null);

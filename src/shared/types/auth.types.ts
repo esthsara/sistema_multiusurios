@@ -5,7 +5,8 @@ export type EstadoPersona = "ACTIVO" | "INACTIVO" | "BLOQUEADO"
 export type RoleName = string
 
 /**
- *listamos permisos conocidos para tener autocompletado y evitar errores de typo y tambien los permitimos como string dinamico para que el sistema sea flexible y no dependa de una lista fija en el frontend.
+ *
+ * listamos permisos conocidos para tener autocompletado y evitar errores de typo y tambien los permitimos como string dinamico para que el sistema sea flexible y no dependa de una lista fija en el frontend.
  */
 type KnownPermission =
   | 'personas.ver'    | 'personas.crear'    | 'personas.editar'    | 'personas.eliminar'

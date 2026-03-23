@@ -1,5 +1,5 @@
 // src/app/providers/AppProviders.tsx
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { ConfigProvider } from "antd";
 import { ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
@@ -15,20 +15,38 @@ interface AppProvidersProps {
 export const AppProviders = ({ children }: AppProvidersProps) => {
   const { isDark } = useTheme();
   const initializeAuth = useAuthStore((state) => state.initializeAuth);
-  const isLoading = useAuthStore((state) => state.isLoading);
+  const [isBootstrappingAuth, setIsBootstrappingAuth] = useState(true);
 
   /**
-   * initializeAuth al montar la app.
+   * initializeAuth solo durante el arranque de la app.
+   * Importante: NO bloquear el árbol completo con auth.isLoading,
+   * porque ese flag también se usa en login/logout y desmontaría el router.
    */
   useEffect(() => {
-    initializeAuth();
+    let isMounted = true;
+
+    const bootstrapAuth = async () => {
+      try {
+        await initializeAuth();
+      } finally {
+        if (isMounted) {
+          setIsBootstrappingAuth(false);
+        }
+      }
+    };
+
+    bootstrapAuth();
+
+    return () => {
+      isMounted = false;
+    };
   }, [initializeAuth]);
 
   /**
    * Pantalla de carga inicial — evita flash de login
    * cuando el usuario ya tiene sesión activa.
    */
-  if (isLoading) {
+  if (isBootstrappingAuth) {
     return (
       <div
         className="flex items-center justify-center min-h-screen"
@@ -48,6 +66,7 @@ export const AppProviders = ({ children }: AppProvidersProps) => {
           </p>
         </div>
       </div>
+      /*Cambiar spiner */
     );
   }
 

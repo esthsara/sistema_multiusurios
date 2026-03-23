@@ -21,7 +21,7 @@ const ERROR_MESSAGES: Record<number, string> = {
 };
 
 /**
- * parseApiError — Convierte un AxiosError en un ApiError normalizado.
+ * Aqui me mostraran el error que me devuelve el backend, lo parseo y lo normalizo a un formato común (ApiError)
  *
  * AxiosError<ApiError>: Generic que le dice a TypeScript
  * cómo luce el body del error que devuelve nuestro backend.
@@ -80,3 +80,4 @@ export const handleHttpError = (error: unknown, silent = false): ApiError => {
 
   return parsed;
 };
+/*Revisar si tiene el erro SARA */

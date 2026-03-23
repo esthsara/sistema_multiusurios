@@ -118,7 +118,7 @@ export const http = {
   },
 
   /**
-   * UPLOAD — Para subir archivos (tabla 'archivo' polimórfica)
+   * Para subir archivos (tabla 'archivo' polimórfica)
    * Cambia Content-Type a multipart/form-data automáticamente
    */
   async upload<TResponse>(

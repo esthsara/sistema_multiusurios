@@ -10,7 +10,7 @@ import type {
 } from "@/shared/types/auth.types";
 import type { ApiResponse } from "@/shared/types/api.types";
 
-/* ── Tipos de respuesta crudos del backend ── */
+/* ── Tipos de respuesta crudos del backend  ── */
 
 interface LoginResponseData {
   user: BackendUser;

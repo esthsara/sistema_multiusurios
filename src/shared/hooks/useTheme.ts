@@ -2,21 +2,13 @@
 import { useState, useEffect, useCallback } from "react";
 
 /**
- * 'light' | 'dark' — Union Type.
- *
- * ¿Por qué no string?
- * Con string podrías escribir theme = 'azul' y TypeScript no te avisaría.
- * Con este Union Type solo existen dos valores válidos en todo el proyecto.
+ * 'light' | 'dark' controlamos 
+
  */
 type Theme = "light" | "dark";
 
 const THEME_KEY = "app-theme";
 
-/**
- * ¿Por qué useCallback en toggleTheme?
- * Evita que la función se recree en cada render.
- * Importante cuando se pasa como prop a componentes hijos.
- */
 export const useTheme = () => {
   const [theme, setTheme] = useState<Theme>(() => {
     // Inicialización lazy — solo corre una vez
@@ -58,9 +50,4 @@ export const useTheme = () => {
     setLightTheme,
     setDarkTheme,
   } as const;
-  /**
-   * 'as const' — hace el objeto readonly.
-   * ¿Por qué? Garantiza que quien consuma este hook
-   * no pueda mutar las propiedades accidentalmente.
-   */
 };

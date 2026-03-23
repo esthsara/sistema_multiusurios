@@ -8,7 +8,7 @@ import type { Sucursal } from "@/shared/types/auth.types";
 interface BranchSelectorProps {
   collapsed?: boolean;
 }
-
+/*esta seccion es para cambair de sucursal segun lo que me legue */
 export const BranchSelector = ({ collapsed }: BranchSelectorProps) => {
   const { sucursales, sucursalActiva } = useAuth();
   const setSucursalActiva = useAuthStore((s) => s.setSucursalActiva);

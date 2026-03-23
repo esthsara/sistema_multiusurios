@@ -5,6 +5,7 @@ import type { MenuProps } from "antd";
 import { useAuth } from "@/shared/hooks/useAuth";
 import { useAuthActions } from "@/features/auth/hooks/useAuthActions";
 
+/* Componente para el menú del usuario en la barra de navegación  este junta las iniciales y lo covierte en uno solo*/
 interface UserMenuProps {
   collapsed?: boolean;
 }

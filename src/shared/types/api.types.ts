@@ -39,6 +39,7 @@ export interface PaginatedResponse<T> {
 }
 
 /**
+ * 
  * ApiError — Estructura de error estándar de Laravel.
  * Laravel devuelve errores de validación en 'errors'
  * como { campo: ['mensaje'] }

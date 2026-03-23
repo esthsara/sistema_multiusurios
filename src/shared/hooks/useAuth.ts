@@ -5,7 +5,7 @@ import { useShallow } from "zustand/react/shallow";
 const EMPTY_SUCURSALES = [] as const;
 
 /**
-
+Para saber quien esta conectado, sus permisos, etc. Es un selector del store de auth, no hace nada más.
  */
 export const useAuth = () => {
   

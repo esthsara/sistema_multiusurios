@@ -17,10 +17,7 @@ import { APP_ROUTES } from "@/shared/constants/routes.constants";
 
 /**
  * NavItem — Un ítem del menú de navegación.
- *
- * ¿Por qué 'permissions' es un array?
- * Porque un ítem puede requerir CUALQUIERA de varios permisos (OR lógico).
- * Si permissions está vacío → visible para todos los autenticados.
+ * Aqui tenemos loq ue se muestra el sidebar y debemos controlar mediante permisos quien lo vera :,)
  */
 export interface NavItem {
   key: string;
@@ -32,9 +29,7 @@ export interface NavItem {
 }
 
 /**
- * NAV_CONFIG — La única fuente de verdad del menú.
- * El Sidebar la consume, filtra y renderiza.
- * Para agregar un módulo: agrega un objeto aquí.
+ * Para agregar un módulo agregar un objeto aquí.
  */
 export const NAV_CONFIG: NavItem[] = [
   {
@@ -48,21 +43,21 @@ export const NAV_CONFIG: NavItem[] = [
     key: "gestion-personas",
     label: "Gestión de Personas",
     icon: Users,
-    permissions: ["personas.ver", "usuarios.ver"],
+    permissions: [],
     children: [
       {
         key: "personas",
         label: "Personas",
         icon: UserCircle,
         path: APP_ROUTES.DASHBOARD.PERSONAS.ROOT,
-        permissions: ["personas.ver"],
+        permissions: [],
       },
       {
         key: "usuarios",
         label: "Usuarios",
         icon: Users,
         path: APP_ROUTES.DASHBOARD.USUARIOS.ROOT,
-        permissions: ["usuarios.ver"],
+        permissions: [],
       },
     ],
   },
@@ -70,21 +65,21 @@ export const NAV_CONFIG: NavItem[] = [
     key: "gestion-organizacional",
     label: "Gestión Organizacional",
     icon: Building2,
-    permissions: ["sucursales.ver"],
+    permissions: [],
     children: [
       {
         key: "sucursales",
         label: "Sucursales",
         icon: Building2,
         path: APP_ROUTES.DASHBOARD.SUCURSALES.ROOT,
-        permissions: ["sucursales.ver"],
+        permissions: [],
       },
       {
         key: "asignaciones",
         label: "Asignaciones Usuario-Sucursal",
         icon: GitMerge,
         path: APP_ROUTES.DASHBOARD.ASIGNACIONES,
-        permissions: ["sucursales.ver", "usuarios.ver"],
+        permissions: [/*"sucursales.ver", "usuarios.ver" aqui debo poner los permisos*/],
       },
     ],
   },
@@ -92,35 +87,35 @@ export const NAV_CONFIG: NavItem[] = [
     key: "seguridad",
     label: "Seguridad y Accesos",
     icon: ShieldCheck,
-    permissions: ["roles.ver"],
+    permissions: [],
     children: [
       {
         key: "roles",
         label: "Roles",
         icon: ShieldCheck,
         path: APP_ROUTES.DASHBOARD.ROLES,
-        permissions: ["roles.ver"],
+        permissions: [],
       },
       {
         key: "permisos",
         label: "Permisos",
         icon: KeyRound,
         path: APP_ROUTES.DASHBOARD.PERMISOS,
-        permissions: ["roles.ver"],
+        permissions: [],
       },
       {
         key: "matriz",
         label: "Matriz Rol-Permiso",
         icon: LayoutGrid,
         path: APP_ROUTES.DASHBOARD.MATRIZ,
-        permissions: ["roles.ver"],
+        permissions: [],
       },
       {
         key: "sesiones",
         label: "Sesiones",
         icon: MonitorCheck,
         path: APP_ROUTES.DASHBOARD.SESIONES,
-        permissions: ["usuarios.ver"],
+        permissions: [],
       },
     ],
   },
@@ -129,6 +124,6 @@ export const NAV_CONFIG: NavItem[] = [
     label: "Auditoría",
     icon: ClipboardList,
     path: APP_ROUTES.DASHBOARD.AUDITORIA,
-    permissions: ["auditoria.ver"],
+    permissions: [],
   },
 ];

@@ -10,22 +10,16 @@ import { APP_ROUTES } from "@/shared/constants/routes.constants";
 
 /**
  * Creamos una instancia nombrada en lugar de usar axios directamente.
- *
- * ¿Por qué? Si mañana cambiamos de Axios a Fetch o a otro cliente,
- * solo cambiamos este archivo. Los servicios no se tocan.
  * Esto es el principio Open/Closed de SOLID.
  */
+/*Todas las peticiones al backend pasan por aquí*/
 const apiClient: AxiosInstance = axios.create({
   baseURL: import.meta.env.VITE_API_URL,
   timeout: Number(import.meta.env.VITE_API_TIMEOUT) || 15000,
   headers: {
     "Content-Type": "application/json",
     Accept: "application/json",
-    /**
-     * X-Sucursal-ID → Header personalizado.
-     * El backend necesita saber con qué sucursal opera la petición.
-     * Se actualiza dinámicamente en el interceptor de request.
-     */
+    /*Le digo al backend desde qué sucursal estoy trabajando */
     "X-Sucursal-ID": "",
   },
 });
@@ -39,7 +33,7 @@ apiClient.interceptors.request.use(
      * Token JWT — Lo leeremos del store de Zustand en Paso 7.
      * Por ahora lo leemos de sessionStorage como puente temporal.
      *
-     * ⚠️  NOTA TÉCNICA:
+     * NOTA TÉCNICA:
      * En Paso 6 usaremos httpOnly cookies para el refresh token.
      * El accessToken vivirá en memoria (Zustand), NO en localStorage.
      * sessionStorage es solo temporal para este paso.
