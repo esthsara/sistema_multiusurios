@@ -11,134 +11,120 @@ const LoginPage = () => {
   const onFinish = (values: LoginDto) => login(values);
 
   return (
-    <div className="w-full min-h-screen flex">
-      {/* IZQUIERDA - IMAGEN */}
-      <div className="w-1/2 hidden md:flex items-center justify-center var(--color-bg-base-white)">
-        <img
-          src="../public/image/font-login.png"
-          alt="medical"
-          className="object-cover w-full h-full"
-        />
-      </div>
+    <div
+      className="w-full min-h-screen flex items-center justify-center bg-cover bg-center"
+      style={{
+        backgroundImage: "url('/image/font-login.png')",
+      }}
+    >
+      {/* OVERLAY oscuro para mejor contraste */}
+      <div className="absolute inset-0 bg-black/50 backdrop-blur-sm"></div>
 
-      {/* DERECHA - LOGIN */}
-      <div className="w-full md:w-1/2 flex items-center justify-center px-6">
-        <div className="w-full max-w-md">
-          <Card
-            className="shadow-lg"
-            style={{
-              backgroundColor: "var(--color-bg-base)",
-              border: "1px solid var(--color-border)",
-              borderRadius: "var(--radius-card)",
-            }}
+      {/* CARD */}
+      <div className="relative w-full max-w-sm px-4">
+        <Card
+          variant="outlined"
+          className="shadow-2xl"
+          style={{
+            backgroundColor: "rgba(10, 20, 40, 0.6)",
+            border: "1px solid var(--color-border)",
+            borderRadius: "var(--radius-card)",
+            backdropFilter: "blur(10px)",
+          }}
+        >
+          {/* Header */}
+          {/* Sara no te olvides con el modo claro */}
+          <div className="text-center mb-6">
+            <h1
+              className="text-xl font-bold m-0"
+              style={{ color: "var(--color-text-primary)" }}
+            >
+              Bienvenido
+            </h1>
+
+            <p
+              className="mt-1 text-sm"
+              style={{ color: "var(--color-text-secondary)" }}
+            >
+              Inicia sesión para continuar
+            </p>
+          </div>
+
+          <Divider
+            style={{ borderColor: "var(--color-border)", margin: "0 0 20px" }}
+          />
+
+          {/* FORM */}
+          <Form
+            form={form}
+            layout="vertical"
+            onFinish={onFinish}
+            requiredMark={false}
+            autoComplete="off"
           >
-            {/* Header */}
-            <div className="text-center mb-8">
-              <div
-                className="inline-flex items-center justify-center
-                w-14 h-14 rounded-2xl mb-4"
-                style={{ backgroundColor: "var(--color-primary-600)" }}
-              >
-                <img
-                  src="../public/image/font-login.png"
-                  alt="medical"
-                  className="object-cover w-full h-full"
-                />
-                {/*icono de la empres */}
-              </div>
+            <Form.Item
+              name="login"
+              label="Email o Usuario"
+              rules={[
+                {
+                  required: true,
+                  message: "Ingresa tu email o usuario",
+                },
+              ]}
+            >
+              <Input
+                prefix={
+                  <User
+                    size={16}
+                    style={{ color: "var(--color-text-disabled)" }}
+                  />
+                }
+                placeholder="email o usuario"
+                size="large"
+              />
+            </Form.Item>
 
-              <h1
-                className="text-2xl font-bold m-0"
-                style={{ color: "var(--color-text-primary)" }}
-              >
-                Bienvenido de nuevo
-              </h1>
+            <Form.Item
+              name="password"
+              label="Contraseña"
+              rules={[{ required: true, message: "Ingresa tu contraseña" }]}
+            >
+              <Input.Password
+                prefix={
+                  <Lock
+                    size={16}
+                    style={{ color: "var(--color-text-disabled)" }}
+                  />
+                }
+                placeholder="••••••••"
+                size="large"
+              />
+            </Form.Item>
 
-              <p
-                className="mt-1 text-sm"
-                style={{ color: "var(--color-text-secondary)" }}
+            <div className="text-right mb-3">
+              <a
+                href="/recuperar-password"
+                className="text-xs hover:underline"
+                style={{ color: "var(--color-primary-600)" }}
               >
-                Ingresa tus credenciales para continuar
-              </p>
+                ¿Olvidaste tu contraseña?
+              </a>
             </div>
 
-            <Divider
-              style={{ borderColor: "var(--color-border)", margin: "0 0 24px" }}
-            />
-
-            {/* FORMULARIO */}
-            <Form
-              form={form}
-              layout="vertical"
-              onFinish={onFinish}
-              requiredMark={false}
-              autoComplete="off"
-            >
-              <Form.Item
-                name="login"
-                label="Email o Usuario"
-                rules={[
-                  {
-                    required: true,
-                    message: "Ingresa tu email o nombre de usuario",
-                  },
-                ]}
+            <Form.Item className="mb-0">
+              <Button
+                type="primary"
+                htmlType="submit"
+                size="large"
+                loading={isLoading}
+                block
+                style={{ height: 44, fontWeight: 600 }}
               >
-                <Input
-                  prefix={
-                    <User
-                      size={16}
-                      style={{ color: "var(--color-text-disabled)" }}
-                    />
-                  }
-                  placeholder="email@ejemplo.com o usuario"
-                  size="large"
-                />
-              </Form.Item>
-
-              <Form.Item
-                name="password"
-                label="Contraseña"
-                rules={[{ required: true, message: "Ingresa tu contraseña" }]}
-              >
-                <Input.Password
-                  prefix={
-                    <Lock
-                      size={16}
-                      style={{ color: "var(--color-text-disabled)" }}
-                    />
-                  }
-                  placeholder="••••••••"
-                  size="large"
-                />
-              </Form.Item>
-
-              {/* RECUPERAR CONTRASEÑA */}
-              <div className="text-right mb-4">
-                <a
-                  href="/recuperar-password"
-                  className="text-sm hover:underline"
-                  style={{ color: "var(--color-primary-600)" }}
-                >
-                  ¿Olvidaste tu contraseña?
-                </a>
-              </div>
-
-              <Form.Item className="mb-0">
-                <Button
-                  type="primary"
-                  htmlType="submit"
-                  size="large"
-                  loading={isLoading}
-                  block
-                  style={{ height: 48, fontWeight: 600 }}
-                >
-                  {isLoading ? "Iniciando sesión..." : "Iniciar Sesión"}
-                </Button>
-              </Form.Item>
-            </Form>
-          </Card>
-        </div>
+                {isLoading ? "Iniciando..." : "Iniciar Sesión"}
+              </Button>
+            </Form.Item>
+          </Form>
+        </Card>
       </div>
     </div>
   );
