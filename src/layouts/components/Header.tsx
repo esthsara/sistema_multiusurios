@@ -5,6 +5,7 @@ import {
   Sun,
   Moon,
   Bell,
+  Settings,
   PanelLeftClose,
   PanelLeftOpen,
 } from "lucide-react";
@@ -26,7 +27,7 @@ export const Header = ({ collapsed, onToggle, onMobileOpen }: HeaderProps) => {
     <AntHeader
       className="flex items-center justify-between px-4 gap-4"
       style={{
-        backgroundColor: "var(--color-bg-base)",
+        backgroundColor: "var(--color-bg-base-2)",
         borderBottom: "1px solid var(--color-border)",
         height: 64,
         position: "sticky",
@@ -83,6 +84,20 @@ export const Header = ({ collapsed, onToggle, onMobileOpen }: HeaderProps) => {
                        hover:bg-[var(--color-bg-overlay)]"
           >
             <Bell size={18} style={{ color: "var(--color-text-secondary)" }} />
+          </button>
+        </Tooltip>
+
+        {/* Configuración */}
+        <Tooltip title="Configuración">
+          <button
+            className="flex items-center justify-center w-8 h-8
+                       rounded-lg transition-colors
+                       hover:bg-[var(--color-bg-overlay)]"
+          >
+            <Settings
+              size={18}
+              className="text-[var(--color-text-secondary)]"
+            />
           </button>
         </Tooltip>
 

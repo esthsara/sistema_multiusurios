@@ -1,4 +1,5 @@
 // src/layouts/AuthLayout.tsx
+/*Es un placeholder donde se renderizan las rutas hijas.*/
 import { Outlet } from "react-router-dom";
 
 const AuthLayout = () => (

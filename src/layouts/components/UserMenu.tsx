@@ -82,13 +82,13 @@ export const UserMenu = ({ collapsed }: UserMenuProps) => {
           <div className="flex-1 min-w-0">
             <p
               className="text-xs font-semibold m-0 truncate"
-              style={{ color: "#ffffff" }}
+              style={{ color: "var(--color-text-inverse)" }}
             >
               {user?.persona.nombreCompleto}
             </p>
             <p
               className="text-xs m-0 truncate"
-              style={{ color: "rgba(255,255,255,0.5)" }}
+              style={{ color: "var(--color-primary-200)" }}
             >
               {user?.roles[0]?.name ?? "Sin rol"}
             </p>

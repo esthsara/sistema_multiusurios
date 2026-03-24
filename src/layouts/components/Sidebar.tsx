@@ -1,5 +1,5 @@
 // src/layouts/components/Sidebar.tsx
-import { useMemo } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
 import { Menu, Layout } from "antd";
 import type { MenuProps } from "antd";
@@ -10,8 +10,13 @@ import {
   type NavItem,
 } from "@/shared/constants/navigation.constants";
 import type { PermissionString } from "@/shared/types/auth.types";
+import "./Sidebar.css";
 
 const { Sider } = Layout;
+
+/* ═══════════════════════════════════════════════════════════════
+   TYPES & INTERFACES
+═══════════════════════════════════════════════════════════════ */
 
 interface SidebarProps {
   collapsed: boolean;
@@ -20,14 +25,14 @@ interface SidebarProps {
   onMobileClose: () => void;
 }
 
-/* ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-   RBAC FILTER
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ */
+/* ═══════════════════════════════════════════════════════════════
+   RBAC & PERMISSION LOGIC
+═══════════════════════════════════════════════════════════════ */
 
 /**
- * userCanSee — Verifica si el usuario puede ver un ítem.
- * Sin permisos requeridos → visible para todos.
- * Con permisos → necesita AL MENOS uno (OR lógico).
+ * userCanSee — Verifica si el usuario puede ver un ítem
+ * • Sin permisos requeridos → visible para todos
+ * • Con permisos → necesita AL MENOS uno (OR lógico)
  */
 const userCanSee = (
   item: NavItem,
@@ -38,8 +43,9 @@ const userCanSee = (
 };
 
 /**
- * filterNavItems — Filtra recursivamente el árbol de navegación.
- * Un grupo (parent) sin hijos visibles también se oculta.
+ * filterNavItems — Filtra recursivamente el árbol de navegación
+ * • Oculta items sin permisos
+ * • Oculta grupos (parent) sin hijos visibles
  */
 const filterNavItems = (
   items: NavItem[],
@@ -59,13 +65,14 @@ const filterNavItems = (
   }, []);
 };
 
-/* ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-   MENU ITEMS BUILDER
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ */
+/* ═══════════════════════════════════════════════════════════════
+   MENU BUILDING & ACTIVE STATE LOGIC
+═══════════════════════════════════════════════════════════════ */
 
 /**
- * buildMenuItems — Convierte NavItem[] al formato de Ant Design Menu.
- * Separamos la lógica de datos de la lógica de renderizado.
+ * buildMenuItems — Convierte NavItem[] al formato de Ant Design Menu
+ * • Renderiza grupos (submenus) y items individuales
+ * • Maneja iconografía de cada ítem
  */
 const buildMenuItems = (items: NavItem[]): MenuProps["items"] => {
   return items.map((item) => {
@@ -88,9 +95,295 @@ const buildMenuItems = (items: NavItem[]): MenuProps["items"] => {
   });
 };
 
-/* ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-   COMPONENTE
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ */
+/**
+ * findActiveLeafKey — Encuentra el ítem más específico que coincide con la ruta actual
+ * • Busca el path más largo (más específico)
+ * • Retorna el key del ítem activo
+ */
+const findActiveLeafKey = (
+  items: NavItem[],
+  pathname: string,
+): string | null => {
+  let bestMatchKey: string | null = null;
+  let bestMatchLength = -1;
+
+  const walk = (nodes: NavItem[]) => {
+    nodes.forEach((node) => {
+      if (node.path && pathname.startsWith(node.path)) {
+        if (node.path.length > bestMatchLength) {
+          bestMatchKey = node.path;
+          bestMatchLength = node.path.length;
+        }
+      }
+
+      if (node.children) {
+        walk(node.children);
+      }
+    });
+  };
+
+  walk(items);
+  return bestMatchKey;
+};
+
+/**
+ * findParentSubmenuKey — Encuentra el grupo parent que debe estar expandido
+ * • Navega el árbol hasta encontrar el padre del ítem actual
+ * • Retorna null si es un ítem root
+ */
+const findParentSubmenuKey = (
+  items: NavItem[],
+  pathname: string,
+  currentParent?: string,
+): string | null => {
+  for (const item of items) {
+    const nextParent = item.children ? item.key : currentParent;
+
+    if (item.path && pathname.startsWith(item.path)) {
+      return currentParent ?? null;
+    }
+
+    if (item.children) {
+      const childMatch = findParentSubmenuKey(
+        item.children,
+        pathname,
+        nextParent,
+      );
+      if (childMatch) return childMatch;
+    }
+  }
+  return null;
+};
+
+/**
+ * getRootSubmenuKeys — Retorna todas las keys de los submenus root
+ * • Usado para controlar qué submenus pueden estar abiertos
+ * • Asegura que solo un grupo pueda estar expandido a la vez
+ */
+const getRootSubmenuKeys = (items: NavItem[]): string[] => {
+  return items.filter((item) => item.children?.length).map((item) => item.key);
+};
+
+/* ═══════════════════════════════════════════════════════════════
+   COMPONENT: Logo Mark
+═══════════════════════════════════════════════════════════════ */
+
+const LogoMark = () => (
+  <div className="saas-sidebar-logo-mark" aria-label="Logo">
+    <span className="text-white font-bold text-sm">P</span>
+  </div>
+);
+
+/* ═══════════════════════════════════════════════════════════════
+   COMPONENT: Sidebar Header
+═══════════════════════════════════════════════════════════════ */
+
+interface SidebarHeaderProps {
+  isCollapsed: boolean;
+}
+
+const SidebarHeader = ({ isCollapsed }: SidebarHeaderProps) => (
+  <div className="saas-sidebar-header">
+    {isCollapsed ? (
+      <LogoMark />
+    ) : (
+      <div className="saas-sidebar-brand">
+        <LogoMark />
+        <div className="min-w-0">
+          <span className="saas-sidebar-brand-title">Panel Admin</span>
+          <p className="saas-sidebar-brand-subtitle">Control Center</p>
+        </div>
+      </div>
+    )}
+  </div>
+);
+
+/* ═══════════════════════════════════════════════════════════════
+   COMPONENT: Sidebar Curve Decoration
+═══════════════════════════════════════════════════════════════ */
+
+const SidebarCurve = () => (
+  <div className="saas-sidebar-curve" aria-hidden>
+    <svg viewBox="0 0 574 566" preserveAspectRatio="none">
+      <path
+        d="M9.69214e-05 0.000290273H573.035V565.393C569.9 504.502 543.35 343.134 362.267 179.764C204.661 37.5738 69.3529 5.8904 9.69214e-05 0.000290273Z"
+        fill="currentColor"
+        stroke="currentColor"
+      />
+    </svg>
+  </div>
+);
+
+/* ═══════════════════════════════════════════════════════════════
+   COMPONENT: Sidebar Menu Wrapper
+═══════════════════════════════════════════════════════════════ */
+
+interface SidebarMenuWrapperProps {
+  items: MenuProps["items"];
+  selectedKeys: string[];
+  openKeys: string[];
+  isCollapsed: boolean;
+  onOpenChange: MenuProps["onOpenChange"];
+  onMenuClick: MenuProps["onClick"];
+}
+
+const SidebarMenuWrapper = ({
+  items,
+  selectedKeys,
+  openKeys,
+  isCollapsed,
+  onOpenChange,
+  onMenuClick,
+}: SidebarMenuWrapperProps) => (
+  <div className="saas-sidebar-menu-wrap">
+    <Menu
+      mode="inline"
+      theme="dark"
+      items={items}
+      selectedKeys={selectedKeys}
+      openKeys={openKeys}
+      onOpenChange={onOpenChange}
+      inlineCollapsed={isCollapsed}
+      onClick={onMenuClick}
+      inlineIndent={18}
+      className="saas-sidebar-menu"
+    />
+  </div>
+);
+
+/* ═══════════════════════════════════════════════════════════════
+   COMPONENT: Sidebar Footer with User Menu
+═══════════════════════════════════════════════════════════════ */
+
+interface SidebarFooterProps {
+  isCollapsed: boolean;
+}
+
+const SidebarFooterUser = ({ isCollapsed }: SidebarFooterProps) => (
+  <div className="saas-sidebar-footer">
+    <UserMenu collapsed={isCollapsed} />
+  </div>
+);
+
+/* ═══════════════════════════════════════════════════════════════
+   COMPONENT: Sidebar Content (Composición principal)
+═══════════════════════════════════════════════════════════════ */
+
+interface SidebarContentProps {
+  isCollapsed: boolean;
+  isMobile?: boolean;
+  items: MenuProps["items"];
+  selectedKeys: string[];
+  openKeys: string[];
+  onOpenChange: MenuProps["onOpenChange"];
+  onMenuClick: MenuProps["onClick"];
+}
+
+const SidebarContent = ({
+  isCollapsed,
+  isMobile = false,
+  items,
+  selectedKeys,
+  openKeys,
+  onOpenChange,
+  onMenuClick,
+}: SidebarContentProps) => (
+  <div
+    className={`saas-sidebar-shell ${isCollapsed ? "is-collapsed" : ""} ${
+      isMobile ? "is-mobile" : ""
+    }`}
+  >
+    {/* Ambient Background */}
+    <div className="saas-sidebar-ambient" aria-hidden />
+
+    {/* Header with Logo */}
+    <SidebarHeader isCollapsed={isCollapsed} />
+
+    {/* Decorative Curve */}
+    <SidebarCurve />
+
+    {/* Navigation Menu */}
+    <SidebarMenuWrapper
+      items={items}
+      selectedKeys={selectedKeys}
+      openKeys={openKeys}
+      isCollapsed={isCollapsed}
+      onOpenChange={onOpenChange}
+      onMenuClick={onMenuClick}
+    />
+
+    {/* User Menu Footer */}
+    <SidebarFooterUser isCollapsed={isCollapsed} />
+  </div>
+);
+
+/* ═══════════════════════════════════════════════════════════════
+   COMPONENT: Mobile Overlay
+═══════════════════════════════════════════════════════════════ */
+
+interface MobileOverlayProps {
+  isOpen: boolean;
+  onClose: () => void;
+}
+
+const MobileOverlay = ({ isOpen, onClose }: MobileOverlayProps) => {
+  if (!isOpen) return null;
+
+  return (
+    <div
+      className="saas-sidebar-mobile-overlay md:hidden"
+      onClick={onClose}
+      role="button"
+      aria-label="Close sidebar"
+      tabIndex={0}
+      onKeyDown={(e) => {
+        if (e.key === "Escape") onClose();
+      }}
+    />
+  );
+};
+
+/* ═══════════════════════════════════════════════════════════════
+   COMPONENT: Mobile Drawer Panel
+═══════════════════════════════════════════════════════════════ */
+
+interface MobileDrawerProps {
+  isOpen: boolean;
+  items: MenuProps["items"];
+  selectedKeys: string[];
+  openKeys: string[];
+  onOpenChange: MenuProps["onOpenChange"];
+  onMenuClick: MenuProps["onClick"];
+}
+
+const MobileDrawer = ({
+  isOpen,
+  items,
+  selectedKeys,
+  openKeys,
+  onOpenChange,
+  onMenuClick,
+}: MobileDrawerProps) => {
+  if (!isOpen) return null;
+
+  return (
+    <div className="saas-sidebar-mobile-panel md:hidden">
+      <SidebarContent
+        isCollapsed={false}
+        isMobile={true}
+        items={items}
+        selectedKeys={selectedKeys}
+        openKeys={openKeys}
+        onOpenChange={onOpenChange}
+        onMenuClick={onMenuClick}
+      />
+    </div>
+  );
+};
+
+/* ═══════════════════════════════════════════════════════════════
+   MAIN COMPONENT: Sidebar
+═══════════════════════════════════════════════════════════════ */
 
 export const Sidebar = ({
   collapsed,
@@ -101,29 +394,71 @@ export const Sidebar = ({
   const navigate = useNavigate();
   const location = useLocation();
   const { hasAnyPermission } = useAuth();
+  const [hoverExpanded, setHoverExpanded] = useState(false);
 
-  /**
-   * useMemo — el menú se recalcula solo si cambian
-   * los permisos del usuario. No en cada render.
-   */
-  const menuItems = useMemo(() => {
-    const filtered = filterNavItems(NAV_CONFIG, hasAnyPermission);
-    return buildMenuItems(filtered);
+  /* ──────────────────────────────────────────
+     STATE: Computed Values & Memoization
+  ────────────────────────────────────────── */
+
+  const filteredNav = useMemo(() => {
+    return filterNavItems(NAV_CONFIG, hasAnyPermission);
   }, [hasAnyPermission]);
 
-  /**
-   * selectedKeys — resalta el ítem activo según la ruta actual.
-   * openKeys se calcula para expandir el grupo correcto.
-   */
-  const selectedKeys = [location.pathname];
+  const menuItems = useMemo(() => buildMenuItems(filteredNav), [filteredNav]);
 
-  const defaultOpenKeys = useMemo(() => {
-    return NAV_CONFIG.filter((item) =>
-      item.children?.some((child) =>
-        location.pathname.startsWith(child.path ?? ""),
-      ),
-    ).map((item) => item.key);
-  }, [location.pathname]);
+  const rootSubmenuKeys = useMemo(
+    () => getRootSubmenuKeys(filteredNav),
+    [filteredNav],
+  );
+
+  const selectedKeys = useMemo(() => {
+    const active = findActiveLeafKey(filteredNav, location.pathname);
+    return active ? [active] : [location.pathname];
+  }, [filteredNav, location.pathname]);
+
+  const desktopIsCollapsed = collapsed && !hoverExpanded;
+
+  const [openKeys, setOpenKeys] = useState<string[]>([]);
+
+  /* ──────────────────────────────────────────
+     EFFECTS: Side Effects & State Sync
+  ────────────────────────────────────────── */
+
+  useEffect(() => {
+    if (collapsed) setHoverExpanded(false);
+  }, [collapsed]);
+
+  useEffect(() => {
+    const shouldCollapseMenus = desktopIsCollapsed && !mobileOpen;
+
+    if (shouldCollapseMenus) {
+      setOpenKeys([]);
+      return;
+    }
+
+    const currentParent = findParentSubmenuKey(filteredNav, location.pathname);
+    setOpenKeys(currentParent ? [currentParent] : []);
+  }, [desktopIsCollapsed, mobileOpen, filteredNav, location.pathname]);
+
+  /* ──────────────────────────────────────────
+     HANDLERS: Event Callbacks
+  ────────────────────────────────────────── */
+
+  const handleOpenChange: MenuProps["onOpenChange"] = (keys) => {
+    const latestOpenKey = keys.find((key) => !openKeys.includes(key));
+
+    if (!latestOpenKey) {
+      setOpenKeys([]);
+      return;
+    }
+
+    if (rootSubmenuKeys.includes(latestOpenKey)) {
+      setOpenKeys([latestOpenKey]);
+      return;
+    }
+
+    setOpenKeys(keys.slice(-1));
+  };
 
   const handleMenuClick: MenuProps["onClick"] = ({ key }) => {
     if (key.startsWith("/")) {
@@ -132,109 +467,65 @@ export const Sidebar = ({
     }
   };
 
-  const siderContent = (
-    <div className="flex flex-col h-full">
-      {/* Logo */}
-      <div
-        className="flex items-center justify-center h-16 flex-shrink-0"
-        style={{ borderBottom: "1px solid rgba(255,255,255,0.08)" }}
-      >
-        {collapsed ? (
-          <div
-            className="w-8 h-8 rounded-lg flex items-center justify-center"
-            style={{ backgroundColor: "var(--color-primary-600)" }}
-          >
-            <span className="text-white font-bold text-sm">P</span>
-          </div>
-        ) : (
-          <div className="flex items-center gap-2 px-4">
-            <div
-              className="w-8 h-8 rounded-lg flex items-center justify-center flex-shrink-0"
-              style={{ backgroundColor: "var(--color-primary-600)" }}
-            >
-              <span className="text-white font-bold text-sm">P</span>
-            </div>
-            <span className="text-white font-semibold text-base truncate">
-              Panel Admin
-            </span>
-          </div>
-        )}
-      </div>
+  const handleMouseEnter = () => {
+    if (collapsed) setHoverExpanded(true);
+  };
 
-      {/* Menú — ocupa el espacio disponible */}
-      <div
-        className="flex-1 overflow-y-auto overflow-x-hidden py-2"
-        style={{ scrollbarWidth: "thin" }}
-      >
-        <Menu
-          mode="inline"
-          theme="dark"
-          items={menuItems}
-          selectedKeys={selectedKeys}
-          defaultOpenKeys={defaultOpenKeys}
-          inlineCollapsed={collapsed}
-          onClick={handleMenuClick}
-          style={{
-            backgroundColor: "transparent",
-            border: "none",
-            fontSize: "0.875rem",
-          }}
-        />
-      </div>
+  const handleMouseLeave = () => {
+    setHoverExpanded(false);
+  };
 
-      {/* User Menu — anclado al fondo */}
-      <div
-        className="flex-shrink-0 p-3"
-        style={{ borderTop: "1px solid rgba(255,255,255,0.08)" }}
-      >
-        <UserMenu collapsed={collapsed} />
-      </div>
-    </div>
-  );
+  /* ──────────────────────────────────────────
+     RENDER: Component Output
+  ────────────────────────────────────────── */
 
   return (
     <>
-      {/* ── Desktop Sidebar ── */}
+      {/* ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+          DESKTOP SIDEBAR (hidden on mobile)
+      ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ */}
       <Sider
         collapsible
-        collapsed={collapsed}
+        collapsed={desktopIsCollapsed}
         onCollapse={onCollapse}
-        width={240}
-        collapsedWidth={64}
-        className="hidden md:flex flex-col"
+        width={260}
+        collapsedWidth={76}
+        className="saas-sidebar hidden md:flex flex-col"
+        onMouseEnter={handleMouseEnter}
+        onMouseLeave={handleMouseLeave}
         style={{
-          backgroundColor: "var(--color-bg-sidebar)",
+          backgroundColor: "transparent",
           height: "100vh",
           position: "sticky",
           top: 0,
-          overflow: "hidden",
+          overflow: "visible",
           flexShrink: 0,
         }}
         trigger={null}
       >
-        {siderContent}
+        <SidebarContent
+          isCollapsed={desktopIsCollapsed}
+          isMobile={false}
+          items={menuItems}
+          selectedKeys={selectedKeys}
+          openKeys={openKeys}
+          onOpenChange={handleOpenChange}
+          onMenuClick={handleMenuClick}
+        />
       </Sider>
 
-      {/* ── Mobile Drawer ── */}
-      {mobileOpen && (
-        <>
-          {/* Overlay */}
-          <div
-            className="fixed inset-0 z-40 bg-black/50 md:hidden"
-            onClick={onMobileClose}
-          />
-          {/* Panel */}
-          <div
-            className="fixed left-0 top-0 h-full z-50 md:hidden"
-            style={{
-              width: 240,
-              backgroundColor: "var(--color-bg-sidebar)",
-            }}
-          >
-            {siderContent}
-          </div>
-        </>
-      )}
+      {/* ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+          MOBILE DRAWER (visible on mobile)
+      ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ */}
+      <MobileOverlay isOpen={mobileOpen} onClose={onMobileClose} />
+      <MobileDrawer
+        isOpen={mobileOpen}
+        items={menuItems}
+        selectedKeys={selectedKeys}
+        openKeys={openKeys}
+        onOpenChange={handleOpenChange}
+        onMenuClick={handleMenuClick}
+      />
     </>
   );
 };
