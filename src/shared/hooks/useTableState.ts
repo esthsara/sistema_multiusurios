@@ -56,17 +56,24 @@ export const useTableState = <F extends object = object>(
    * toParams — Convierte el estado en query params para la API.
    * Compatible con RequestParams del Paso 5.
    */
-  const toParams = useCallback(
-    () => ({
+  const toParams = useCallback(() => {
+    const rawParams = {
       page: state.page,
       per_page: state.pageSize,
       search: state.search || undefined,
       sort_by: state.sort?.field,
       sort_dir: state.sort?.direction,
       ...state.filters,
-    }),
-    [state],
-  );
+    } as Record<string, unknown>;
+
+    return Object.fromEntries(
+      Object.entries(rawParams).filter(([, value]) => {
+        if (value === undefined || value === null) return false;
+        if (typeof value === "string") return value.trim() !== "";
+        return true;
+      }),
+    );
+  }, [state]);
 
   return {
     state,

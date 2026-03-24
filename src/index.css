@@ -2,18 +2,13 @@
 
 @theme {
 
-  
   /* Tonos de azules */
-  --color-primary-50:  #eff6ff;
-  --color-primary-100: #dbeafe;
+  --color-primary-50: #7a91b1;  
   --color-primary-200: #bfdbfe;
-  --color-primary-300: #93c5fd;
-  --color-primary-400: #60a5fa;
-  --color-primary-500: #3b82f6;
+  --color-primary-400: #80b4f3;
   --color-primary-600: #2563eb;
-  --color-primary-700: #1d4ed8;
-  --color-primary-800: #1e40af;
-  --color-primary-900: #1e3a8a;
+  --color-primary-700: #1857df;
+
 
   /* Éxito */
   --color-success-500: #45e43f;
@@ -24,54 +19,38 @@
   --color-warning-600: #da8320;
 
   /* Peligro */
-  --color-danger-500:  #ef4444;
-  --color-danger-600:  #c22323;
-
-  /* Neutrales */
-  --color-neutral-50:  #f8fafc;
-  --color-neutral-100: #f1f5f9;
-  --color-neutral-200: #e2e8f0;
-  --color-neutral-300: #cbd5e1;
-  --color-neutral-400: #94a3b8;
-  --color-neutral-500: #64748b;
-  --color-neutral-600: #475569;
-  --color-neutral-700: #334155;
-  --color-neutral-800: #1e293b;
-  --color-neutral-900: #0f172a;
-
-
-  /* ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-     Light Mode (default)
-     Estos son los que usan los componentes.
-  ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ */
+  --color-danger-500: #ef4444;
+  --color-danger-600: #c22323;
 
   /* Superficies para cambiar  */
-  --color-bg-base:      #ffffff;
-  --color-bg-subtle:    #f8fafc;
-  --color-bg-overlay:   #f1f5f9;
-  --color-bg-sidebar:   #021024;
-  --color-bg-base-2:      #ffffff;
+  --color-bg-base-loader: #ffffff;
+  --color-bg-base: #ffffff;
+  --color-bg-base-2: #ffffff;
+  --color-bg-overlay: #f1f5f9;
+  --color-bg-sidebar: #021024;
+  --color-bg-filter: #f1f5f9;
 
   /* Bordes */
-  --color-border:       #e2e8f0;
+  --color-border: #e2e8f0;
   --color-border-focus: #3b82f6;
 
+
   /* Textos */
-  --color-text-primary:   #4d5e85;
+  --color-text-primary: #565c69;
   --color-text-secondary: #64748b;
-  --color-text-disabled:  #94a3b8;
-  --color-text-inverse:   #ffffff;
+  --color-text-disabled: #bfdbfe;
+  --color-text-inverse: #ffffff;
 
   /* Tipografía */
-  --font-sans:  'Inter', system-ui, -apple-system, sans-serif;
-  --font-mono:  'JetBrains Mono', 'Fira Code', monospace;
+  --font-sans: "Inter", system-ui, -apple-system, sans-serif;
+  --font-mono: "JetBrains Mono", "Fira Code", monospace;
 
   /* Radios */
-  --radius-sm:    0.25rem;
-  --radius-md:    0.5rem;
-  --radius-lg:    0.75rem;
-  --radius-xl:    1rem;
-  --radius-card:  0.75rem;
+  --radius-sm: 0.25rem;
+  --radius-md: 0.5rem;
+  --radius-lg: 0.75rem;
+  --radius-xl: 1rem;
+  --radius-card: 0.75rem;
 
   /* Sombras */
   --shadow-card: 0 1px 3px 0 rgb(0 0 0 / 0.1), 0 1px 2px -1px rgb(0 0 0 / 0.1);
@@ -82,29 +61,33 @@
 }
 
 .dark {
+  /* Primarios oscuros */
     
+  --color-primary-50: #f5faff;
+  --color-primary-200: #bfdbfe;
+  --color-primary-400: #a3b4c7;
+  --color-primary-600: #4767a3;
 
-  /*color dark superficies*/
-  --color-bg-base:      #0f172a;
-  --color-bg-base-white:      #e8ebf3;
-  --color-bg-base-2:      #1e293b;
+  /* Superficies oscuras */
+  --color-bg-base: #1e293b;
+  --color-bg-base-2: #1e2533;
+  --color-bg-overlay: #334155;
+  --color-bg-subtle: #293548;
+  --color-bg-filter: #293548;
 
-  --color-bg-subtle:    #1e293b;
-  --color-bg-overlay:   #334155;
-  --color-bg-sidebar:   #021024;
-
-  /* Bordes */
-  --color-border:       #334155;
+  /* Bordes y focus */
+  --color-border: #334155;
   --color-border-focus: #60a5fa;
 
-  /*textos*/
-  --color-text-primary:   #fcfcf8;
-  --color-text-secondary: #94a3b8;
-  --color-text-disabled:  #c5cad1;
-  --color-text-inverse:   #93b2fa;
+  /* Textos claros sobre fondo oscuro */
+  --color-text-primary: #f1f5f9;
+  --color-text-secondary: #cbd5e1;
+  --color-text-disabled: #64748b;
+  --color-text-inverse: #b6bed1;
+
 
   /* Sombras */
-  --shadow-card:  0 1px 3px 0 rgb(0 0 0 / 0.4);
+  --shadow-card: 0 1px 3px 0 rgb(0 0 0 / 0.4);
   --shadow-modal: 0 20px 25px -5px rgb(0 0 0 / 0.5);
 }
 
@@ -112,7 +95,9 @@
    ESTILOS BASE GLOBALES 
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ */
 
-*, *::before, *::after {
+*,
+*::before,
+*::after {
   box-sizing: border-box; /* Evita que el padding y border afecten al tamaño total de los elementos es decir que ocupe el 100% */
 }
 
@@ -123,17 +108,155 @@ html {
 /*el webkit-font-smoothing es una propiedad CSS que mejora la apariencia de las fuentes en navegadores basados en WebKit, como Chrome y Safari. Al habilitar esta propiedad, las fuentes se renderizan de manera más suave y clara, lo que mejora la legibilidad y la estética del texto en la página web.*/
 
 body {
-  background-color: var(--color-bg-base);
+  background-color: var(--color-bg-base-2);
   color: var(--color-text-primary);
-  transition: background-color var(--transition-base),
-              color var(--transition-base);
+  transition:
+    background-color var(--transition-base),
+    color var(--transition-base);
 }
 
 /* Scrollbar personalizado */
-::-webkit-scrollbar       { width: 6px; height: 6px; }
-::-webkit-scrollbar-track { background: var(--color-bg-subtle); }
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+::-webkit-scrollbar-track {
+  background: var(--color-bg-subtle);
+}
 ::-webkit-scrollbar-thumb {
   background: var(--color-border);
   border-radius: 999px;
 }
-::-webkit-scrollbar-thumb:hover { background: var(--color-text-disabled); }
+::-webkit-scrollbar-thumb:hover {
+  background: var(--color-text-disabled);
+}
+
+/* ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+   ANT DESIGN THEME HARMONIZATION
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ */
+
+/* Filtros */
+.persona-filters .ant-input-affix-wrapper,
+.persona-filters .ant-select-selector,
+.persona-filters .ant-btn {
+  border-radius: var(--radius-md) !important;
+  transition: all var(--transition-base) !important;
+}
+
+.persona-filters .ant-input-affix-wrapper,
+.persona-filters .ant-select .ant-select-selector {
+  background: var(--color-bg-base) !important;
+  border-color: var(--color-border) !important;
+  color: var(--color-text-primary) !important;
+}
+
+.persona-filters .ant-input,
+.persona-filters .ant-input::placeholder,
+.persona-filters .ant-select-selection-placeholder,
+.persona-filters .ant-select-selection-item {
+  color: var(--color-text-secondary) !important;
+}
+
+.persona-filters .ant-btn {
+  background: var(--color-bg-base) !important;
+  border-color: var(--color-border) !important;
+  color: var(--color-text-primary) !important;
+}
+
+.persona-filters .ant-btn:hover,
+.persona-filters .ant-input-affix-wrapper:hover,
+.persona-filters .ant-select:hover .ant-select-selector {
+  border-color: var(--color-primary-600) !important;
+}
+
+.persona-filters .ant-input-affix-wrapper-focused,
+.persona-filters .ant-select-focused .ant-select-selector {
+  border-color: var(--color-border-focus) !important;
+  box-shadow: 0 0 0 2px color-mix(in srgb, var(--color-border-focus) 15%, transparent) !important;
+}
+
+/* Select Dropdown */
+.ant-select-dropdown {
+  background: var(--color-bg-base-2) !important;
+  border: 1px solid var(--color-border) !important;
+}
+
+.ant-select-item {
+  color: var(--color-text-primary) !important;
+}
+
+.ant-select-item-option-selected {
+  background: color-mix(in srgb, var(--color-primary-600) 20%, transparent) !important;
+  color: var(--color-text-primary) !important;
+}
+
+.ant-select-item-option-active {
+  background: color-mix(in srgb, var(--color-primary-600) 12%, transparent) !important;
+}
+
+/* Tabla */
+.app-data-table .ant-table {
+  background: var(--color-bg-base) !important;
+  color: var(--color-text-primary) !important;
+}
+
+.app-data-table .ant-table-container {
+  border: 1px solid var(--color-border) !important;
+  border-radius: var(--radius-card) !important;
+}
+
+.app-data-table .ant-table-thead > tr > th {
+  background: var(--color-bg-overlay) !important;
+  color: var(--color-text-primary) !important;
+  border-bottom: 1px solid var(--color-border) !important;
+  font-weight: 600;
+}
+
+.app-data-table .ant-table-tbody > tr > td {
+  background: var(--color-bg-base) !important;
+  color: var(--color-text-primary) !important;
+  border-bottom: 1px solid var(--color-border) !important;
+}
+
+.app-data-table .ant-table-tbody > tr:hover > td {
+  background: color-mix(in srgb, var(--color-primary-600) 8%, var(--color-bg-base)) !important;
+}
+
+.app-data-table .ant-table-column-sorter,
+.app-data-table .ant-table-column-sorter-up,
+.app-data-table .ant-table-column-sorter-down {
+  color: var(--color-text-secondary) !important;
+}
+
+/* Paginación */
+.app-data-table .ant-pagination .ant-pagination-item,
+.app-data-table .ant-pagination .ant-pagination-prev .ant-pagination-item-link,
+.app-data-table .ant-pagination .ant-pagination-next .ant-pagination-item-link {
+  background: var(--color-bg-base) !important;
+  border-color: var(--color-border) !important;
+  color: var(--color-text-primary) !important;
+  border-radius: 4px !important;
+}
+
+.app-data-table .ant-pagination .ant-pagination-item a,
+.app-data-table .ant-pagination .ant-pagination-options,
+.app-data-table .ant-pagination .ant-select-selection-item,
+.app-data-table .ant-pagination .ant-select-arrow,
+.app-data-table .ant-pagination .ant-pagination-total-text {
+  color: var(--color-text-primary) !important;
+}
+
+.app-data-table .ant-pagination .ant-pagination-item-active {
+  border-color: var(--color-primary-600) !important;
+}
+
+.app-data-table .ant-pagination .ant-pagination-item-active a {
+  color: var(--color-primary-600) !important;
+}
+
+.app-data-table .ant-pagination-options-size-changer {
+  background: var(--color-bg-base) !important;
+  border-color: var(--color-border) !important;
+  color: var(--color-text-primary) !important;
+}
+

@@ -50,12 +50,12 @@ export const AppProviders = ({ children }: AppProvidersProps) => {
     return (
       <div
         className="flex items-center justify-center min-h-screen"
-        style={{ backgroundColor: "var(--color-bg-base)" }}
+        style={{ backgroundColor: "var(--color-bg-base-loader)" }}
       >
         <div className="flex flex-col items-center gap-4">
           <div
             className="animate-spin rounded-full h-10 w-10
-                          border-2 border-[var(--color-primary-600)]
+                          border-2 border-[var(--color-primary-700)]
                           border-t-transparent"
           />
           <p

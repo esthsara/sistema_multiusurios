@@ -28,7 +28,7 @@ export const Header = ({ collapsed, onToggle, onMobileOpen }: HeaderProps) => {
       className="flex items-center justify-between px-4 gap-4"
       style={{
         backgroundColor: "var(--color-bg-base-2)",
-        borderBottom: "1px solid var(--color-border)",
+        /*borderBottom: "1px solid var(--color-border)",*/
         height: 64,
         position: "sticky",
         top: 0,

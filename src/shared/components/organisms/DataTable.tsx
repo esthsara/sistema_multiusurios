@@ -4,15 +4,10 @@ import type { DataTableProps } from "@/shared/types/table.types";
 
 /**
  * DataTable<T> — Tabla genérica reutilizable.
- *
- * ¿Por qué un wrapper sobre Table de Ant Design?
- * 1. Estandariza la configuración (locale, scroll, etc.)
- * 2. Si Ant Design cambia su API, solo actualizamos aquí
- * 3. Agrega comportamientos comunes: click en fila, empty state
- *
  * T extends object — restricción para garantizar que T es un objeto
  * y que podemos usarlo como tipo de dato de la tabla.
  */
+
 export const DataTable = <T extends object>({
   data,
   columns,
@@ -23,9 +18,12 @@ export const DataTable = <T extends object>({
   scrollX = 800,
   onRowClick,
 }: DataTableProps<T>) => {
+  const safeData = Array.isArray(data) ? data : [];
+
   return (
     <Table<T>
-      dataSource={data}
+      className="app-data-table"
+      dataSource={safeData}
       columns={columns}
       rowKey={rowKey as string}
       loading={loading}
@@ -60,8 +58,8 @@ export const DataTable = <T extends object>({
         ),
       }}
       style={{
-        backgroundColor: "var(--color-bg-base)",
-        borderRadius: "var(--radius-card)",
+        backgroundColor: "var(--color-bg-base-2)",
+        borderRadius: "var(--radius-md)",
       }}
     />
   );

@@ -15,11 +15,11 @@ export const AuthGuard = () => {
     return (
       <div
         className="flex items-center justify-center min-h-screen"
-        style={{ backgroundColor: "var(--color-bg-base)" }}
+        style={{ backgroundColor: "var(--color-bg-base-loader)" }}
       >
         <div
           className="animate-spin rounded-full h-8 w-8
-                        border-2 border-[var(--color-primary-600)]
+                        border-2 border-[var(--color-primary-700)]
                         border-t-transparent"
         />
       </div>

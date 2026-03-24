@@ -50,7 +50,7 @@ export const NAV_CONFIG: NavItem[] = [
         label: "Personas",
         icon: UserCircle,
         path: APP_ROUTES.DASHBOARD.PERSONAS.ROOT,
-        permissions: [],
+        permissions: ["personas.ver"],
       },
       {
         key: "usuarios",
@@ -79,7 +79,9 @@ export const NAV_CONFIG: NavItem[] = [
         label: "Asignaciones Usuario-Sucursal",
         icon: GitMerge,
         path: APP_ROUTES.DASHBOARD.ASIGNACIONES,
-        permissions: [/*"sucursales.ver", "usuarios.ver" aqui debo poner los permisos*/],
+        permissions: [
+          /*"sucursales.ver", "usuarios.ver" aqui debo poner los permisos*/
+        ],
       },
     ],
   },

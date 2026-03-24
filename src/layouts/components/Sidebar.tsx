@@ -14,10 +14,6 @@ import "./Sidebar.css";
 
 const { Sider } = Layout;
 
-/* ═══════════════════════════════════════════════════════════════
-   TYPES & INTERFACES
-═══════════════════════════════════════════════════════════════ */
-
 interface SidebarProps {
   collapsed: boolean;
   onCollapse: (value: boolean) => void;
@@ -25,9 +21,6 @@ interface SidebarProps {
   onMobileClose: () => void;
 }
 
-/* ═══════════════════════════════════════════════════════════════
-   RBAC & PERMISSION LOGIC
-═══════════════════════════════════════════════════════════════ */
 
 /**
  * userCanSee — Verifica si el usuario puede ver un ítem
@@ -65,10 +58,7 @@ const filterNavItems = (
   }, []);
 };
 
-/* ═══════════════════════════════════════════════════════════════
-   MENU BUILDING & ACTIVE STATE LOGIC
-═══════════════════════════════════════════════════════════════ */
-
+/* ═══════════════════════════════════════════════════════════════*/
 /**
  * buildMenuItems — Convierte NavItem[] al formato de Ant Design Menu
  * • Renderiza grupos (submenus) y items individuales

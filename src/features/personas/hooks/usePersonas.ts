@@ -1,0 +1,101 @@
+// src/features/personas/hooks/usePersonas.ts
+import { useState, useEffect, useCallback } from "react";
+import { toast } from "react-toastify";
+import { personasService } from "../services/personas.service";
+import { useTableState } from "@/shared/hooks/useTableState";
+import type {
+  PersonaListItem,
+  PersonaFilters,
+  PersonaQueryParams,
+} from "../types/persona.types";
+
+export const usePersonas = () => {
+  const [data, setData] = useState<PersonaListItem[]>([]);//datos de la tabla
+  const [total, setTotal] = useState(0);//total de registros para paginación
+  const [loading, setLoading] = useState(false);//spinner de carga
+
+  /*filtros table */
+  const table = useTableState<PersonaFilters>({
+    tipo_persona: "",
+    estado: "",
+    fecha_desde: "",
+    fecha_hasta: "",
+  });
+
+  const fetchPersonas = useCallback(async () => {
+    setLoading(true);
+    try {
+      const params = table.toParams() as PersonaQueryParams;
+      const res = await personasService.getAll(params);
+
+      if (import.meta.env.DEV) {
+        console.groupCollapsed("[usePersonas.fetchPersonas]");
+        console.log("params:", params);
+        console.log("response normalized:", res);
+        console.log(
+          "items length:",
+          Array.isArray(res.data) ? res.data.length : "no-array",
+        );
+        console.log("total:", res.meta?.total);
+        console.groupEnd();
+      }
+
+      setData(res.data);
+      setTotal(res.meta.total);
+    } catch {
+      toast.error("Error al cargar personas");
+    } finally {
+      setLoading(false);
+    }
+  }, [table.toParams]);
+
+  useEffect(() => {
+    fetchPersonas();
+  }, [fetchPersonas]);
+
+  const toggleEstado = async (persona: PersonaListItem) => {
+    const nuevoEstado = persona.estado === "ACTIVO" ? "INACTIVO" : "ACTIVO";
+    try {
+      await personasService.toggleEstado(persona.id, nuevoEstado);
+      toast.success(
+        nuevoEstado === "ACTIVO"
+          ? "Persona activada correctamente"
+          : "Persona desactivada correctamente",
+      );
+      fetchPersonas();
+    } catch {
+      toast.error("Error al cambiar estado");
+    }
+  };
+
+  const remove = async (id: number) => {
+    try {
+      await personasService.remove(id);
+      toast.success("Persona eliminada correctamente");
+      fetchPersonas();
+    } catch {
+      toast.error("Error al eliminar persona");
+    }
+  };
+
+  const restore = async (id: number) => {
+    try {
+      await personasService.restore(id);
+      toast.success("Persona restaurada correctamente");
+      fetchPersonas();
+    } catch {
+      toast.error("Error al restaurar persona");
+    }
+  };
+
+  return {
+    data,
+    total,
+    loading,
+    table,
+    fetchPersonas,
+    toggleEstado,
+    remove,
+    restore,
+  };
+};

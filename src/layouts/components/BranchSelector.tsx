@@ -64,7 +64,7 @@ export const BranchSelector = ({ collapsed }: BranchSelectorProps) => {
             fontSize: "0.75rem",
           }}
           dropdownStyle={{
-            backgroundColor: "var(--color-bg-base)",
+            backgroundColor: "var(--color-bg-base-2)",
           }}
         />
       )}

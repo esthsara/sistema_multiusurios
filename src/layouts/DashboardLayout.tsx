@@ -23,7 +23,7 @@ const DashboardLayout = () => {
       />
 
       {/* Área principal */}
-      <Layout style={{ backgroundColor: "var(--color-bg-base)" }}>
+      <Layout style={{ backgroundColor: "var(--color-bg-base-2)" }}>
         {/* Header */}
         <Header
           collapsed={collapsed}

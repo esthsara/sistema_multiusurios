@@ -21,17 +21,17 @@ export const lightTheme: ThemeConfig = {
     colorError: "#dc2626",
     colorBgBase: "#ffffff",
     colorBgContainer: "#ffffff",
-    colorBgLayout: "#f8fafc",
+    colorBgLayout: "#ffffff",
     colorBorder: "#e2e8f0",
-    colorText: "#0f172a",
+    colorText: "#1e293b",
     colorTextSecondary: "#64748b",
     colorTextDisabled: "#94a3b8",
   },
   components: {
     Layout: {
       siderBg: "#021024",
-      triggerBg: "#1e293b",/*boton para el sidebar */
-      triggerColor: "#f8fafc",/*icono del sidebar */
+      triggerBg: "#1e293b",
+      triggerColor: "#f8fafc",
     },
     Menu: {
       darkItemBg: "#0f172a",
@@ -43,8 +43,26 @@ export const lightTheme: ThemeConfig = {
     },
     Table: {
       headerBg: "#f8fafc",
-      rowHoverBg: "#eff6ff",
+      headerColor: "#1e293b",
+      rowHoverBg: "#f0f7ff",
       borderColor: "#e2e8f0",
+      colorBgContainer: "#ffffff",
+      colorText: "#1e293b",
+    },
+    Input: {
+      colorBgContainer: "#ffffff",
+      colorBorder: "#e2e8f0",
+      colorText: "#1e293b",
+    },
+    Select: {
+      colorBgContainer: "#ffffff",
+      colorBorder: "#e2e8f0",
+      colorText: "#1e293b",
+    },
+    Button: {
+      colorBgContainer: "#ffffff",
+      colorBorder: "#e2e8f0",
+      colorText: "#1e293b",
     },
   },
 };
@@ -56,13 +74,13 @@ export const darkTheme: ThemeConfig = {
     colorSuccess: "#22c55e",
     colorWarning: "#f59e0b",
     colorError: "#ef4444",
-    colorBgBase: "#0f172a",
+    colorBgBase: "#1e293b",
     colorBgContainer: "#1e293b",
-    colorBgLayout: "#0f172a",
+    colorBgLayout: "#1e293b",
     colorBorder: "#334155",
-    colorText: "#f8fafc",
-    colorTextSecondary: "#94a3b8",
-    colorTextDisabled: "#475569",
+    colorText: "#f1f5f9",
+    colorTextSecondary: "#cbd5e1",
+    colorTextDisabled: "#64748b",
   },
   components: {
     Layout: {
@@ -79,9 +97,27 @@ export const darkTheme: ThemeConfig = {
       darkItemHoverColor: "#f8fafc",
     },
     Table: {
-      headerBg: "#1e293b",
-      rowHoverBg: "#334155",
+      headerBg: "#334155",
+      headerColor: "#f1f5f9",
+      rowHoverBg: "#273547",
       borderColor: "#334155",
+      colorBgContainer: "#1e293b",
+      colorText: "#f1f5f9",
+    },
+    Input: {
+      colorBgContainer: "#1e293b",
+      colorBorder: "#334155",
+      colorText: "#f1f5f9",
+    },
+    Select: {
+      colorBgContainer: "#1e293b",
+      colorBorder: "#334155",
+      colorText: "#f1f5f9",
+    },
+    Button: {
+      colorBgContainer: "#1e293b",
+      colorBorder: "#334155",
+      colorText: "#f1f5f9",
     },
   },
 };
