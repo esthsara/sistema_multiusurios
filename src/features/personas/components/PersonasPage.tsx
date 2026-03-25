@@ -18,7 +18,6 @@ import type { PersonaListItem } from "../types/persona.types";
 const PersonasPage = () => {
   const personas = usePersonas();
   const form = usePersonaForm(personas.fetchPersonas);
-  
 
   /* Estado para modales de confirmación */
   const [confirmState, setConfirmState] = useState<{
@@ -63,8 +62,15 @@ const PersonasPage = () => {
     },
     {
       title: "Nombre / Razón Social",
-      key: "nombre",
+      key: "display_name",
+      dataIndex: "display_name",
       sorter: true,
+      sortOrder:
+        personas.table.state.sort?.field === "display_name"
+          ? personas.table.state.sort.direction === "asc"
+            ? "ascend"
+            : "descend"
+          : null,
       render: (_, r) => (
         <div>
           <p
@@ -104,10 +110,7 @@ const PersonasPage = () => {
               r.tipo_persona === "FISICA"
                 ? "rgba(59,130,246,0.1)"
                 : "rgba(99,102,241,0.1)",
-            color:
-              r.tipo_persona === "FISICA"
-                ? "#6366f1"
-                : "#6366f1",
+            color: r.tipo_persona === "FISICA" ? "#6366f1" : "#6366f1",
           }}
         >
           {r.tipo_texto}
@@ -246,7 +249,7 @@ const PersonasPage = () => {
       <PersonaFiltersBar
         filters={personas.table.state.filters}
         search={personas.table.state.search}
-        onSearch={personas.table.setSearch}
+        onSearch={(value) => personas.table.setSearch(value.trimStart())}
         onFilter={personas.table.setFilters}
         onReset={personas.table.reset}
       />
@@ -263,6 +266,7 @@ const PersonasPage = () => {
           total: personas.total,
           onChange: personas.table.setPage,
         }}
+        onSortChange={personas.table.setSort}
       />
 
       {/* Modal selector de tipo */}

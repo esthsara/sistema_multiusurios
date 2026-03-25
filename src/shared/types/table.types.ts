@@ -10,7 +10,7 @@ import type { TableColumnsType } from "antd";
  * TableColumnsType<T> → tipo oficial de Ant Design para columnas.
  * Cuando defines dataIndex, TypeScript verifica que
  * ese campo exista en T.
- * 
+ *
  * Una tabla genérica DataTable<T> acepta cualquier tipo de dato.
  */
 export interface DataTableProps<T extends object> {
@@ -35,6 +35,8 @@ export interface DataTableProps<T extends object> {
   scrollX?: number;
   /** Callback al hacer clic en una fila */
   onRowClick?: (record: T) => void;
+  /** Callback cuando cambia el ordenamiento */
+  onSortChange?: (sort: SortConfig | null) => void;
 }
 
 /**

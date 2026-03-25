@@ -10,9 +10,9 @@ import type {
 } from "../types/persona.types";
 
 export const usePersonas = () => {
-  const [data, setData] = useState<PersonaListItem[]>([]);//datos de la tabla
-  const [total, setTotal] = useState(0);//total de registros para paginación
-  const [loading, setLoading] = useState(false);//spinner de carga
+  const [data, setData] = useState<PersonaListItem[]>([]); //datos de la tabla
+  const [total, setTotal] = useState(0); //total de registros para paginación
+  const [loading, setLoading] = useState(false); //spinner de carga
 
   /*filtros table */
   const table = useTableState<PersonaFilters>({
@@ -28,20 +28,67 @@ export const usePersonas = () => {
       const params = table.toParams() as PersonaQueryParams;
       const res = await personasService.getAll(params);
 
+      let nextData = Array.isArray(res.data) ? [...res.data] : [];
+
+      // Fallback local: búsqueda por nombre, usuario o identificación
+      const searchTerm = table.state.search.trim().toLowerCase();
+      if (searchTerm) {
+        nextData = nextData.filter((item) => {
+          const fullName = (
+            item.razon_social ??
+            `${item.nombre ?? ""} ${item.apellido ?? ""}`.trim()
+          ).toLowerCase();
+
+          return (
+            fullName.includes(searchTerm) ||
+            item.display_name.toLowerCase().includes(searchTerm) ||
+            item.identificacion_principal.toLowerCase().includes(searchTerm) ||
+            item.usuario_asociado?.username
+              .toLowerCase()
+              .includes(searchTerm) ||
+            false
+          );
+        });
+      }
+
+      // Fallback local: orden por nombre
+      if (table.state.sort?.field === "display_name") {
+        nextData.sort((a, b) => {
+          const aFallbackName = `${a.nombre ?? ""} ${a.apellido ?? ""}`.trim();
+          const bFallbackName = `${b.nombre ?? ""} ${b.apellido ?? ""}`.trim();
+
+          const aName = (
+            (a.razon_social ?? aFallbackName) ||
+            a.display_name
+          ).toLowerCase();
+          const bName = (
+            (b.razon_social ?? bFallbackName) ||
+            b.display_name
+          ).toLowerCase();
+
+          const compare = aName.localeCompare(bName, "es", {
+            sensitivity: "base",
+          });
+          return table.state.sort?.direction === "asc" ? compare : -compare;
+        });
+      }
+
       if (import.meta.env.DEV) {
         console.groupCollapsed("[usePersonas.fetchPersonas]");
         console.log("params:", params);
         console.log("response normalized:", res);
+        console.log("search term:", searchTerm);
+        console.log("sort:", table.state.sort);
         console.log(
           "items length:",
-          Array.isArray(res.data) ? res.data.length : "no-array",
+          Array.isArray(nextData) ? nextData.length : "no-array",
         );
-        console.log("total:", res.meta?.total);
+        console.log("total:", searchTerm ? nextData.length : res.meta?.total);
         console.groupEnd();
       }
 
-      setData(res.data);
-      setTotal(res.meta.total);
+      setData(nextData);
+      setTotal(searchTerm ? nextData.length : res.meta.total);
     } catch {
       toast.error("Error al cargar personas");
     } finally {

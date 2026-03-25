@@ -1,5 +1,6 @@
 // src/shared/components/organisms/DataTable.tsx
 import { Table, Empty } from "antd";
+import type { TableProps } from "antd";
 import type { DataTableProps } from "@/shared/types/table.types";
 
 /**
@@ -17,8 +18,34 @@ export const DataTable = <T extends object>({
   emptyText = "No hay datos disponibles",
   scrollX = 800,
   onRowClick,
+  onSortChange,
 }: DataTableProps<T>) => {
   const safeData = Array.isArray(data) ? data : [];
+
+  const handleTableChange: TableProps<T>["onChange"] = (
+    _pagination,
+    _filters,
+    sorter,
+  ) => {
+    if (!onSortChange) return;
+
+    const currentSorter = Array.isArray(sorter) ? sorter[0] : sorter;
+    if (!currentSorter?.order) {
+      onSortChange(null);
+      return;
+    }
+
+    const field = String(currentSorter.field ?? currentSorter.columnKey ?? "");
+    if (!field) {
+      onSortChange(null);
+      return;
+    }
+
+    onSortChange({
+      field,
+      direction: currentSorter.order === "ascend" ? "asc" : "desc",
+    });
+  };
 
   return (
     <Table<T>
@@ -29,6 +56,7 @@ export const DataTable = <T extends object>({
       loading={loading}
       size="middle"
       scroll={{ x: scrollX }}
+      onChange={handleTableChange}
       onRow={
         onRowClick
           ? (record) => ({
