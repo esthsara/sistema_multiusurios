@@ -71,7 +71,11 @@ export const AppProviders = ({ children }: AppProvidersProps) => {
   }
 
   return (
-    <ConfigProvider locale={esES} theme={isDark ? darkTheme : lightTheme}>
+    <ConfigProvider
+      key={isDark ? "theme-dark" : "theme-light"}
+      locale={esES}
+      theme={isDark ? darkTheme : lightTheme}
+    >
       {children}
 
       <ToastContainer

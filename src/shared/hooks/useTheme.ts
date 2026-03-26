@@ -1,5 +1,5 @@
 // src/shared/hooks/useTheme.ts
-import { useState, useEffect, useCallback } from "react";
+import { useCallback, useSyncExternalStore } from "react";
 
 /**
  * 'light' | 'dark' controlamos 
@@ -9,38 +9,60 @@ type Theme = "light" | "dark";
 
 const THEME_KEY = "app-theme";
 
+const isBrowser = typeof window !== "undefined";
+
+const getPreferredTheme = (): Theme => {
+  if (!isBrowser) return "light";
+
+  const stored = localStorage.getItem(THEME_KEY) as Theme | null;
+  if (stored === "light" || stored === "dark") return stored;
+
+  return window.matchMedia("(prefers-color-scheme: dark)").matches
+    ? "dark"
+    : "light";
+};
+
+let currentTheme: Theme = getPreferredTheme();
+const listeners = new Set<() => void>();
+
+const applyTheme = (theme: Theme) => {
+  if (!isBrowser) return;
+
+  const root = document.documentElement;
+  root.classList.toggle("dark", theme === "dark");
+  localStorage.setItem(THEME_KEY, theme);
+};
+
+const setGlobalTheme = (nextTheme: Theme) => {
+  if (currentTheme === nextTheme) return;
+  currentTheme = nextTheme;
+  applyTheme(currentTheme);
+  listeners.forEach((listener) => listener());
+};
+
+applyTheme(currentTheme);
+
 export const useTheme = () => {
-  const [theme, setTheme] = useState<Theme>(() => {
-    // Inicialización lazy — solo corre una vez
-    const stored = localStorage.getItem(THEME_KEY) as Theme | null;
-    if (stored === "light" || stored === "dark") return stored;
-
-    // Respeta la preferencia del sistema operativo
-    return window.matchMedia("(prefers-color-scheme: dark)").matches
-      ? "dark"
-      : "light";
-  });
-
-  useEffect(() => {
-    const root = document.documentElement;
-
-    // Aplica/remueve la clase .dark en <html>
-    if (theme === "dark") {
-      root.classList.add("dark");
-    } else {
-      root.classList.remove("dark");
-    }
-
-    // Persiste la preferencia del usuario
-    localStorage.setItem(THEME_KEY, theme);
-  }, [theme]);
+  const theme = useSyncExternalStore(
+    (listener) => {
+      listeners.add(listener);
+      return () => listeners.delete(listener);
+    },
+    () => currentTheme,
+    () => "light",
+  );
 
   const toggleTheme = useCallback(() => {
-    setTheme((prev) => (prev === "light" ? "dark" : "light"));
+    setGlobalTheme(theme === "light" ? "dark" : "light");
+  }, [theme]);
+
+  const setLightTheme = useCallback(() => {
+    setGlobalTheme("light");
   }, []);
 
-  const setLightTheme = useCallback(() => setTheme("light"), []);
-  const setDarkTheme = useCallback(() => setTheme("dark"), []);
+  const setDarkTheme = useCallback(() => {
+    setGlobalTheme("dark");
+  }, []);
 
   return {
     theme,

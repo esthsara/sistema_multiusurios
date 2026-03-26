@@ -1,7 +1,6 @@
 // src/features/personas/components/PersonaFormModal.tsx
 import { useEffect } from "react";
 import { Modal, Form, Input, Select, DatePicker } from "antd";
-import dayjs from "dayjs";
 import type { TipoPersona } from "@/shared/types/auth.types";
 import type {
   PersonaListItem,
@@ -40,9 +39,8 @@ export const PersonaFormModal = ({
         apellido: selectedItem.apellido,
         razon_social: selectedItem.razon_social,
         identificacion_principal: selectedItem.identificacion_principal,
-        fecha_nacimiento: selectedItem.fecha_registro
-          ? dayjs(selectedItem.fecha_registro)
-          : null,
+        fecha_nacimiento: null,
+        genero: null,
       });
     } else {
       form.resetFields();
@@ -82,7 +80,13 @@ export const PersonaFormModal = ({
       destroyOnHidden
       width={520}
     >
-      <Form form={form} layout="vertical" requiredMark={false} className="mt-4">
+      <Form
+        form={form}
+        layout="vertical"
+        requiredMark={false}
+        className="mt-4"
+        preserve={false}
+      >
         {tipo === "FISICA" && (
           <>
             <div className="grid grid-cols-2 gap-x-4">

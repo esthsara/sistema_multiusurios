@@ -26,6 +26,7 @@ export const lightTheme: ThemeConfig = {
     colorText: "#1e293b",
     colorTextSecondary: "#64748b",
     colorTextDisabled: "#94a3b8",
+    colorTextPlaceholder: "#64748b ",
   },
   components: {
     Layout: {
@@ -81,6 +82,7 @@ export const darkTheme: ThemeConfig = {
     colorText: "#f1f5f9",
     colorTextSecondary: "#cbd5e1",
     colorTextDisabled: "#64748b",
+    colorTextPlaceholder: "#cbd5e1",
   },
   components: {
     Layout: {

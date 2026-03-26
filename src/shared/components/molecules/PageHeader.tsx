@@ -19,8 +19,6 @@ interface PageHeaderProps {
 
 /**
  * PageHeader — Cabecera estándar de cada módulo.
- * Estandariza: título + breadcrumb + acciones.
- * Todos los módulos del Paso 10 lo usarán.
  */
 export const PageHeader = ({
   title,
@@ -35,15 +33,19 @@ export const PageHeader = ({
           to={APP_ROUTES.DASHBOARD.HOME}
           className="flex items-center gap-1"
         >
-          <Home size={14} />
+          <Home size={14} style={{ color: "var(--color-text-secondary)" }} />
         </Link>
       ),
     },
     ...breadcrumbs.map((item) => ({
       title: item.path ? (
-        <Link to={item.path}>{item.label}</Link>
+        <Link to={item.path} style={{ color: "var(--color-text-secondary)" }}>
+          {item.label}
+        </Link>
       ) : (
-        <span>{item.label}</span>
+        <span style={{ color: "var(--color-text-secondary)" }}>
+          {item.label}
+        </span>
       ),
     })),
   ];
@@ -53,17 +55,17 @@ export const PageHeader = ({
       <Breadcrumb
         items={breadcrumbItems}
         className="mb-3"
-        style={{ fontSize: "0.8125rem" }}
+        style={{ fontSize: "0.8125rem"  }}
       />
 
       <div
         className="flex items-start justify-between gap-4
-                      flex-wrap"
+                      flex-wrap" 
       >
         <div>
           <h1
             className="text-2xl font-bold m-0"
-            style={{ color: "var(--color-text-primary)" }}
+            style={{ color: "var(--color-text-secondary)" }}
           >
             {title}
           </h1>
@@ -78,7 +80,8 @@ export const PageHeader = ({
         </div>
 
         {actions && (
-          <div className="flex items-center gap-2 flex-wrap">{actions}</div>
+          <div className="flex items-center gap-2 flex-wrap"
+          >{actions}</div>
         )}
       </div>
     </div>

@@ -26,8 +26,10 @@ export const DataTable = <T extends object>({
     _pagination,
     _filters,
     sorter,
+    extra,
   ) => {
     if (!onSortChange) return;
+    if (extra.action !== "sort") return;
 
     const currentSorter = Array.isArray(sorter) ? sorter[0] : sorter;
     if (!currentSorter?.order) {
@@ -72,11 +74,18 @@ export const DataTable = <T extends object>({
               pageSize: pagination.pageSize,
               total: pagination.total,
               onChange: pagination.onChange,
+              onShowSizeChange: pagination.onChange,
               showSizeChanger: true,
+              responsive: true,
+              showLessItems: true,
               showTotal: (total, range) =>
                 `${range[0]}-${range[1]} de ${total} registros`,
-              pageSizeOptions: ["10", "20", "50", "100"],
-              style: { marginBottom: 0 },
+              pageSizeOptions: ["5", "10", "20", "50", "100"],
+
+              style: {
+                marginTop: 16,
+                padding: "8px 12px",
+              },
             }
           : false
       }

@@ -35,10 +35,7 @@ const LoginPage = () => {
           {/* Header */}
           {/* Sara no te olvides con el modo claro */}
           <div className="text-center mb-6">
-            <h1
-              className="text-xl font-bold m-0"
-              style={{ color: "var(--color-text-primary)" }}
-            >
+            <h1 className="text-xl font-bold m-0" style={{ color: "#ffffff" }}>
               Bienvenido
             </h1>
 
@@ -64,7 +61,11 @@ const LoginPage = () => {
           >
             <Form.Item
               name="login"
-              label="Email o Usuario"
+              label={
+                <span style={{ color: "var(--color-text-secondary)" }}>
+                  Email o Usuario
+                </span>
+              }
               rules={[
                 {
                   required: true,
@@ -86,7 +87,11 @@ const LoginPage = () => {
 
             <Form.Item
               name="password"
-              label="Contraseña"
+              label={
+                <span style={{ color: "var(--color-text-secondary)" }}>
+                  Contraseña
+                </span>
+              }
               rules={[{ required: true, message: "Ingresa tu contraseña" }]}
             >
               <Input.Password

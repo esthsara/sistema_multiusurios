@@ -10,6 +10,43 @@ import type {
 } from "../types/persona.types";
 import type { TipoPersona } from "@/shared/types/auth.types";
 
+const normalizeText = (value: unknown) => {
+  if (typeof value !== "string") return undefined;
+  const trimmed = value.trim();
+  return trimmed.length ? trimmed : undefined;
+};
+
+const buildPersonaPayload = (
+  raw: CreatePersonaDto | UpdatePersonaDto,
+  tipo: TipoPersona,
+  isEditMode: boolean,
+): CreatePersonaDto | UpdatePersonaDto => {
+  const input = raw as UpdatePersonaDto;
+
+  if (tipo === "FISICA") {
+    const payload = {
+      nombre: normalizeText(input.nombre),
+      apellido: normalizeText(input.apellido),
+      identificacion_principal: normalizeText(input.identificacion_principal),
+      fecha_nacimiento: normalizeText(input.fecha_nacimiento),
+      genero: input.genero,
+    };
+
+    return isEditMode
+      ? payload
+      : ({ ...payload, tipo_persona: "FISICA" } as CreatePersonaDto);
+  }
+
+  const payload = {
+    razon_social: normalizeText(input.razon_social),
+    identificacion_principal: normalizeText(input.identificacion_principal),
+  };
+
+  return isEditMode
+    ? payload
+    : ({ ...payload, tipo_persona: "MORAL" } as CreatePersonaDto);
+};
+
 export const usePersonaForm = (onSuccess: () => void) => {
   const modal = useFormModal<PersonaListItem>();
 
@@ -38,14 +75,22 @@ export const usePersonaForm = (onSuccess: () => void) => {
   const handleSubmit = async (values: CreatePersonaDto | UpdatePersonaDto) => {
     modal.setIsSubmitting(true);
     try {
+      const tipo = tipoSeleccionado ?? modal.selectedItem?.tipo_persona;
+      if (!tipo) {
+        toast.error("No se pudo determinar el tipo de persona");
+        return;
+      }
+
+      const payload = buildPersonaPayload(values, tipo, modal.isEditMode);
+
       if (modal.isEditMode && modal.selectedItem) {
         await personasService.update(
           modal.selectedItem.id,
-          values as UpdatePersonaDto,
+          payload as UpdatePersonaDto,
         );
         toast.success("Persona actualizada correctamente");
       } else {
-        await personasService.create(values as CreatePersonaDto);
+        await personasService.create(payload as CreatePersonaDto);
         toast.success("Persona creada correctamente");
       }
       modal.close();

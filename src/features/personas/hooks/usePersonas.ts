@@ -51,6 +51,15 @@ export const usePersonas = () => {
         });
       }
 
+      // Fallback local: filtro por fecha exacta de registro
+      const exactDate = table.state.filters.fecha_desde?.trim();
+      if (exactDate) {
+        nextData = nextData.filter((item) => {
+          const createdDate = item.fecha_registro?.slice(0, 10) ?? "";
+          return createdDate === exactDate;
+        });
+      }
+
       // Fallback local: orden por nombre
       if (table.state.sort?.field === "display_name") {
         nextData.sort((a, b) => {
@@ -78,6 +87,7 @@ export const usePersonas = () => {
         console.log("params:", params);
         console.log("response normalized:", res);
         console.log("search term:", searchTerm);
+        console.log("date filter:", exactDate);
         console.log("sort:", table.state.sort);
         console.log(
           "items length:",
