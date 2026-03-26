@@ -1,5 +1,4 @@
 // src/features/personas/components/detalle/PersonaDomicilios.tsx
-import { useState, useEffect, useCallback } from "react";
 import {
   Button,
   Modal,
@@ -12,12 +11,10 @@ import {
   Tooltip,
 } from "antd";
 import { Plus, Pencil, Trash2, Star } from "lucide-react";
-import { toast } from "react-toastify";
 import type { TableColumnsType } from "antd";
 import { ConfirmModal } from "@/shared/components/molecules/ConfirmModal";
 import { Can } from "@/shared/components/atoms/Can";
-import { domiciliosService } from "../../services/domicilios.service";
-import { useFormModal } from "@/shared/hooks/useFormModal";
+import { useDomicilios } from "../../hooks/useDomicilios";
 import type {
   Domicilio,
   CreateDomicilioDto,
@@ -37,31 +34,21 @@ interface PersonaDomiciliosProps {
 }
 
 export const PersonaDomicilios = ({ personaId }: PersonaDomiciliosProps) => {
-  const [domicilios, setDomicilios] = useState<Domicilio[]>([]);
-  const [loading, setLoading] = useState(false);
-  const [deleteTarget, setDeleteTarget] = useState<Domicilio | null>(null);
-  const [deleting, setDeleting] = useState(false);
-  const [markingPrincipalId, setMarkingPrincipalId] = useState<number | null>(
-    null,
-  );
-  const modal = useFormModal<Domicilio>();
+  const {
+    domicilios,
+    loading,
+    modal,
+    deleteTarget,
+    deleting,
+    markingPrincipalId,
+    handleSubmit,
+    handleDelete,
+    confirmDelete,
+    handleMarkPrincipal,
+    setDeleteTarget,
+  } = useDomicilios(personaId);
+
   const [form] = Form.useForm();
-
-  const fetch = useCallback(async () => {
-    setLoading(true);
-    try {
-      const res = await domiciliosService.getByPersona(personaId);
-      setDomicilios(res.data.items);
-    } catch {
-      toast.error("Error al cargar domicilios");
-    } finally {
-      setLoading(false);
-    }
-  }, [personaId]);
-
-  useEffect(() => {
-    fetch();
-  }, [fetch]);
 
   const openEdit = (item: Domicilio) => {
     modal.openEdit(item);
@@ -71,56 +58,9 @@ export const PersonaDomicilios = ({ personaId }: PersonaDomiciliosProps) => {
   const onSubmit = async () => {
     try {
       const values = await form.validateFields();
-      modal.setIsSubmitting(true);
-      if (modal.isEditMode && modal.selectedItem) {
-        await domiciliosService.update(
-          modal.selectedItem.id,
-          values as UpdateDomicilioDto,
-        );
-        toast.success("Domicilio actualizado");
-      } else {
-        await domiciliosService.create({
-          ...values,
-          persona_id: personaId,
-        } as CreateDomicilioDto);
-        toast.success("Domicilio creado");
-      }
-      modal.close();
-      fetch();
+      await handleSubmit(values as CreateDomicilioDto | UpdateDomicilioDto);
     } catch {
-      toast.error("Error al guardar domicilio");
-    } finally {
-      modal.setIsSubmitting(false);
-    }
-  };
-
-  const confirmDelete = async () => {
-    if (!deleteTarget) return;
-    setDeleting(true);
-    try {
-      await domiciliosService.remove(deleteTarget.id);
-      toast.success("Domicilio eliminado");
-      fetch();
-    } catch {
-      toast.error("Error al eliminar domicilio");
-    } finally {
-      setDeleting(false);
-      setDeleteTarget(null);
-    }
-  };
-
-  const setAsPrincipal = async (item: Domicilio) => {
-    if (item.principal) return;
-
-    setMarkingPrincipalId(item.id);
-    try {
-      await domiciliosService.update(item.id, { principal: true });
-      toast.success("Domicilio principal actualizado");
-      fetch();
-    } catch {
-      toast.error("Error al actualizar domicilio principal");
-    } finally {
-      setMarkingPrincipalId(null);
+      /* validación antd */
     }
   };
 
@@ -150,9 +90,8 @@ export const PersonaDomicilios = ({ personaId }: PersonaDomiciliosProps) => {
                 type="text"
                 icon={<Star size={14} />}
                 loading={markingPrincipalId === r.id}
-                onClick={() => setAsPrincipal(r)}
-              >
-              </Button>
+                onClick={() => handleMarkPrincipal(r)}
+              ></Button>
             </Tooltip>
           </Can>
         ),

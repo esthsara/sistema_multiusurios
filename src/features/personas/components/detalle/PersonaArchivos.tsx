@@ -1,5 +1,5 @@
 // src/features/personas/components/detalle/PersonaArchivos.tsx
-import { useState, useEffect, useCallback } from "react";
+import { useState } from "react";
 import {
   Button,
   Modal,
@@ -11,11 +11,10 @@ import {
   Tooltip,
 } from "antd";
 import { Plus, Download, Trash2, Eye } from "lucide-react";
-import { toast } from "react-toastify";
 import type { TableColumnsType } from "antd";
 import { Can } from "@/shared/components/atoms/Can";
 import { ConfirmModal } from "@/shared/components/molecules/ConfirmModal";
-import { archivosService } from "../../services/archivos.service";
+import { useArchivos } from "../../hooks/useArchivos";
 import type { Archivo, TipoArchivo } from "../../types/persona-detalle.types";
 
 const TIPO_OPTIONS: { value: TipoArchivo; label: string }[] = [
@@ -65,79 +64,30 @@ const getFilenameFromDisposition = (headerValue?: string) => {
 };
 
 export const PersonaArchivos = ({ personaId }: PersonaArchivosProps) => {
-  const [archivos, setArchivos] = useState<Archivo[]>([]);
-  const [loading, setLoading] = useState(false);
+  const {
+    archivos,
+    loading,
+    uploading,
+    deleting,
+    handleUpload,
+    handleDelete,
+    handleDownload,
+  } = useArchivos(personaId);
+
   const [modalOpen, setModalOpen] = useState(false);
-  const [uploading, setUploading] = useState(false);
   const [deleteTarget, setDeleteTarget] = useState<Archivo | null>(null);
-  const [deleting, setDeleting] = useState(false);
   const [form] = Form.useForm();
-
-  const fetch = useCallback(async () => {
-    setLoading(true);
-    try {
-      const res = await archivosService.getByPersona(personaId);
-      setArchivos(res.data.items);
-    } catch {
-      toast.error("Error al cargar archivos");
-    } finally {
-      setLoading(false);
-    }
-  }, [personaId]);
-
-  useEffect(() => {
-    fetch();
-  }, [fetch]);
-
-  const handleUpload = async () => {
+  const handleUploadFile = async () => {
     try {
       const values = await form.validateFields();
       if (!values.archivo?.file) {
-        toast.error("Selecciona un archivo");
         return;
       }
-      setUploading(true);
-      await archivosService.upload(
-        personaId,
-        values.archivo.file,
-        values.tipo,
-        values.nombre,
-      );
-      toast.success("Archivo subido correctamente");
+      await handleUpload(values.archivo.file, values.tipo, values.nombre);
       setModalOpen(false);
       form.resetFields();
-      fetch();
     } catch {
-      toast.error("Error al subir archivo");
-    } finally {
-      setUploading(false);
-    }
-  };
-
-  const handleDownload = async (archivo: Archivo) => {
-    try {
-      const res = await archivosService.download(archivo.id);
-      const blob = res.data instanceof Blob ? res.data : new Blob([res.data]);
-      const url = window.URL.createObjectURL(blob);
-      const contentDisposition =
-        (res.headers?.["content-disposition"] as string | undefined) ??
-        undefined;
-      const fromHeader = getFilenameFromDisposition(contentDisposition);
-      const extension =
-        getFileExtensionFromMime(blob.type) ||
-        (archivo.url.match(/\.[a-z0-9]+$/i)?.[0] ?? "");
-      const fallbackName =
-        archivo.nombre && archivo.nombre.includes(".")
-          ? archivo.nombre
-          : `${archivo.nombre}${extension}`;
-
-      const a = document.createElement("a");
-      a.href = url;
-      a.download = fromHeader ?? fallbackName;
-      a.click();
-      window.URL.revokeObjectURL(url);
-    } catch {
-      toast.error("Error al descargar archivo");
+      /* validación antd */
     }
   };
 
@@ -153,29 +103,16 @@ export const PersonaArchivos = ({ personaId }: PersonaArchivosProps) => {
         return;
       }
 
-      const res = await archivosService.download(archivo.id);
-      const blob = res.data instanceof Blob ? res.data : new Blob([res.data]);
-      const previewUrl = window.URL.createObjectURL(blob);
-      window.open(previewUrl, "_blank", "noopener,noreferrer");
-      setTimeout(() => window.URL.revokeObjectURL(previewUrl), 60_000);
+      await handleDownload(archivo.id);
     } catch {
-      toast.error("No se pudo previsualizar el archivo");
+      /* error handling in hook */
     }
   };
 
   const confirmDelete = async () => {
     if (!deleteTarget) return;
-    setDeleting(true);
-    try {
-      await archivosService.remove(deleteTarget.id);
-      toast.success("Archivo eliminado");
-      fetch();
-    } catch {
-      toast.error("Error al eliminar archivo");
-    } finally {
-      setDeleting(false);
-      setDeleteTarget(null);
-    }
+    await handleDelete(deleteTarget.id);
+    setDeleteTarget(null);
   };
 
   const columns: TableColumnsType<Archivo> = [
@@ -225,7 +162,7 @@ export const PersonaArchivos = ({ personaId }: PersonaArchivosProps) => {
               type="text"
               size="small"
               icon={<Download size={14} />}
-              onClick={() => handleDownload(record)}
+              onClick={() => handleDownload(record.id)}
             />
           </Tooltip>
           <Can permission="personas.eliminar">
@@ -281,7 +218,7 @@ export const PersonaArchivos = ({ personaId }: PersonaArchivosProps) => {
       <Modal
         open={modalOpen}
         title="Subir Archivo"
-        onOk={handleUpload}
+        onOk={handleUploadFile}
         onCancel={() => {
           setModalOpen(false);
           form.resetFields();
@@ -330,7 +267,7 @@ export const PersonaArchivos = ({ personaId }: PersonaArchivosProps) => {
         description={`El archivo "${deleteTarget?.nombre}" será eliminado.`}
         confirmText="Eliminar"
         danger
-        loading={deleting}
+        loading={deleting === deleteTarget?.id}
         onConfirm={confirmDelete}
         onCancel={() => setDeleteTarget(null)}
       />
