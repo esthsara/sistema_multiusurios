@@ -1,4 +1,3 @@
-// src/features/personas/components/detalle/PersonaArchivos.tsx
 import { useState } from "react";
 import {
   Button,
@@ -10,24 +9,20 @@ import {
   Table,
   Tooltip,
 } from "antd";
-import { Plus, Download, Trash2, Eye } from "lucide-react";
 import type { TableColumnsType } from "antd";
+import { Plus, Download, Trash2, Eye } from "lucide-react";
 import { Can } from "@/shared/components/atoms/Can";
 import { ConfirmModal } from "@/shared/components/molecules/ConfirmModal";
-import { useArchivos } from "../../hooks/useArchivos";
-import type { Archivo, TipoArchivo } from "../../types/persona-detalle.types";
+import { useSucursalArchivos } from "../../hooks/useSucursalArchivos";
+import type { SucursalArchivo as Archivo } from "../../types/sucursal.types";
 
-const TIPO_OPTIONS: { value: TipoArchivo; label: string }[] = [
+const TIPO_OPTIONS = [
   { value: "CI", label: "CI" },
   { value: "CONTRATO", label: "Contrato" },
   { value: "CERTIFICADO", label: "Certificado" },
   { value: "FOTO", label: "Foto" },
   { value: "OTRO", label: "Otro" },
 ];
-
-interface PersonaArchivosProps {
-  personaId: number;
-}
 
 const getResolvedFileUrl = (rawUrl: string) => {
   if (!rawUrl) return "";
@@ -41,7 +36,11 @@ const getResolvedFileUrl = (rawUrl: string) => {
   return `${origin}${rawUrl.startsWith("/") ? rawUrl : `/${rawUrl}`}`;
 };
 
-export const PersonaArchivos = ({ personaId }: PersonaArchivosProps) => {
+interface SucursalArchivoProps {
+  sucursalId: number;
+}
+
+export const SucursalArchivo = ({ sucursalId }: SucursalArchivoProps) => {
   const {
     archivos,
     loading,
@@ -50,18 +49,24 @@ export const PersonaArchivos = ({ personaId }: PersonaArchivosProps) => {
     handleUpload,
     handleDelete,
     handleDownload,
-  } = useArchivos(personaId);
+  } = useSucursalArchivos(sucursalId);
 
   const [modalOpen, setModalOpen] = useState(false);
   const [deleteTarget, setDeleteTarget] = useState<Archivo | null>(null);
   const [form] = Form.useForm();
+
   const handleUploadFile = async () => {
     try {
       const values = await form.validateFields();
       if (!values.archivo?.file) {
         return;
       }
-      await handleUpload(values.archivo.file, values.tipo, values.nombre);
+      await handleUpload(
+        values.archivo.file,
+        values.tipo,
+        values.nombre,
+        values.fecha_expiracion,
+      );
       setModalOpen(false);
       form.resetFields();
     } catch {
@@ -109,7 +114,11 @@ export const PersonaArchivos = ({ personaId }: PersonaArchivosProps) => {
         </Tooltip>
       ),
     },
-    { title: "Nombre", dataIndex: "nombre" },
+    {
+      title: "Nombre",
+      dataIndex: "nombre",
+      key: "nombre",
+    },
     {
       title: "Tipo",
       key: "tipo",
@@ -130,8 +139,8 @@ export const PersonaArchivos = ({ personaId }: PersonaArchivosProps) => {
       ),
     },
     {
-      title: "Descargar",
-      key: "descargar",
+      title: "Acciones",
+      key: "acciones",
       width: 90,
       render: (_, record) => (
         <div className="flex gap-1">
@@ -143,7 +152,7 @@ export const PersonaArchivos = ({ personaId }: PersonaArchivosProps) => {
               onClick={() => handleDownload(record.id)}
             />
           </Tooltip>
-          <Can permission="personas.eliminar">
+          <Can permission="sucursales.eliminar">
             <Tooltip title="Eliminar">
               <Button
                 type="text"
@@ -168,7 +177,7 @@ export const PersonaArchivos = ({ personaId }: PersonaArchivosProps) => {
         >
           Archivos
         </h3>
-        <Can permission="personas.crear">
+        <Can permission="sucursales.crear">
           <Button
             type="primary"
             size="small"
@@ -218,7 +227,7 @@ export const PersonaArchivos = ({ personaId }: PersonaArchivosProps) => {
             label="Nombre del archivo"
             rules={[{ required: true, message: "Ingresa un nombre" }]}
           >
-            <Input placeholder="Ej: CI de Juan Pérez" />
+            <Input placeholder="Ej: Contrato de sucursal" />
           </Form.Item>
           <Form.Item
             name="tipo"
@@ -235,6 +244,12 @@ export const PersonaArchivos = ({ personaId }: PersonaArchivosProps) => {
             <Upload beforeUpload={() => false} maxCount={1}>
               <Button icon={<Plus size={14} />}>Seleccionar archivo</Button>
             </Upload>
+          </Form.Item>
+          <Form.Item
+            name="fecha_expiracion"
+            label="Fecha de vencimiento (opcional)"
+          >
+            <Input type="date" />
           </Form.Item>
         </Form>
       </Modal>

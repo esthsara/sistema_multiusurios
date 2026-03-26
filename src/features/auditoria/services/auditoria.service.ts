@@ -6,7 +6,7 @@ import type {
   AuditoriaDetalle,
   AccionAuditoria,
   EntidadAuditoria,
-  ExportAuditoriaItem,
+  AuditoriaExportData,
 } from "../types/auditoria.types";
 
 export const auditoriaService = {
@@ -19,10 +19,13 @@ export const auditoriaService = {
 
   getEntidades: () => http.get<EntidadAuditoria[]>("/auditoria/entidades"),
 
-  exportar: async (): Promise<
-    ApiResponse<{ total: number; data: ExportAuditoriaItem[] }>
-  > => {
-    const res = await apiClient.get("/auditoria/exportar");
+  exportar: async (
+    params?: RequestParams,
+  ): Promise<ApiResponse<AuditoriaExportData>> => {
+    const res = await apiClient.get<ApiResponse<AuditoriaExportData>>(
+      "/auditoria/exportar",
+      { params },
+    );
     return res.data;
   },
 };

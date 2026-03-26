@@ -41,11 +41,51 @@ export interface SucursalDetalle {
   usuarios_count: number;
   usuarios: SucursalUsuario[];
   administradores: SucursalAdministrador[];
-  contactos: unknown[];
-  domicilios: unknown[];
-  archivos: unknown[];
+  contactos: SucursalContacto[];
+  domicilios: SucursalDomicilio[];
+  archivos: SucursalArchivo[];
   created_at: string;
   updated_at: string;
+}
+
+export type TipoContactoSucursal = "EMAIL" | "TELEFONO" | "OTRO";
+export type TipoDomicilioSucursal =
+  | "FISCAL"
+  | "PARTICULAR"
+  | "ENTREGA"
+  | "OTRO";
+
+export interface SucursalContacto {
+  id: number;
+  tipo: TipoContactoSucursal;
+  tipo_texto: string;
+  valor: string;
+  created_at: string;
+  updated_at: string;
+}
+
+export interface SucursalDomicilio {
+  id: number;
+  tipo: TipoDomicilioSucursal;
+  tipo_texto: string;
+  pais: string;
+  ciudad: string;
+  direccion: string;
+  codigo_postal: string | null;
+  principal: boolean;
+  created_at: string;
+  updated_at: string;
+}
+
+export interface SucursalArchivo {
+  id: number;
+  nombre: string;
+  ruta: string;
+  url: string;
+  tipo: string;
+  tipo_texto: string;
+  fecha_expiracion: string | null;
+  created_at: string;
 }
 
 export interface SucursalUsuario {
@@ -139,6 +179,27 @@ export interface AsignarUsuarioDto {
   usuario_id: number;
   sucursal_id: number;
 }
+
+export interface CreateSucursalContactoDto {
+  tipo: TipoContactoSucursal;
+  valor: string;
+}
+
+export interface UpdateSucursalContactoDto {
+  tipo: TipoContactoSucursal;
+  valor: string;
+}
+
+export interface CreateSucursalDomicilioDto {
+  tipo: TipoDomicilioSucursal;
+  direccion: string;
+  ciudad: string;
+  pais: string;
+  codigo_postal?: string;
+  principal?: boolean;
+}
+
+export type UpdateSucursalDomicilioDto = Partial<CreateSucursalDomicilioDto>;
 
 /* ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
    FILTROS

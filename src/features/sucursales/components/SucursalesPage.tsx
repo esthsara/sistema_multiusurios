@@ -2,12 +2,13 @@ import { useState } from "react";
 import { Avatar, Button, Tooltip } from "antd";
 import type { TableColumnsType } from "antd";
 import { Eye, Pencil, Plus, PowerOff, RotateCcw, Trash2 } from "lucide-react";
-import { toast } from "react-toastify";
 import { PageHeader } from "@/shared/components/molecules/PageHeader";
 import { DataTable } from "@/shared/components/organisms/DataTable";
 import { ConfirmModal } from "@/shared/components/molecules/ConfirmModal";
 import { RowActions } from "@/shared/components/molecules/RowActions";
 import { Can } from "@/shared/components/atoms/Can";
+import { APP_ROUTES } from "@/shared/constants/routes.constants";
+import { useNavigate } from "react-router-dom";
 import { useSucursales } from "../hooks/useSucursales";
 import { useSucursalForm } from "../hooks/useSucursalForm";
 import { SucursalFiltersBar } from "./SucursalFilters";
@@ -16,6 +17,7 @@ import { SucursalFormModal } from "./SucursalFormModal";
 import type { SucursalListItem } from "../types/sucursal.types";
 
 const SucursalesPage = () => {
+  const navigate = useNavigate();
   const sucursales = useSucursales();
   const form = useSucursalForm(sucursales.fetchSucursales);
 
@@ -143,7 +145,8 @@ const SucursalesPage = () => {
             permission: "sucursales.ver" as const,
             label: "Ver",
             icon: <Eye size={14} />,
-            onClick: () => toast.info("Vista detalle disponible próximamente"),
+            onClick: () =>
+              navigate(APP_ROUTES.DASHBOARD.SUCURSALES.DETALLE(record.id)),
           },
           {
             key: "edit",

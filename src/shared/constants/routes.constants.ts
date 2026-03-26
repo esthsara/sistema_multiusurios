@@ -19,6 +19,7 @@ export const APP_ROUTES = {
     SUCURSALES: {
       ROOT: "/dashboard/sucursales",
       NUEVA: "/dashboard/sucursales/nueva",
+      DETALLE: (id: number | string) => `/dashboard/sucursales/${id}`,
     },
     USUARIOS: {
       ROOT: "/dashboard/usuarios",

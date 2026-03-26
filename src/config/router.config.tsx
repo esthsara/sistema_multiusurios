@@ -27,6 +27,10 @@ const PersonaDetallePage = lazy(
 const SucursalesPage = lazy(
   () => import("@/features/sucursales/components/SucursalesPage"),
 );
+const SucursalDetallePage = lazy(
+  () => import("@/features/sucursales/components/detalle/SucursalDetallePage"),
+);
+
 const UsuariosPage = lazy(
   () => import("@/features/usuarios/components/UsuariosPage"),
 );
@@ -35,16 +39,25 @@ const UsuarioDetallePage = lazy(
   () => import("@/features/usuarios/components/detalle/UsuarioDetallePage"),
 );
 
-const RolesPage = lazy(
-  () => import("@/features/roles/components/RolesPage"),
+const RolesPage = lazy(() => import("@/features/roles/components/RolesPage"));
+
+const PermisosPage = lazy(
+  () => import("@/features/permisos/components/PermisosPage"),
 );
+const MatrizPage = lazy(
+  () => import("@/features/matriz/components/MatrizPage"),
+);
+const AsignacionesPage = lazy(
+  () => import("@/features/asignaciones/components/AsignacionesPage"),
+);
+
 const AuditoriaPage = lazy(
   () => import("@/features/auditoria/components/AuditoriaPage"),
 );
 const NotFoundPage = lazy(() => import("@/shared/components/NotFoundPage"));
 
 /**
-  * Este componente se muestra mientras se cargan las páginas de forma perezosa (lazy loading). Es una buena práctica mostrar algo al usuario para que sepa que la aplicación está trabajando en cargar el contenido.
+ * Este componente se muestra mientras se cargan las páginas de forma perezosa (lazy loading). Es una buena práctica mostrar algo al usuario para que sepa que la aplicación está trabajando en cargar el contenido.
  */
 const PageLoader = () => (
   <div
@@ -154,8 +167,8 @@ export const router = createBrowserRouter([
                 element: withSuspense(SucursalesPage),
               },
               {
-                path: `${APP_ROUTES.DASHBOARD.USUARIOS.ROOT}/:id`,
-                element: withSuspense(UsuarioDetallePage),
+                path: `${APP_ROUTES.DASHBOARD.SUCURSALES.ROOT}/:id`,
+                element: withSuspense(SucursalDetallePage),
               },
             ],
           },
@@ -168,6 +181,10 @@ export const router = createBrowserRouter([
                 path: APP_ROUTES.DASHBOARD.USUARIOS.ROOT,
                 element: withSuspense(UsuariosPage),
               },
+              {
+                path: `${APP_ROUTES.DASHBOARD.USUARIOS.ROOT}/:id`,
+                element: withSuspense(UsuarioDetallePage),
+              },
             ],
           },
 
@@ -178,6 +195,37 @@ export const router = createBrowserRouter([
               {
                 path: APP_ROUTES.DASHBOARD.ROLES,
                 element: withSuspense(RolesPage),
+              },
+            ],
+          },
+          {
+            element: <PermissionGuard permission="roles.ver" />,
+            children: [
+              {
+                path: APP_ROUTES.DASHBOARD.PERMISOS,
+                element: withSuspense(PermisosPage),
+              },
+            ],
+          },
+
+          /* Matriz Roles-Permisos */
+          {
+            element: <PermissionGuard permission="roles.editar" />,
+            children: [
+              {
+                path: APP_ROUTES.DASHBOARD.MATRIZ,
+                element: withSuspense(MatrizPage),
+              },
+            ],
+          },
+
+          /* Asignaciones Usuario-Sucursal */
+          {
+            element: <PermissionGuard permission="sucursales.ver" />,
+            children: [
+              {
+                path: APP_ROUTES.DASHBOARD.ASIGNACIONES,
+                element: withSuspense(AsignacionesPage),
               },
             ],
           },

@@ -42,7 +42,6 @@ export const PersonaDomicilios = ({ personaId }: PersonaDomiciliosProps) => {
     deleting,
     markingPrincipalId,
     handleSubmit,
-    handleDelete,
     confirmDelete,
     handleMarkPrincipal,
     setDeleteTarget,
