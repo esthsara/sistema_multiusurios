@@ -1,23 +1,13 @@
 // src/features/personas/components/PersonasPage.tsx
-import { useState, type ReactNode } from "react";
-import { Button, Avatar, Tooltip, Dropdown, Grid } from "antd";
-import {
-  Plus,
-  Pencil,
-  Trash2,
-  RotateCcw,
-  PowerOff,
-  Ellipsis,
-  Eye,
-} from "lucide-react";
+import { useState } from "react";
+import { Button, Avatar, Tooltip } from "antd";
+import { Plus, Pencil, Trash2, RotateCcw, PowerOff, Eye } from "lucide-react";
 import type { TableColumnsType } from "antd";
-import type { MenuProps } from "antd";
-import type { PermissionString } from "@/shared/types/auth.types";
 import { PageHeader } from "@/shared/components/molecules/PageHeader";
 import { DataTable } from "@/shared/components/organisms/DataTable";
 import { ConfirmModal } from "@/shared/components/molecules/ConfirmModal";
+import { RowActions } from "@/shared/components/molecules/RowActions";
 import { Can } from "@/shared/components/atoms/Can";
-import { usePermissions } from "@/shared/hooks/usePermissions";
 import { usePersonas } from "../hooks/usePersonas";
 import { usePersonaForm } from "../hooks/usePersonaForm";
 import { PersonaStatusBadge } from "./PersonaStatusBadge";
@@ -28,11 +18,7 @@ import type { PersonaListItem } from "../types/persona.types";
 import { useNavigate } from "react-router-dom";
 import { APP_ROUTES } from "@/shared/constants/routes.constants";
 
-
 const PersonasPage = () => {
-  const { can } = usePermissions();
-  const screens = Grid.useBreakpoint();
-
   const personas = usePersonas();
   const form = usePersonaForm(personas.fetchPersonas);
 
@@ -64,15 +50,6 @@ const PersonasPage = () => {
 
   /*navegar al ver */
   const navigate = useNavigate();
-
-  interface RowAction {
-    key: string;
-    permission: PermissionString;
-    label: string;
-    icon: ReactNode;
-    onClick: () => void;
-    danger?: boolean;
-  }
 
   const getPersonaInitials = (persona: PersonaListItem) => {
     if (persona.tipo_persona === "FISICA") {
@@ -224,117 +201,53 @@ const PersonasPage = () => {
       key: "acciones",
       fixed: "right",
       width: 180,
-      render: (_, record) =>
-        (() => {
-          const allActions: RowAction[] = [
-            {
-              key: "view",
-              permission: "personas.ver",
-              label: "Ver",
-              icon: <Eye size={14} />,
-              onClick: () =>
-                navigate(APP_ROUTES.DASHBOARD.PERSONAS.DETALLE(record.id)),
-            },
-            {
-              key: "edit",
-              permission: "personas.editar",
-              label: "Editar",
-              icon: <Pencil size={14} />,
-              onClick: () => form.handleEdit(record),
-            },
-            {
-              key: "toggle",
-              permission: "personas.editar",
-              label: record.estado === "ACTIVO" ? "Desactivar" : "Activar",
-              icon:
-                record.estado === "ACTIVO" ? (
-                  <PowerOff
-                    size={14}
-                    style={{ color: "var(--color-warning-500)" }}
-                  />
-                ) : (
-                  <RotateCcw
-                    size={14}
-                    style={{ color: "var(--color-success-500)" }}
-                  />
-                ),
-              onClick: () => openConfirm("toggle", record),
-            },
-            {
-              key: "delete",
-              permission: "personas.eliminar",
-              label: "Eliminar",
-              icon: <Trash2 size={14} />,
-              danger: true,
-              onClick: () => openConfirm("delete", record),
-            },
-          ];
-
-          const allowedActions = allActions.filter((action) =>
-            can(action.permission),
-          );
-
-          const collapseActions = !screens.lg;
-          const maxVisibleActions = 4;
-          const visibleActions = collapseActions
-            ? []
-            : allowedActions.slice(0, maxVisibleActions);
-          const hiddenActions = collapseActions
-            ? allowedActions
-            : allowedActions.slice(maxVisibleActions);
-
-          const dropdownItems: MenuProps["items"] = hiddenActions.map(
-            (action) => ({
-              key: action.key,
-              danger: action.danger,
-              label: (
-                <span className="row-actions-dropdown-item">
-                  {action.icon}
-                  <span>{action.label}</span>
-                </span>
+      render: (_, record) => {
+        const actions = [
+          {
+            key: "view",
+            permission: "personas.ver" as const,
+            label: "Ver",
+            icon: <Eye size={14} />,
+            onClick: () =>
+              navigate(APP_ROUTES.DASHBOARD.PERSONAS.DETALLE(record.id)),
+          },
+          {
+            key: "edit",
+            permission: "personas.editar" as const,
+            label: "Editar",
+            icon: <Pencil size={14} />,
+            onClick: () => form.handleEdit(record),
+          },
+          {
+            key: "toggle",
+            permission: "personas.editar" as const,
+            label: record.estado === "ACTIVO" ? "Desactivar" : "Activar",
+            icon:
+              record.estado === "ACTIVO" ? (
+                <PowerOff
+                  size={14}
+                  style={{ color: "var(--color-warning-500)" }}
+                />
+              ) : (
+                <RotateCcw
+                  size={14}
+                  style={{ color: "var(--color-success-500)" }}
+                />
               ),
-            }),
-          );
+            onClick: () => openConfirm("toggle", record),
+          },
+          {
+            key: "delete",
+            permission: "personas.eliminar" as const,
+            label: "Eliminar",
+            icon: <Trash2 size={14} />,
+            danger: true,
+            onClick: () => openConfirm("delete", record),
+          },
+        ];
 
-          return (
-            <div className="row-actions-wrap">
-              {visibleActions.map((action) => (
-                <Tooltip key={action.key} title={action.label}>
-                  <Button
-                    type="text"
-                    size="small"
-                    danger={action.danger}
-                    icon={action.icon}
-                    onClick={action.onClick}
-                    className="row-action-btn"
-                  />
-                </Tooltip>
-              ))}
-
-              {hiddenActions.length > 0 && (
-                <Dropdown
-                  trigger={["hover", "click"]}
-                  menu={{
-                    items: dropdownItems,
-                    onClick: ({ key }) => {
-                      const action = hiddenActions.find(
-                        (item) => item.key === key,
-                      );
-                      action?.onClick();
-                    },
-                  }}
-                >
-                  <Button
-                    type="text"
-                    size="small"
-                    icon={<Ellipsis size={15} />}
-                    className="row-actions-trigger"
-                  />
-                </Dropdown>
-              )}
-            </div>
-          );
-        })(),
+        return <RowActions actions={actions} />;
+      },
     },
   ];
 

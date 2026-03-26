@@ -101,6 +101,7 @@ export interface AccessTokenObject {
  * Persona normalizada — campos calculados incluidos.
  * 'nombreCompleto' es derivado según tipo_persona.
  */
+
 export interface Persona {
   id:                      number
   tipoPersona:             TipoPersona
