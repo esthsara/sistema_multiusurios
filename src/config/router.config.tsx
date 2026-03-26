@@ -19,6 +19,11 @@ const HomePage = lazy(() => import("@/features/dashboard/components/HomePage"));
 const PersonasPage = lazy(
   () => import("@/features/personas/components/PersonasPage"),
 );
+/*ver persona */
+const PersonaDetallePage = lazy(
+  () => import("@/features/personas/components/detalle/PersonaDetallePage"),
+);
+
 const SucursalesPage = lazy(
   () => import("@/features/sucursales/components/SucursalesPage"),
 );
@@ -128,6 +133,10 @@ export const router = createBrowserRouter([
                 path: APP_ROUTES.DASHBOARD.PERSONAS.ROOT,
                 element: withSuspense(PersonasPage),
               },
+              {
+                path: `${APP_ROUTES.DASHBOARD.PERSONAS.ROOT}/:id`,
+                element: withSuspense(PersonaDetallePage),
+              },
             ],
           },
 
@@ -174,7 +183,6 @@ export const router = createBrowserRouter([
               },
             ],
           },
-
         ],
       },
     ],
@@ -185,5 +193,4 @@ export const router = createBrowserRouter([
     path: "*",
     element: withSuspense(NotFoundPage),
   },
-
 ]);

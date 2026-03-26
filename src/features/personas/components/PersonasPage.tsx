@@ -25,6 +25,9 @@ import { PersonaTypeSelector } from "./PersonaTypeSelector";
 import { PersonaFormModal } from "./PersonaFormModal";
 import { PersonaFiltersBar } from "./PersonaFilters";
 import type { PersonaListItem } from "../types/persona.types";
+import { useNavigate } from "react-router-dom";
+import { APP_ROUTES } from "@/shared/constants/routes.constants";
+
 
 const PersonasPage = () => {
   const { can } = usePermissions();
@@ -58,6 +61,9 @@ const PersonasPage = () => {
     }
     closeConfirm();
   };
+
+  /*navegar al ver */
+  const navigate = useNavigate();
 
   interface RowAction {
     key: string;
@@ -226,7 +232,8 @@ const PersonasPage = () => {
               permission: "personas.ver",
               label: "Ver",
               icon: <Eye size={14} />,
-              onClick: () => undefined,
+              onClick: () =>
+                navigate(APP_ROUTES.DASHBOARD.PERSONAS.DETALLE(record.id)),
             },
             {
               key: "edit",

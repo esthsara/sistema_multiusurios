@@ -1,9 +1,11 @@
 // src/features/personas/components/PersonaFormModal.tsx
 import { useEffect } from "react";
 import { Modal, Form, Input, Select, DatePicker } from "antd";
+import dayjs from "dayjs";
 import type { TipoPersona } from "@/shared/types/auth.types";
 import type {
   PersonaListItem,
+  PersonaDetalle,
   CreatePersonaDto,
   UpdatePersonaDto,
 } from "../types/persona.types";
@@ -11,7 +13,7 @@ import type {
 interface PersonaFormModalProps {
   open: boolean;
   tipo: TipoPersona | null;
-  selectedItem: PersonaListItem | null;
+  selectedItem: PersonaListItem | PersonaDetalle | null;
   isEditMode: boolean;
   isSubmitting: boolean;
   onSubmit: (values: CreatePersonaDto | UpdatePersonaDto) => void;
@@ -34,13 +36,19 @@ export const PersonaFormModal = ({
     if (!open) return;
 
     if (isEditMode && selectedItem) {
+      const hasFechaNacimiento = "fecha_nacimiento" in selectedItem;
+      const fechaNacimiento = hasFechaNacimiento
+        ? selectedItem.fecha_nacimiento
+        : null;
+      const genero = "genero" in selectedItem ? selectedItem.genero : null;
+
       form.setFieldsValue({
         nombre: selectedItem.nombre,
         apellido: selectedItem.apellido,
         razon_social: selectedItem.razon_social,
         identificacion_principal: selectedItem.identificacion_principal,
-        fecha_nacimiento: null,
-        genero: null,
+        fecha_nacimiento: fechaNacimiento ? dayjs(fechaNacimiento) : null,
+        genero: genero ?? null,
       });
     } else {
       form.resetFields();
