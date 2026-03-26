@@ -62,18 +62,16 @@ export const UsuarioFiltersBar = ({
       <Select
         className="estado-placeholder"
         placeholder="Estado"
-        value={filters.estado === "" ? undefined : filters.estado}
-        onChange={(val) =>
-          onFilter({ estado: typeof val === "boolean" ? val : "" })
-        }
+        value={filters.estado || undefined}
+        onChange={(val) => onFilter({ estado: val })}
         allowClear
         style={{
           width: 140,
           background: "var(--color-bg-filter)",
         }}
         options={[
-          { value: true, label: "✓ Activo" },
-          { value: false, label: "✗ Inactivo" },
+          { value: "ACTIVO", label: "✓ Activo" },
+          { value: "INACTIVO", label: "✗ Inactivo" },
         ]}
       />
 

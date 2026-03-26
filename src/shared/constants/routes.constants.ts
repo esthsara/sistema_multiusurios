@@ -23,6 +23,7 @@ export const APP_ROUTES = {
     USUARIOS: {
       ROOT: "/dashboard/usuarios",
       NUEVO: "/dashboard/usuarios/nuevo",
+      DETALLE: (id: number | string) => `/dashboard/usuarios/${id}`,
     },
     ROLES: "/dashboard/roles",
     PERMISOS: "/dashboard/permisos",
@@ -30,6 +31,5 @@ export const APP_ROUTES = {
     SESIONES: "/dashboard/sesiones",
     ASIGNACIONES: "/dashboard/asignaciones",
     AUDITORIA: "/dashboard/auditoria",
-
   },
 } as const;

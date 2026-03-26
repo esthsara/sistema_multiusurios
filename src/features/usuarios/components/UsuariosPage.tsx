@@ -1,4 +1,4 @@
-import { useMemo, useState } from "react";
+import { useState } from "react";
 import { Button, Avatar, Tooltip } from "antd";
 import {
   Plus,
@@ -14,21 +14,34 @@ import { PageHeader } from "@/shared/components/molecules/PageHeader";
 import { DataTable } from "@/shared/components/organisms/DataTable";
 import { ConfirmModal } from "@/shared/components/molecules/ConfirmModal";
 import { RowActions } from "@/shared/components/molecules/RowActions";
+
+import { useNavigate } from "react-router-dom";
+import { APP_ROUTES } from "@/shared/constants/routes.constants";
+
 import { Can } from "@/shared/components/atoms/Can";
-import { useAuth } from "@/shared/hooks/useAuth";
 import { useUsuarios } from "../hooks/useUsuarios";
 import { useUsuarioForm } from "../hooks/useUsuarioForm";
+import { useRolesOptions } from "../hooks/useRolesOptions";
+import { useResetPassword } from "../hooks/useResetPassword";
+import { useSucursalesOptions } from "../hooks/useSucursalesOptions";
 import { UsuarioStatusBadge } from "./UsuarioStatusBadge";
 import { UsuarioFormModal } from "./UsuarioFormModal";
 import { UsuarioFiltersBar } from "./UsuarioFilters";
 import type { UsuarioListItem } from "../types/usuario.types";
 import { toast } from "react-toastify";
+import {
+  getUsuarioDisplayName,
+  getUsuarioInitials,
+} from "../utils/usuario.formatters";
 
 const UsuariosPage = () => {
-  const { sucursales } = useAuth();
+  const navigate = useNavigate();
 
   const usuarios = useUsuarios();
   const form = useUsuarioForm(usuarios.fetchUsuarios);
+  const { roleOptions } = useRolesOptions();
+  const resetPassword = useResetPassword();
+  const { branchOptions } = useSucursalesOptions();
 
   /* Estado para modales de confirmación */
   const [confirmState, setConfirmState] = useState<{
@@ -55,63 +68,20 @@ const UsuariosPage = () => {
     } else if (confirmState.type === "delete") {
       await usuarios.remove(confirmState.item.id);
     } else if (confirmState.type === "reset-password") {
-      try {
-        // Endpoint para resetear contraseña
-        toast.info("Función de reset de contraseña pendiente de implementar");
-      } catch {
-        toast.error("Error al resetear contraseña");
+      const result = await resetPassword.generateAndResetPassword(
+        confirmState.item.id,
+        "Reset de contraseña desde panel de administración",
+      );
+      if (result.success && result.temporaryPassword) {
+        // Mostrar contraseña temporal en un modal o copiar al portapapeles
+        await navigator.clipboard.writeText(result.temporaryPassword);
+        toast.info(
+          `Contraseña temporal copiada al portapapeles: ${result.temporaryPassword}`,
+        );
       }
     }
+
     closeConfirm();
-  };
-
-  const roleOptions = useMemo(() => {
-    const roleSet = new Set<string>();
-
-    usuarios.data.forEach((user) => {
-      user.roles_detalle?.forEach((role) => roleSet.add(role.name));
-      user.roles?.forEach((role) => roleSet.add(role));
-    });
-
-    return Array.from(roleSet)
-      .sort((a, b) => a.localeCompare(b, "es", { sensitivity: "base" }))
-      .map((role) => ({ label: role, value: role }));
-  }, [usuarios.data]);
-
-  const branchOptions = useMemo(
-    () =>
-      sucursales.map((branch) => ({ label: branch.nombre, value: branch.id })),
-    [sucursales],
-  );
-
-  const getUsuarioInitials = (usuario: UsuarioListItem) => {
-    const { nombre, apellido, razon_social } = usuario.persona;
-
-    if (razon_social) {
-      const initials = razon_social
-        .split(/\s+/)
-        .filter(Boolean)
-        .slice(0, 2)
-        .map((part) => part.charAt(0).toUpperCase())
-        .join("");
-      return initials || "M";
-    }
-
-    if (nombre && apellido) {
-      return `${nombre.charAt(0)}${apellido.charAt(0)}`.toUpperCase();
-    }
-
-    if (nombre) {
-      const initials = nombre
-        .split(/\s+/)
-        .filter(Boolean)
-        .slice(0, 2)
-        .map((part) => part.charAt(0).toUpperCase())
-        .join("");
-      return initials || "U";
-    }
-
-    return "U";
   };
 
   const getAvatarStyle = (usuario: UsuarioListItem) => {
@@ -155,7 +125,7 @@ const UsuariosPage = () => {
       width: 410,
       sorter: true,
       sortOrder:
-        usuarios.table.state.sort?.field === "display_name"
+        usuarios.table.state.sort?.field === "persona.nombre"
           ? usuarios.table.state.sort.direction === "asc"
             ? "ascend"
             : "descend"
@@ -166,9 +136,7 @@ const UsuariosPage = () => {
             className="font-medium m-0"
             style={{ color: "var(--color-text-primary)" }}
           >
-            {(r.persona.razon_social ??
-              `${r.persona.nombre ?? ""} ${r.persona.apellido ?? ""}`.trim()) ||
-              "Sin nombre"}
+            {getUsuarioDisplayName(r)}
           </p>
           <p
             className="text-xs m-0"
@@ -226,7 +194,8 @@ const UsuariosPage = () => {
             permission: "usuarios.ver" as const,
             label: "Ver",
             icon: <Eye size={14} />,
-            onClick: () => toast.info("Detalle de usuario - Próximamente"),
+            onClick: () =>
+              navigate(APP_ROUTES.DASHBOARD.USUARIOS.DETALLE(record.id)),
           },
           {
             key: "edit",
@@ -288,14 +257,15 @@ const UsuariosPage = () => {
     },
     "reset-password": {
       title: `¿Resetear contraseña de ${confirmState.item?.username}?`,
-      description: "Se enviará un enlace de recuperación al email del usuario.",
+      description:
+        "Se generará una contraseña temporal y se copiará automáticamente al portapapeles.",
       confirmText: "Resetear",
       danger: false,
     },
     delete: {
       title: `¿Seguro que deseas eliminar a ${confirmState.item?.username}?`,
       description:
-        "Esta acción puede revertirse restaurando el usuario más adelante.",
+        "Se aplicará una baja lógica (soft delete). Podrás restaurar el usuario después.",
       confirmText: "Eliminar",
       danger: true,
     },

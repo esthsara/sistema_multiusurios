@@ -1,59 +1,85 @@
+// src/features/usuarios/services/usuarios.service.ts
+import apiClient from "@/config/axios.config";
 import { http } from "@/shared/services/http.service";
-import type { RequestParams } from "@/shared/types/api.types";
+import type { ApiResponse, RequestParams } from "@/shared/types/api.types";
 import type {
   UsuarioListItem,
   UsuarioDetalle,
   CreateUsuarioDto,
   UpdateUsuarioDto,
+  ToggleStatusDto,
 } from "../types/usuario.types";
 
 export const usuariosService = {
-  /**
-   * Obtiene la lista de usuarios con paginación y filtros
-   */
   getAll: (params?: RequestParams) =>
     http.getPaginated<UsuarioListItem>("/users", params),
 
-  /**
-   * Obtiene el detalle de un usuario específico
-   */
   getById: (id: number) => http.get<UsuarioDetalle>(`/users/${id}`),
 
-  /**
-   * Crea un nuevo usuario asociado a una persona
-   */
-  create: (dto: CreateUsuarioDto) =>
-    http.post<UsuarioDetalle, CreateUsuarioDto>("/users", dto),
+  create: (data: CreateUsuarioDto) =>
+    http.post<UsuarioDetalle, CreateUsuarioDto>("/users", data),
+
+  update: (id: number, data: UpdateUsuarioDto) =>
+    http.put<UsuarioDetalle, UpdateUsuarioDto>(`/users/${id}`, data),
+
+  toggleStatus: (id: number, data: ToggleStatusDto) =>
+    http.patch<{ id: number; activo: boolean }, ToggleStatusDto>(
+      `/users/${id}/toggle-status`,
+      data,
+    ),
 
   /**
-   * Actualiza un usuario existente
-   */
-  update: (id: number, dto: UpdateUsuarioDto) =>
-    http.put<UsuarioDetalle, UpdateUsuarioDto>(`/users/${id}`, dto),
-
-  /**
-   * Elimina un usuario
+   * remove — soft delete (no elimina, solo marca como eliminado).
+   * El API usa DELETE para soft delete, pero la lógica backend maneja
+   * la eliminación suave mediante deleted_at timestamp.
    */
   remove: (id: number) => http.delete(`/users/${id}`),
 
   /**
-   * Activa o desactiva un usuario
+   * restore — recupera un usuario eliminado (si lo soporta el backend)
    */
-  toggleEstado: (id: number, activo: boolean) =>
-    http.patch<UsuarioDetalle>(`/users/${id}/toggle-status`, { activo }),
-
-  /**
-   * Reinicia la contraseña de un usuario
-   */
-  resetPassword: (id: number) =>
+  restore: (id: number) =>
     http.post<UsuarioDetalle, Record<string, never>>(
-      `/users/${id}/reset-password`,
+      `/users/${id}/restore`,
       {},
     ),
 
-  /**
-   * Obtiene todos los usuarios de una sucursal
-   */
+  resetPassword: (
+    id: number,
+    data: {
+      new_password: string;
+      password_confirmation: string;
+      motivo?: string;
+    },
+  ) => http.post<UsuarioDetalle>(`/users/${id}/reset-password`, data),
+
   getByBranch: (branchId: number) =>
     http.getPaginated<UsuarioListItem>(`/sucursales/${branchId}/usuarios`),
+
+  cambiarRol: (userId: number, rolId: number) =>
+    http.patch<UsuarioDetalle>(`/users/${userId}/rol`, { rol_id: rolId }),
+
+  cerrarSesiones: (userId: number) => http.delete(`/users/${userId}/sessions`),
+
+  asignarSucursal: (userId: number, sucursalId: number) =>
+    http.post<UsuarioDetalle>(`/users/${userId}/sucursales`, {
+      sucursal_id: sucursalId,
+    }),
+
+  desasignarSucursal: (userId: number, sucursalId: number) =>
+    http.delete(`/users/${userId}/sucursales/${sucursalId}`),
+
+  uploadFoto: async (
+    userId: number,
+    file: File,
+  ): Promise<ApiResponse<{ url: string }>> => {
+    const formData = new FormData();
+    formData.append("foto", file);
+    const res = await apiClient.post<ApiResponse<{ url: string }>>(
+      `/users/${userId}/foto`,
+      formData,
+      { headers: { "Content-Type": "multipart/form-data" } },
+    );
+    return res.data;
+  },
 };

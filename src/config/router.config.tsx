@@ -30,8 +30,13 @@ const SucursalesPage = lazy(
 const UsuariosPage = lazy(
   () => import("@/features/usuarios/components/UsuariosPage"),
 );
+/*ver usuario */
+const UsuarioDetallePage = lazy(
+  () => import("@/features/usuarios/components/detalle/UsuarioDetallePage"),
+);
+
 const RolesPage = lazy(
-  () => import("@/features/roles-permisos/components/RolesPage"),
+  () => import("@/features/roles/components/RolesPage"),
 );
 const AuditoriaPage = lazy(
   () => import("@/features/auditoria/components/AuditoriaPage"),
@@ -147,6 +152,10 @@ export const router = createBrowserRouter([
               {
                 path: APP_ROUTES.DASHBOARD.SUCURSALES.ROOT,
                 element: withSuspense(SucursalesPage),
+              },
+              {
+                path: `${APP_ROUTES.DASHBOARD.USUARIOS.ROOT}/:id`,
+                element: withSuspense(UsuarioDetallePage),
               },
             ],
           },
