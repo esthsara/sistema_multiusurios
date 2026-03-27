@@ -8,12 +8,67 @@ interface AuditoriaDetailModalProps {
   onClose: () => void;
 }
 
-const renderJson = (value: unknown) => {
-  if (value === null || value === undefined) return "—";
+const renderChanges = (cambios: AuditoriaDetalle["diferencias"]) => {
+  if (!cambios || Object.keys(cambios).length === 0) {
+    return <span>—</span>;
+  }
+
   return (
-    <pre className="m-0 text-xs whitespace-pre-wrap">
-      {JSON.stringify(value, null, 2)}
-    </pre>
+    <div className="flex flex-col gap-2">
+      {/* 🔹 HEADER */}
+      <div
+        className="grid grid-cols-3 px-3 py-1 text-[11px] font-semibold"
+        style={{ color: "var(--color-text-secondary)" }}
+      >
+        <span>Campo</span>
+        <span className="text-center">Antes</span>
+        <span className="text-center">Ahora</span>
+      </div>
+
+      {/* 🔹 FILAS */}
+      {Object.entries(cambios).map(([key, value]) => (
+        <div
+          key={key}
+          className="grid grid-cols-3 items-center gap-2 px-3 py-2 rounded-md"
+          style={{
+            background: "var(--color-bg-subtle)",
+            border: "1px solid var(--color-border)",
+          }}
+        >
+          {/* CAMPO */}
+          <span
+            className="text-xs font-medium truncate"
+            style={{ color: "var(--color-text-primary)" }}
+          >
+            {key.replace(/_/g, " ")}
+          </span>
+
+          {/* ANTES */}
+          <span
+            className="text-xs px-2 py-1 rounded text-center truncate"
+            style={{
+              background:
+                "color-mix(in srgb, var(--color-danger-500) 12%, transparent)",
+              color: "var(--color-danger-600)",
+            }}
+          >
+            {String(value.anterior ?? "—")}
+          </span>
+
+          {/* AHORA */}
+          <span
+            className="text-xs px-2 py-1 rounded text-center truncate"
+            style={{
+              background:
+                "color-mix(in srgb, var(--color-success-500) 12%, transparent)",
+              color: "var(--color-success-600)",
+            }}
+          >
+            {String(value.nuevo ?? "—")}
+          </span>
+        </div>
+      ))}
+    </div>
   );
 };
 
@@ -51,7 +106,7 @@ export const AuditoriaDetailModal = ({
             <Descriptions.Item label="Entidad ID">
               {detail.entidad_id}
             </Descriptions.Item>
-            <Descriptions.Item label="IP">{detail.ip || "—"}</Descriptions.Item>
+            <Descriptions.Item label="IP">{detail.ip || "-"}</Descriptions.Item>
             <Descriptions.Item label="Fecha completa">
               {detail.fecha_completa}
             </Descriptions.Item>
@@ -59,16 +114,8 @@ export const AuditoriaDetailModal = ({
               {detail.user_agent || "—"}
             </Descriptions.Item>
 
-            <Descriptions.Item label="Valores anteriores" span={2}>
-              {renderJson(detail.valores_anteriores)}
-            </Descriptions.Item>
-
-            <Descriptions.Item label="Valores nuevos" span={2}>
-              {renderJson(detail.valores_nuevos)}
-            </Descriptions.Item>
-
-            <Descriptions.Item label="Diferencias" span={2}>
-              {renderJson(detail.diferencias)}
+            <Descriptions.Item label="Cambios realizados" span={2}>
+              {renderChanges(detail.diferencias)}
             </Descriptions.Item>
           </Descriptions>
         )}

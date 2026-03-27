@@ -109,6 +109,7 @@ export const PersonaFiltersBar = ({
       <Button icon={<RotateCcw size={14} />} onClick={onReset} type="default">
         Limpiar
       </Button>
+      
     </div>
   );
 };

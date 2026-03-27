@@ -7,6 +7,7 @@ import esES from "antd/locale/es_ES";
 import { lightTheme, darkTheme } from "@/config/theme.config";
 import { useTheme } from "@/shared/hooks/useTheme";
 import { useAuthStore } from "@/features/auth/store/auth.store";
+import Spinner from "@/shared/components/molecules/Spinner";
 
 interface AppProvidersProps {
   children: React.ReactNode;
@@ -47,27 +48,7 @@ export const AppProviders = ({ children }: AppProvidersProps) => {
    * cuando el usuario ya tiene sesión activa.
    */
   if (isBootstrappingAuth) {
-    return (
-      <div
-        className="flex items-center justify-center min-h-screen"
-        style={{ backgroundColor: "var(--color-bg-base-loader)" }}
-      >
-        <div className="flex flex-col items-center gap-4">
-          <div
-            className="animate-spin rounded-full h-10 w-10
-                          border-2 border-[var(--color-primary-700)]
-                          border-t-transparent"
-          />
-          <p
-            className="text-sm"
-            style={{ color: "var(--color-text-secondary)" }}
-          >
-            Verificando sesión...
-          </p>
-        </div>
-      </div>
-      /*Cambiar spiner */
-    );
+    return <Spinner fullScreen text="Verificando sesión SARA..." size={40} />;
   }
 
   return (

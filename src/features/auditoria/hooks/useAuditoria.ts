@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { toast } from "react-toastify";
 import { useTableState } from "@/shared/hooks/useTableState";
 import { usuariosService } from "@/features/usuarios/services/usuarios.service";
@@ -37,8 +37,10 @@ const toCsv = (rows: Record<string, unknown>[]) => {
 export const useAuditoria = () => {
   const [data, setData] = useState<AuditoriaListItem[]>([]);
   const [total, setTotal] = useState(0);
+  const [lastPage, setLastPage] = useState(1);
   const [loading, setLoading] = useState(false);
   const [exporting, setExporting] = useState(false);
+  const requestIdRef = useRef(0);
 
   const [viewMode, setViewMode] = useState<AuditoriaViewMode>("timeline");
 
@@ -61,16 +63,25 @@ export const useAuditoria = () => {
   });
 
   const fetchAuditoria = useCallback(async () => {
+    const requestId = ++requestIdRef.current;
     setLoading(true);
     try {
       const params = table.toParams() as RequestParams;
       const res = await auditoriaService.getAll(params);
+
+      if (requestId !== requestIdRef.current) return;
+
       setData(res.data);
       setTotal(res.meta.total);
+      setLastPage(res.meta.last_page);
     } catch {
-      toast.error("Error al cargar auditoría");
+      if (requestId === requestIdRef.current) {
+        toast.error("Error al cargar auditoría");
+      }
     } finally {
-      setLoading(false);
+      if (requestId === requestIdRef.current) {
+        setLoading(false);
+      }
     }
   }, [table.toParams]);
 
@@ -96,7 +107,13 @@ export const useAuditoria = () => {
   }, []);
 
   useEffect(() => {
-    fetchAuditoria();
+    const timer = window.setTimeout(() => {
+      fetchAuditoria();
+    }, 300);
+
+    return () => {
+      window.clearTimeout(timer);
+    };
   }, [fetchAuditoria]);
 
   useEffect(() => {
@@ -176,6 +193,7 @@ export const useAuditoria = () => {
   return {
     data,
     total,
+    lastPage,
     loading,
     exporting,
     viewMode,

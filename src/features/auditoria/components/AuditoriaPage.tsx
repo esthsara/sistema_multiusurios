@@ -36,6 +36,14 @@ const normalizeGroupLabel = (dateKey: string) => {
 const AuditoriaPage = () => {
   const auditoria = useAuditoria();
 
+  const activeFiltersCount = useMemo(() => {
+    return Object.values(auditoria.table.state.filters).filter((value) => {
+      if (value === null || value === undefined) return false;
+      if (typeof value === "string") return value.trim() !== "";
+      return true;
+    }).length;
+  }, [auditoria.table.state.filters]);
+
   const columns: TableColumnsType<AuditoriaListItem> = useMemo(
     () => [
       {
@@ -89,26 +97,51 @@ const AuditoriaPage = () => {
 
   return (
     <div className="p-6">
+      {/* SARA areglar color de audittoria y actividades, filtros activos*/}
       <PageHeader
         title="Auditoría"
         description="Registro completo de todas las acciones realizadas en el sistema"
         breadcrumbs={[{ label: "Seguridad y Accesos" }, { label: "Auditoría" }]}
       />
 
-      <Row gutter={16} className="mb-4">
+      <Row gutter={[12, 12]} className="mb-4">
         <Col xs={12} sm={8} md={6}>
-          <Statistic
-            title="Actividades"
-            value={auditoria.total}
-            valueStyle={{ color: "var(--color-primary-600)" }}
-          />
+          <div
+            className="p-3 rounded-lg"
+            style={{
+              background: "var(--color-bg-base)",
+              border: "1px solid var(--color-border)",
+            }}
+          >
+            <Statistic
+              title="Actividades"
+              value={auditoria.total}
+              valueStyle={{ color: "var(--color-primary-600)" }}
+            />
+          </div>
+        </Col>
+
+        <Col xs={12} sm={8} md={6}>
+          <div
+            className="p-3 rounded-lg"
+            style={{
+              background: "var(--color-bg-base)",
+              border: "1px solid var(--color-border)",
+            }}
+          >
+            <Statistic title="Filtros activos" value={activeFiltersCount} />
+          </div>
         </Col>
         <Col xs={12} sm={8} md={6}>
-          <Statistic
-            title="Página actual"
-            value={auditoria.table.state.page}
-            valueStyle={{ color: "var(--color-success-600)" }}
-          />
+          <div
+            className="p-3 rounded-lg"
+            style={{
+              background: "var(--color-bg-base)",
+              border: "1px solid var(--color-border)",
+            }}
+          >
+            <Statistic title="Total páginas" value={auditoria.lastPage} />
+          </div>
         </Col>
       </Row>
 
@@ -152,7 +185,10 @@ const AuditoriaPage = () => {
             <div className="space-y-5">
               {auditoria.timelineGroups.map((group) => (
                 <div key={group.date}>
-                  <div className="flex items-center justify-between mb-2 border-b pb-2">
+                  <div
+                    className="flex items-center justify-between mb-2 border-b pb-2"
+                    style={{ borderBottomColor: "var(--color-border)" }}
+                  >
                     <h3 className="m-0 text-sm font-semibold text-gray-600">
                       {normalizeGroupLabel(group.date)}
                     </h3>
@@ -167,6 +203,7 @@ const AuditoriaPage = () => {
                         key={item.id}
                         type="button"
                         className="w-full text-left border rounded-lg px-3 py-2 hover:bg-gray-50 transition"
+                        style={{ borderColor: "var(--color-border)" }}
                         onClick={() => auditoria.openDetail(item.id)}
                       >
                         <div className="flex items-center justify-between gap-3">

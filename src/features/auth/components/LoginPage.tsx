@@ -14,11 +14,11 @@ const LoginPage = () => {
     <div
       className="w-full min-h-screen flex items-center justify-center bg-cover bg-center"
       style={{
-        backgroundImage: "url('/image/font-login.png')",
+        backgroundImage: "url('/image/font-login-2.png')",
       }}
     >
       {/* OVERLAY oscuro para mejor contraste */}
-      <div className="absolute inset-0 bg-black/50 backdrop-blur-sm"></div>
+      <div className="absolute inset-0 bg-black/40 backdrop-blur-sm"></div>
 
       {/* CARD */}
       <div className="relative w-full max-w-sm px-4">
@@ -26,7 +26,7 @@ const LoginPage = () => {
           variant="outlined"
           className="shadow-2xl"
           style={{
-            backgroundColor: "rgba(10, 20, 40, 0.6)",
+            backgroundColor: "rgba(10, 20, 40, 0.53)",
             border: "1px solid var(--color-border)",
             borderRadius: "var(--radius-card)",
             backdropFilter: "blur(10px)",
@@ -115,6 +115,7 @@ const LoginPage = () => {
                 ¿Olvidaste tu contraseña?
               </a>
             </div>
+            {/* SARA Funcionalidad de contraseña no te olvides   */}
 
             <Form.Item className="mb-0">
               <Button

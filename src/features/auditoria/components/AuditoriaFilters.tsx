@@ -1,7 +1,7 @@
-import { Button, DatePicker, Input, Row, Col, Select, Segmented } from "antd";
+import { Button, DatePicker, Input, Row, Col, Select, Segmented, Space } from "antd";
 import type { Dayjs } from "dayjs";
 import dayjs from "dayjs";
-import { Calendar, Download, Search } from "lucide-react";
+import { Calendar, Download, RotateCcw, Search } from "lucide-react";
 import type {
   AuditoriaFilters as AuditoriaFilterValues,
   AuditoriaViewMode,
@@ -60,9 +60,91 @@ export const AuditoriaFiltersPanel = ({
   onExport,
 }: AuditoriaFiltersProps) => {
   return (
-    <div className="space-y-4 mb-6">
+    <div
+      className="mb-6 p-4 rounded-xl border"
+      style={{
+        background: "var(--color-bg-base)",
+        borderColor: "var(--color-border)",
+        boxShadow: "var(--shadow-card)",
+      }}
+    >
+      {/* HEADER / TOOLBAR */}
+      <Row justify="space-between" align="middle" className="mb-4">
+        <Col>
+          <div className="flex items-center gap-2">
+            <span
+              className="text-sm font-medium"
+              style={{ color: "var(--color-text-secondary)" }}
+            >
+              Vista:
+            </span>
+
+            <Segmented
+              options={[
+                {
+                  label: (
+                    <span
+                      className={`flex items-center gap-1 ${
+                        viewMode === "timeline"
+                          ? "border-b-2 border-blue-500 text-blue-600 font-semibold pb-1"
+                          : "text-gray-600"
+                      }`}
+                    >
+                      <Calendar size={14} />
+                      Linea de Tiempo
+                    </span>
+                  ),
+                  value: "timeline",
+                },
+                {
+                  label: (
+                    <span
+                      className={`flex items-center gap-1 ${
+                        viewMode === "table"
+                          ? "border-b-2 border-blue-500 text-blue-600 font-semibold pb-1"
+                          : "text-gray-600"
+                      }`}
+                    >
+                      <Search size={14} />
+                      Tabla
+                    </span>
+                  ),
+                  value: "table",
+                },
+              ]}
+              value={viewMode}
+              onChange={(value) => onViewModeChange(value as AuditoriaViewMode)}
+            />
+          </div>
+        </Col>
+
+        {/* BOTONES */}
+        <Col>
+          <Space>
+            <Button
+              icon={<RotateCcw size={14} />}
+              onClick={onReset}
+              disabled={loading || exporting}
+            >
+              Limpiar
+            </Button>
+
+            <Button
+              type="primary"
+              icon={<Download size={16} />}
+              loading={exporting}
+              onClick={onExport}
+            >
+              Exportar
+            </Button>
+          </Space>
+        </Col>
+      </Row>
+
+      {/*  FILA PRINCIPAL (más limpia y alineada) */}
       <Row gutter={[12, 12]} align="middle">
-        <Col xs={24} md={10}>
+        {/* BUSCADOR */}
+        <Col xs={24} md={12}>
           <Input
             placeholder="Buscar por nombre o código"
             value={search}
@@ -72,101 +154,91 @@ export const AuditoriaFiltersPanel = ({
           />
         </Col>
 
-        <Col xs={12} md={4}>
-          <DatePicker
-            className="w-full"
-            placeholder="Desde"
-            value={toDateValue(filters.fecha_inicio)}
-            onChange={(date) =>
-              onFiltersChange({ fecha_inicio: toApiDate(date) })
-            }
-            format="DD/MM/YYYY"
-            suffixIcon={<Calendar size={16} />}
-            allowClear
-          />
-        </Col>
+        {/* FECHAS AGRUPADAS */}
+        <Col xs={24} md={12}>
+          <div className="flex gap-2">
+            <DatePicker
+              className="w-full"
+              placeholder="Desde"
+              value={toDateValue(filters.fecha_inicio)}
+              onChange={(date) =>
+                onFiltersChange({ fecha_inicio: toApiDate(date) })
+              }
+              format="DD/MM/YYYY"
+              suffixIcon={<Calendar size={16} />}
+              allowClear
+            />
 
-        <Col xs={12} md={4}>
-          <DatePicker
-            className="w-full"
-            placeholder="Hasta"
-            value={toDateValue(filters.fecha_fin)}
-            onChange={(date) => onFiltersChange({ fecha_fin: toApiDate(date) })}
-            format="DD/MM/YYYY"
-            suffixIcon={<Calendar size={16} />}
-            allowClear
-          />
-        </Col>
-
-        <Col xs={24} md={6} className="flex justify-end gap-2">
-          <Button onClick={onReset} disabled={loading || exporting}>
-            Limpiar
-          </Button>
-          <Button
-            type="primary"
-            icon={<Download size={16} />}
-            loading={exporting}
-            onClick={onExport}
-          >
-            Exportar
-          </Button>
+            <DatePicker
+              className="w-full"
+              placeholder="Hasta"
+              value={toDateValue(filters.fecha_fin)}
+              onChange={(date) =>
+                onFiltersChange({ fecha_fin: toApiDate(date) })
+              }
+              format="DD/MM/YYYY"
+              suffixIcon={<Calendar size={16} />}
+              allowClear
+            />
+          </div>
         </Col>
       </Row>
 
-      <Row gutter={[12, 12]} align="middle">
-        <Col xs={24} md={5}>
-          <Segmented
-            block
-            options={[
-              { label: "Línea Tiempo", value: "timeline" },
-              { label: "Tabla", value: "table" },
-            ]}
-            value={viewMode}
-            onChange={(value) => onViewModeChange(value as AuditoriaViewMode)}
-          />
-        </Col>
+      {/*  BARRA DE FILTROS (tipo toolbar) */}
+      <div
+        className="mt-4 p-3 rounded-lg flex flex-wrap items-center gap-2"
+        style={{
+          background: "var(--color-bg-subtle)",
+          border: "1px solid var(--color-border)",
+        }}
+      >
+        {/* ICONO FILTRO */}
+        <div
+          className="flex items-center gap-1 px-2"
+          style={{ color: "var(--color-text-secondary)" }}
+        >
+          <Search size={14} />
+          <span className="text-sm">Filtros:</span>
+        </div>
 
-        <Col xs={24} md={6}>
-          <Select
-            className="w-full"
-            placeholder="Todas las Acciones"
-            value={filters.accion || undefined}
-            options={acciones.map((accion) => ({
-              label: accion,
-              value: accion,
-            }))}
-            onChange={(value) => onFiltersChange({ accion: value || "" })}
-            allowClear
-          />
-        </Col>
+        {/* ACCIONES */}
+        <Select
+          className="min-w-[160px]"
+          placeholder="Acciones"
+          value={filters.accion || undefined}
+          options={acciones.map((accion) => ({
+            label: accion,
+            value: accion,
+          }))}
+          onChange={(value) => onFiltersChange({ accion: value || "" })}
+          allowClear
+        />
 
-        <Col xs={24} md={6}>
-          <Select
-            className="w-full"
-            placeholder="Todas las Entidades"
-            value={filters.entidad_type || undefined}
-            options={entidades.map((entidad) => ({
-              label: entidad.label,
-              value: entidad.value,
-            }))}
-            onChange={(value) => onFiltersChange({ entidad_type: value || "" })}
-            allowClear
-          />
-        </Col>
+        {/* ENTIDADES */}
+        <Select
+          className="min-w-[180px]"
+          placeholder="Entidades"
+          value={filters.entidad_type || undefined}
+          options={entidades.map((entidad) => ({
+            label: entidad.label,
+            value: entidad.value,
+          }))}
+          onChange={(value) => onFiltersChange({ entidad_type: value || "" })}
+          allowClear
+        />
 
-        <Col xs={24} md={7}>
-          <Select
-            className="w-full"
-            placeholder="Todos los Usuarios"
-            value={filters.usuario_id || undefined}
-            options={usuarios}
-            onChange={(value) => onFiltersChange({ usuario_id: value || "" })}
-            allowClear
-            showSearch
-            optionFilterProp="label"
-          />
-        </Col>
-      </Row>
+        {/* USUARIOS */}
+        <Select
+          className="min-w-[200px]"
+          placeholder="Usuarios"
+          value={filters.usuario_id || undefined}
+          options={usuarios}
+          onChange={(value) => onFiltersChange({ usuario_id: value || "" })}
+          allowClear
+          showSearch
+          optionFilterProp="label"
+        />
+      </div>
     </div>
   );
 };
