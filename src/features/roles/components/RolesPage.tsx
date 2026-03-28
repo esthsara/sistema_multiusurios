@@ -147,12 +147,12 @@ const RolesPage = () => {
         </span>
       ),
     },
-    {
+    {/*
       title: "Guard",
       dataIndex: "guard_name",
       key: "guard_name",
       width: 140,
-      render: (guardName: string) => <Tag color="blue">{guardName}</Tag>,
+      render: (guardName: string) => <Tag color="blue">{guardName}</Tag>,*/
     },
     {
       title: "Nro Usuarios",

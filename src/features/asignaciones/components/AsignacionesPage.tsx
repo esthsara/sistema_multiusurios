@@ -1,331 +1,366 @@
 // src/features/asignaciones/components/AsignacionesPage.tsx
 import { useEffect, useState } from "react";
-import { Button, Table, Tag, Popconfirm, Space, Select, Tooltip } from "antd";
-import type { TableColumnsType } from "antd";
-import { Plus, Trash2, Edit2 } from "lucide-react";
-import { PageHeader } from "@/shared/components/molecules/PageHeader";
-import { Can } from "@/shared/components/atoms/Can";
-import { ConfirmModal } from "@/shared/components/molecules/ConfirmModal";
+import {
+  Card,
+  Row,
+  Col,
+  Input,
+  Button,
+  Empty,
+  Spin,
+  Tag,
+  Popconfirm,
+  Badge,
+} from "antd";
+import { Plus, Trash2 } from "lucide-react";
 import { useAsignaciones } from "../hooks/useAsignaciones";
-import { AsignacionFilters } from "./AsignacionFilters";
-import { AsignacionModal } from "./AsignacionModal";
-import type { AsignacionListItem } from "../types/asignacion.types";
+import { useRoles } from "@/features/roles/hooks/useRoles";
 import { sucursalesService } from "@/features/sucursales/services/sucursales.service";
 import { usuariosService } from "@/features/usuarios/services/usuarios.service";
-import { rolesService } from "@/features/roles/services/roles.service";
+import { AsignacionModal } from "./AsignacionModal";
+import { Can } from "@/shared/components/atoms/Can";
+import type { AsignacionListItem } from "../types/asignacion.types";
 
 export const AsignacionesPage = () => {
-  const { data, total, loading, table, fetchAsignaciones, create, remove } =
-    useAsignaciones();
+  const { data: asignaciones, loading, create, remove } = useAsignaciones();
+  const { data: roles, loading: loadingRoles } = useRoles();
+
+  const [usuarios, setUsuarios] = useState<any[]>([]);
+  const [sucursales, setSucursales] = useState<any[]>([]);
+  const [loadingData, setLoadingData] = useState(false);
 
   const [modalOpen, setModalOpen] = useState(false);
-  const [sucursales, setSucursales] = useState<
-    Array<{ id: number; nombre: string; codigo: string }>
-  >([]);
-  const [usuarios, setUsuarios] = useState<
-    Array<{ id: number; username: string; email: string }>
-  >([]);
-  const [roles, setRoles] = useState<Array<{ id: number; name: string }>>([]);
-  const [loadingSelects, setLoadingSelects] = useState({
-    sucursales: false,
-    usuarios: false,
-    roles: false,
-  });
+  const [selectedSucursal, setSelectedSucursal] = useState<number | null>(null);
+  const [searchUser, setSearchUser] = useState("");
   const [deleteTarget, setDeleteTarget] = useState<AsignacionListItem | null>(
     null,
   );
-  const [editingRol, setEditingRol] = useState<{
-    id: number;
-    rolId: number;
-  } | null>(null);
 
-  // Cargar datos iniciales
+  // Cargar usuarios y sucursales
   useEffect(() => {
-    loadInitialData();
+    const loadData = async () => {
+      setLoadingData(true);
+      try {
+        const [usersRes, sucursalesRes] = await Promise.all([
+          usuariosService.getAll({ per_page: 100 }),
+          sucursalesService.getAll({ per_page: 100 }),
+        ]);
+        setUsuarios(usersRes.data ?? []);
+        setSucursales(sucursalesRes.data ?? []);
+      } catch {
+        // Errores ya manejados en servicios
+      } finally {
+        setLoadingData(false);
+      }
+    };
+    loadData();
   }, []);
 
-  // Cargar asignaciones cuando se abre el modal
-  useEffect(() => {
-    if (modalOpen) {
-      loadSelectors();
-    }
-  }, [modalOpen]);
+  // Agrupar asignaciones por sucursal
+  const asignacionesBySucursal = sucursales.map((sucursal) => ({
+    ...sucursal,
+    asignaciones: asignaciones.filter(
+      (a: AsignacionListItem) => a.sucursal_id === sucursal.id,
+    ),
+  }));
 
-  // Fetch de asignaciones cuando cambian los filtros
-  useEffect(() => {
-    const timer = setTimeout(() => {
-      fetchAsignaciones();
-    }, 300);
-    return () => clearTimeout(timer);
-  }, [table.state, fetchAsignaciones]);
-
-  const loadInitialData = async () => {
-    try {
-      const [sucRes, rolRes] = await Promise.all([
-        sucursalesService.getAll({}),
-        rolesService.getAll({}),
-      ]);
-      setSucursales(
-        (sucRes.data ?? []).map((s: any) => ({
-          id: s.id,
-          nombre: s.nombre,
-          codigo: s.codigo,
-        })),
-      );
-      setRoles(
-        (rolRes.data.items ?? []).map((r: any) => ({
-          id: r.id,
-          name: r.name,
-        })),
-      );
-    } catch {
-      // Error silencioso
-    }
-  };
-
-  const loadSelectors = async () => {
-    setLoadingSelects({ sucursales: true, usuarios: true, roles: true });
-    try {
-      const [sucRes, usRes, rolRes] = await Promise.all([
-        sucursalesService.getAll({}),
-        usuariosService.getAll({}),
-        rolesService.getAll({}),
-      ]);
-
-      setSucursales(
-        (sucRes.data ?? []).map((s: any) => ({
-          id: s.id,
-          nombre: s.nombre,
-          codigo: s.codigo,
-        })),
-      );
-      setUsuarios(
-        (usRes.data ?? []).map((u: any) => ({
-          id: u.id,
-          username: u.username,
-          email: u.email,
-        })),
-      );
-      setRoles(
-        (rolRes.data.items ?? []).map((r: any) => ({
-          id: r.id,
-          name: r.name,
-        })),
-      );
-    } finally {
-      setLoadingSelects({ sucursales: false, usuarios: false, roles: false });
-    }
+  const handleAddUsuario = (sucursalId: number) => {
+    setSelectedSucursal(sucursalId);
+    setModalOpen(true);
   };
 
   const handleCreateAsignacion = async (data: {
     usuario_id: number;
-    sucursal_id: number;
     rol_id: number;
-    es_administrador: boolean;
   }) => {
+    if (!selectedSucursal) return;
     const success = await create(
       data.usuario_id,
-      data.sucursal_id,
+      selectedSucursal,
       data.rol_id,
     );
     if (success) {
       setModalOpen(false);
+      setSelectedSucursal(null);
     }
   };
 
   const confirmDelete = async () => {
     if (!deleteTarget) return;
-    await remove(deleteTarget.id);
-    setDeleteTarget(null);
+    const success = await remove(deleteTarget.id);
+    if (success) {
+      setDeleteTarget(null);
+    }
   };
 
-  const columns: TableColumnsType<AsignacionListItem> = [
-    {
-      title: "Usuario",
-      key: "usuario",
-      render: (_, r) => (
-        <div>
-          <p
-            className="m-0 font-medium"
-            style={{ color: "var(--color-text-primary)" }}
-          >
-            @{r.usuario.username}
-          </p>
-          <p
-            className="m-0 text-xs"
-            style={{ color: "var(--color-text-secondary)" }}
-          >
-            {r.usuario.email}
-          </p>
-        </div>
-      ),
-    },
-    {
-      title: "Sucursal",
-      key: "sucursal",
-      width: 200,
-      render: (_, r) => (
-        <div>
-          <p
-            className="m-0 font-medium"
-            style={{ color: "var(--color-text-primary)" }}
-          >
-            {r.sucursal.nombre}
-          </p>
-          <p
-            className="m-0 text-xs"
-            style={{ color: "var(--color-text-secondary)" }}
-          >
-            {r.sucursal.codigo}
-          </p>
-        </div>
-      ),
-    },
-    {
-      title: "Rol",
-      key: "rol",
-      width: 180,
-      render: (_, r) =>
-        editingRol?.id === r.id ? (
-          <Select
-            value={editingRol.rolId}
-            onChange={(value) => setEditingRol({ ...editingRol, rolId: value })}
-            options={roles.map((ro) => ({
-              value: ro.id,
-              label: ro.name,
-            }))}
-            style={{ width: "100%" }}
-            autoFocus
-            onBlur={() => setEditingRol(null)}
-          />
-        ) : (
-          <Tag>{r.rol.name}</Tag>
-        ),
-    },
-    {
-      title: "Admin",
-      key: "administrador",
-      width: 90,
-      render: (_, r) => (
-        <Tag color={r.es_administrador ? "blue" : "default"}>
-          {r.es_administrador ? "Sí" : "No"}
-        </Tag>
-      ),
-    },
-    {
-      title: "Estado",
-      key: "activo",
-      width: 100,
-      render: (_, r) => (
-        <Tag color={r.activo ? "green" : "red"}>
-          {r.activo ? "Activo" : "Inactivo"}
-        </Tag>
-      ),
-    },
-    {
-      title: "Acciones",
-      key: "acciones",
-      width: 120,
-      render: (_, r) => (
-        <Space>
-          <Can permission="asignaciones.editar">
-            <Tooltip title="Editar rol">
-              <Button
-                type="text"
-                icon={<Edit2 size={14} />}
-                onClick={() => setEditingRol({ id: r.id, rolId: r.rol_id })}
-              />
-            </Tooltip>
-          </Can>
-          <Can permission="asignaciones.eliminar">
-            <Popconfirm
-              title="Quitar asignación"
-              description={`¿Deseas quitar a ${r.usuario.username} de ${r.sucursal.nombre}?`}
-              okText="Quitar"
-              cancelText="Cancelar"
-              onConfirm={() => remove(r.id)}
-            >
-              <Button type="text" danger icon={<Trash2 size={14} />} />
-            </Popconfirm>
-          </Can>
-        </Space>
-      ),
-    },
-  ];
+  if (loadingData) {
+    return (
+      <div className="flex items-center justify-center min-h-screen">
+        <Spin size="large" />
+      </div>
+    );
+  }
 
   return (
-    <div>
-      <PageHeader
-        title="Asignaciones Usuario-Sucursal"
-        description="Gestiona la asignación de usuarios a sucursales y sus roles"
-        breadcrumbs={[
-          { label: "Gestión Organizacional" },
-          { label: "Asignaciones Usuario-Sucursal" },
-        ]}
-        actions={
-          <Can permission="asignaciones.crear">
-            <Button
-              type="primary"
-              icon={<Plus size={15} />}
-              onClick={() => setModalOpen(true)}
-            >
-              Nueva Asignación
-            </Button>
-          </Can>
-        }
-      />
-
-      <div className="mt-6 space-y-4">
-        <AsignacionFilters
-          filters={table.state}
-          onFilterChange={(filters) => table.setFilters(filters)}
-          sucursales={sucursales}
-          roles={roles}
-          loading={loading}
-        />
-
-        <Table
-          rowKey="id"
-          dataSource={data}
-          columns={columns}
-          loading={loading}
-          pagination={{
-            current: table.state.page,
-            pageSize: table.state.pageSize,
-            total: total,
-            onChange: (page, pageSize) => {
-              table.setPage(page, pageSize);
-            },
-          }}
-          size="small"
-          style={{
-            backgroundColor: "var(--color-bg-base)",
-            borderRadius: "var(--radius-card)",
-          }}
-        />
+    <div style={{ padding: "24px" }}>
+      {/* Header */}
+      <div
+        style={{
+          marginBottom: "24px",
+          display: "flex",
+          justifyContent: "space-between",
+          alignItems: "center",
+        }}
+      >
+        <div>
+          <h1 style={{ margin: 0, fontSize: "28px", fontWeight: 600 }}>
+            Asignaciones de Usuarios
+          </h1>
+          <p
+            style={{
+              margin: "8px 0 0 0",
+              color: "var(--color-text-secondary)",
+            }}
+          >
+            Gestiona qué usuarios trabajan en cada sucursal y sus roles
+          </p>
+        </div>
       </div>
 
-      <AsignacionModal
-        open={modalOpen}
-        onCancel={() => setModalOpen(false)}
-        usuarios={usuarios}
-        sucursales={sucursales}
-        roles={roles}
-        loadingUsers={loadingSelects.usuarios}
-        loadingSucursales={loadingSelects.sucursales}
-        loadingRoles={loadingSelects.roles}
-        onSubmit={handleCreateAsignacion}
-      />
+      {/* Filtro de búsqueda */}
+      <Card
+        style={{
+          marginBottom: "24px",
+          borderRadius: "12px",
+          border: "1px solid var(--color-border)",
+        }}
+      >
+        <Input
+          placeholder="Buscar usuario por nombre, email o username..."
+          value={searchUser}
+          onChange={(e) => setSearchUser(e.target.value.toLowerCase())}
+          style={{ maxWidth: "400px" }}
+        />
+      </Card>
 
-      <ConfirmModal
-        open={!!deleteTarget}
-        title="¿Quitar asignación?"
-        description={`Se quitará a ${deleteTarget?.usuario.username} de ${deleteTarget?.sucursal.nombre}`}
-        confirmText="Quitar"
-        danger
-        onConfirm={confirmDelete}
-        onCancel={() => setDeleteTarget(null)}
-      />
+      {/* Grid de sucursales */}
+      {asignacionesBySucursal.length === 0 ? (
+        <Empty
+          description="No hay sucursales disponibles"
+          style={{ marginTop: "48px" }}
+        />
+      ) : (
+        <Row gutter={[24, 24]}>
+          {asignacionesBySucursal
+            .filter(
+              (s) =>
+                s.nombre.toLowerCase().includes(searchUser) ||
+                s.codigo.toLowerCase().includes(searchUser),
+            )
+            .map((sucursal) => (
+              <Col key={sucursal.id} xs={24} sm={12} lg={8}>
+                <Card
+                  className="h-full"
+                  style={{
+                    borderRadius: "12px",
+                    border: "1px solid var(--color-border)",
+                    backgroundColor: "var(--color-bg-secondary)",
+                    cursor: "default",
+                    transition: "all 0.3s ease",
+                  }}
+                  hoverable
+                >
+                  {/* Encabezado de sucursal */}
+                  <div
+                    style={{
+                      marginBottom: "16px",
+                      paddingBottom: "12px",
+                      borderBottom: "2px solid var(--color-border)",
+                    }}
+                  >
+                    <h3
+                      style={{
+                        margin: "0 0 4px 0",
+                        fontSize: "18px",
+                        fontWeight: 600,
+                        color: "var(--color-text-primary)",
+                      }}
+                    >
+                      {sucursal.nombre}
+                    </h3>
+                    <p
+                      style={{
+                        margin: 0,
+                        fontSize: "12px",
+                        color: "var(--color-text-secondary)",
+                      }}
+                    >
+                      Código: {sucursal.codigo}
+                    </p>
+                  </div>
+
+                  {/* Badge de usuarios */}
+                  <div style={{ marginBottom: "16px" }}>
+                    <Badge
+                      count={sucursal.asignaciones.length}
+                      style={{
+                        backgroundColor: "var(--color-primary)",
+                        color: "white",
+                        fontSize: "14px",
+                        padding: "4px 8px",
+                        borderRadius: "8px",
+                      }}
+                    />
+                    <span
+                      style={{
+                        marginLeft: "8px",
+                        color: "var(--color-text-secondary)",
+                        fontSize: "14px",
+                      }}
+                    >
+                      {sucursal.asignaciones.length === 1
+                        ? "usuario asignado"
+                        : "usuarios asignados"}
+                    </span>
+                  </div>
+
+                  {/* Lista de usuarios */}
+                  {sucursal.asignaciones.length === 0 ? (
+                    <div
+                      style={{
+                        padding: "20px",
+                        backgroundColor: "var(--color-bg-tertiary)",
+                        borderRadius: "8px",
+                        textAlign: "center",
+                        marginBottom: "12px",
+                      }}
+                    >
+                      <p
+                        style={{
+                          margin: 0,
+                          color: "var(--color-text-secondary)",
+                          fontSize: "14px",
+                        }}
+                      >
+                        Sin usuarios asignados
+                      </p>
+                    </div>
+                  ) : (
+                    <div style={{ marginBottom: "16px" }}>
+                      {sucursal.asignaciones.map(
+                        (asignacion: AsignacionListItem) => (
+                          <div
+                            key={asignacion.id}
+                            style={{
+                              padding: "12px",
+                              marginBottom: "8px",
+                              backgroundColor: "var(--color-bg-primary)",
+                              borderRadius: "8px",
+                              border: "1px solid var(--color-border)",
+                              display: "flex",
+                              justifyContent: "space-between",
+                              alignItems: "center",
+                            }}
+                          >
+                            <div style={{ flex: 1 }}>
+                              <p
+                                style={{
+                                  margin: "0 0 4px 0",
+                                  fontSize: "14px",
+                                  fontWeight: 500,
+                                  color: "var(--color-text-primary)",
+                                }}
+                              >
+                                @{asignacion.usuario?.username}
+                              </p>
+                              <p
+                                style={{
+                                  margin: "0 0 6px 0",
+                                  fontSize: "12px",
+                                  color: "var(--color-text-secondary)",
+                                }}
+                              >
+                                {asignacion.usuario?.email}
+                              </p>
+                              {asignacion.rol && (
+                                <Tag
+                                  color="var(--color-primary)"
+                                  style={{
+                                    color: "white",
+                                    marginTop: "4px",
+                                    fontSize: "12px",
+                                  }}
+                                >
+                                  {asignacion.rol.name}
+                                </Tag>
+                              )}
+                            </div>
+                            <Can permission="asignaciones.eliminar">
+                              <Button
+                                type="text"
+                                danger
+                                size="small"
+                                icon={<Trash2 size={14} />}
+                                onClick={() => setDeleteTarget(asignacion)}
+                              />
+                            </Can>
+                          </div>
+                        ),
+                      )}
+                    </div>
+                  )}
+
+                  {/* Botón agregar usuario */}
+                  <Can permission="asignaciones.crear">
+                    <Button
+                      type="primary"
+                      block
+                      icon={<Plus size={16} />}
+                      onClick={() => handleAddUsuario(sucursal.id)}
+                      style={{
+                        borderRadius: "8px",
+                        height: "40px",
+                        fontSize: "14px",
+                        fontWeight: 500,
+                      }}
+                    >
+                      Agregar Usuario
+                    </Button>
+                  </Can>
+                </Card>
+              </Col>
+            ))}
+        </Row>
+      )}
+
+      {/* Modal para agregar usuario */}
+      {selectedSucursal && (
+        <AsignacionModal
+          open={modalOpen}
+          onCancel={() => {
+            setModalOpen(false);
+            setSelectedSucursal(null);
+          }}
+          usuarios={usuarios}
+          roles={roles}
+          loading={loading || loadingRoles}
+          onSubmit={handleCreateAsignacion}
+          sucursal={sucursales.find((s) => s.id === selectedSucursal)}
+        />
+      )}
+
+      {/* Modal de confirmación de eliminación */}
+      {deleteTarget && (
+        <Popconfirm
+          title="¿Quitar asignación?"
+          description={`¿Deseas quitar a ${deleteTarget.usuario?.username} de ${deleteTarget.sucursal?.nombre}?`}
+          okText="Quitar"
+          cancelText="Cancelar"
+          open={!!deleteTarget}
+          onConfirm={confirmDelete}
+          onCancel={() => setDeleteTarget(null)}
+        />
+      )}
     </div>
   );
 };

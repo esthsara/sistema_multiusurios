@@ -48,8 +48,21 @@ interface AuthActions {
 /**
  * AuthStore — Intersección de State + Actions.
  * Intersección (&): el store tiene AMBAS formas.
+ * (SARA OJITO REVISA ESTOOOO AAAAA)
  */
 type AuthStore = AuthState & AuthActions;
+
+const AUTH_USER_CACHE_KEY = "auth_user_cache";
+
+const readCachedUser = (): AuthUser | null => {
+  try {
+    const raw = sessionStorage.getItem(AUTH_USER_CACHE_KEY);
+    if (!raw) return null;
+    return JSON.parse(raw) as AuthUser;
+  } catch {
+    return null;
+  }
+};
 
 /* ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
    ESTADO INICIAL
@@ -86,6 +99,21 @@ export const useAuthStore = create<AuthStore>()(
               sessionStorage.removeItem("access_token");
             }
 
+            if (user?.sucursalActiva?.id) {
+              sessionStorage.setItem(
+                "sucursal_activa_id",
+                String(user.sucursalActiva.id),
+              );
+            } else {
+              sessionStorage.removeItem("sucursal_activa_id");
+            }
+
+            if (user) {
+              sessionStorage.setItem(AUTH_USER_CACHE_KEY, JSON.stringify(user));
+            } else {
+              sessionStorage.removeItem(AUTH_USER_CACHE_KEY);
+            }
+
             return {
               user,
               accessToken,
@@ -101,6 +129,7 @@ export const useAuthStore = create<AuthStore>()(
           () => {
             sessionStorage.removeItem("access_token");
             sessionStorage.removeItem("sucursal_activa_id");
+            sessionStorage.removeItem(AUTH_USER_CACHE_KEY);
             return initialState;
           },
           false,
@@ -130,10 +159,28 @@ export const useAuthStore = create<AuthStore>()(
            * ya actualizó el store antes de esta llamada.
            */
           const meResponse = await authService.me();
-          const fullUser = adaptBackendUser(
-            { ...backendUser, ...meResponse.data },
-            session_id,
-          );
+          const meUser = meResponse.data;
+
+          const mergedUser = {
+            ...backendUser,
+            ...meUser,
+            persona: meUser.persona ?? backendUser.persona,
+            roles:
+              (meUser.roles?.length ?? 0) > 0
+                ? meUser.roles
+                : backendUser.roles,
+            permisos:
+              (meUser.permisos?.length ?? 0) > 0
+                ? meUser.permisos
+                : backendUser.permisos,
+            sucursales:
+              (meUser.sucursales?.length ?? 0) > 0
+                ? meUser.sucursales
+                : backendUser.sucursales,
+            current_branch: meUser.current_branch ?? backendUser.current_branch,
+          };
+
+          const fullUser = adaptBackendUser(mergedUser, session_id);
 
           get()._setUser(fullUser, plainToken);
         } finally {
@@ -206,6 +253,28 @@ export const useAuthStore = create<AuthStore>()(
         try {
           const meResponse = await authService.me();
           const backendUser = meResponse.data;
+          const fallbackUser = get().user ?? readCachedUser();
+
+          const adaptedUser = adaptBackendUser(backendUser, null);
+          const hydratedUser: AuthUser = {
+            ...adaptedUser,
+            roles:
+              adaptedUser.roles.length > 0
+                ? adaptedUser.roles
+                : (fallbackUser?.roles ?? []),
+            permisos:
+              adaptedUser.permisos.length > 0
+                ? adaptedUser.permisos
+                : (fallbackUser?.permisos ?? []),
+            sucursales:
+              adaptedUser.sucursales.length > 0
+                ? adaptedUser.sucursales
+                : (fallbackUser?.sucursales ?? []),
+            sucursalActiva:
+              adaptedUser.sucursalActiva ??
+              fallbackUser?.sucursalActiva ??
+              null,
+          };
 
           /**
            * Recuperamos el token del sessionStorage (puente temporal).
@@ -215,14 +284,14 @@ export const useAuthStore = create<AuthStore>()(
           const storedToken = token;
 
           if (storedToken) {
-            const fullUser = adaptBackendUser(backendUser, null);
-            get()._setUser(fullUser, storedToken);
+            get()._setUser(hydratedUser, storedToken);
           } else {
             get()._reset();
           }
         } catch {
           // 401 → sesión inválida → limpiamos
           sessionStorage.removeItem("access_token");
+          sessionStorage.removeItem(AUTH_USER_CACHE_KEY);
           get()._reset();
         } finally {
           get()._setLoading(false);

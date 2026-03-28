@@ -10,26 +10,27 @@ export interface AsignacionUsuarioSucursal {
   usuario_id: number;
   sucursal_id: number;
   rol_id: number;
-  usuario: {
+  usuario?: {
     id: number;
     username: string;
     email: string;
     nombre?: string;
-    activo: boolean;
+    activo?: boolean;
   };
-  sucursal: {
+  sucursal?: {
     id: number;
     nombre: string;
     codigo: string;
   };
-  rol: {
+  rol?: {
     id: number;
     name: string;
+    guard_name?: string;
   };
-  es_administrador: boolean;
-  activo: boolean;
+  activo: boolean | null;
   created_at: string;
-  updated_at: string;
+  created_at_humano?: string;
+  updated_at?: string;
 }
 
 export interface AsignacionListItem extends AsignacionUsuarioSucursal {}
@@ -42,13 +43,12 @@ export interface CreateAsignacionDto {
   usuario_id: number;
   sucursal_id: number;
   rol_id: number;
-  es_administrador?: boolean;
 }
 
 export interface UpdateAsignacionDto {
+  usuario_id?: number;
+  sucursal_id?: number;
   rol_id?: number;
-  es_administrador?: boolean;
-  activo?: boolean;
 }
 
 /* ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
@@ -58,8 +58,6 @@ export interface UpdateAsignacionDto {
 export interface AsignacionFilters {
   sucursal_id?: number;
   usuario_id?: number;
-  rol_id?: number;
-  activa?: boolean | "";
   search?: string;
 }
 

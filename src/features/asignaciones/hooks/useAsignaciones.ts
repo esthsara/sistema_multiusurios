@@ -16,8 +16,6 @@ export const useAsignaciones = () => {
   const table = useTableState<AsignacionFilters>({
     sucursal_id: undefined,
     usuario_id: undefined,
-    rol_id: undefined,
-    activa: "",
     search: "",
   });
 
@@ -38,11 +36,8 @@ export const useAsignaciones = () => {
       if (table.state.filters?.sucursal_id) {
         params.sucursal_id = table.state.filters.sucursal_id;
       }
-      if (table.state.filters?.rol_id) {
-        params.rol_id = table.state.filters.rol_id;
-      }
-      if (table.state.filters?.activa !== "") {
-        params.activa = table.state.filters.activa;
+      if (table.state.filters?.usuario_id) {
+        params.usuario_id = table.state.filters.usuario_id;
       }
 
       const res = await asignacionesService.getAll(params);
@@ -52,10 +47,9 @@ export const useAsignaciones = () => {
         const search = table.state.search?.toLowerCase() || "";
         if (!search) return true;
         return (
-          a.usuario.username.toLowerCase().includes(search) ||
-          a.usuario.email.toLowerCase().includes(search) ||
-          a.sucursal.nombre.toLowerCase().includes(search) ||
-          a.rol.name.toLowerCase().includes(search)
+          a.usuario?.username.toLowerCase().includes(search) ||
+          a.usuario?.email.toLowerCase().includes(search) ||
+          a.sucursal?.nombre.toLowerCase().includes(search)
         );
       });
 
@@ -91,28 +85,14 @@ export const useAsignaciones = () => {
           sucursal_id: sucursalId,
           rol_id: rolId,
         });
-        toast.success("Usuario asignado correctamente");
+        toast.success("Usuario asignado a sucursal correctamente");
         // Refetch después de crear
         setTimeout(() => fetchAsignaciones(), 500);
         return true;
-      } catch {
-        toast.error("Error al asignar usuario");
-        return false;
-      }
-    },
-    [fetchAsignaciones],
-  );
-
-  const updateRol = useCallback(
-    async (asignacionId: number, rolId: number) => {
-      try {
-        await asignacionesService.update(asignacionId, { rol_id: rolId });
-        toast.success("Rol actualizado correctamente");
-        // Refetch después de actualizar
-        setTimeout(() => fetchAsignaciones(), 500);
-        return true;
-      } catch {
-        toast.error("Error al actualizar rol");
+      } catch (error) {
+        const apiError = error as any;
+        const msg = apiError?.message || "Error al asignar usuario";
+        toast.error(msg);
         return false;
       }
     },
@@ -143,7 +123,6 @@ export const useAsignaciones = () => {
     table,
     fetchAsignaciones,
     create,
-    updateRol,
     remove,
   };
 };

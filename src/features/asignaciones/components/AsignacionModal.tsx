@@ -1,30 +1,23 @@
 // src/features/asignaciones/components/AsignacionModal.tsx
 import { useState } from "react";
-import { Modal, Form, Select, Checkbox, Spin } from "antd";
+import { Modal, Form, Select, Spin, Card, Typography } from "antd";
 import type { ModalProps } from "antd";
 
 interface AsignacionModalProps extends Omit<ModalProps, "children"> {
   usuarios: Array<{ id: number; username: string; email: string }>;
-  sucursales: Array<{ id: number; nombre: string; codigo: string }>;
   roles: Array<{ id: number; name: string }>;
-  loadingUsers?: boolean;
-  loadingSucursales?: boolean;
-  loadingRoles?: boolean;
-  onSubmit?: (data: {
-    usuario_id: number;
-    sucursal_id: number;
-    rol_id: number;
-    es_administrador: boolean;
-  }) => Promise<void>;
+  loading?: boolean;
+  sucursal?: { id: number; nombre: string; codigo: string };
+  onSubmit?: (data: { usuario_id: number; rol_id: number }) => Promise<void>;
 }
+
+const { Text } = Typography;
 
 export const AsignacionModal = ({
   usuarios,
-  sucursales,
   roles,
-  loadingUsers = false,
-  loadingSucursales = false,
-  loadingRoles = false,
+  loading = false,
+  sucursal,
   onSubmit,
   ...modalProps
 }: AsignacionModalProps) => {
@@ -56,7 +49,7 @@ export const AsignacionModal = ({
   return (
     <Modal
       {...modalProps}
-      title="Asignar Usuario a Sucursal"
+      title={`Asignar Usuario a ${sucursal?.nombre || "Sucursal"}`}
       okText="Asignar"
       cancelText="Cancelar"
       onOk={handleSubmit}
@@ -65,7 +58,24 @@ export const AsignacionModal = ({
       okButtonProps={{ loading: submitting }}
       destroyOnClose
     >
-      <Spin spinning={loadingUsers || loadingSucursales || loadingRoles}>
+      <Spin spinning={loading}>
+        {sucursal && (
+          <Card
+            size="small"
+            style={{
+              marginBottom: "16px",
+              backgroundColor: "var(--color-bg-tertiary)",
+              border: "1px solid var(--color-border)",
+            }}
+          >
+            <Text strong>{sucursal.nombre}</Text>
+            <br />
+            <Text type="secondary" style={{ fontSize: "12px" }}>
+              Código: {sucursal.codigo}
+            </Text>
+          </Card>
+        )}
+
         <Form
           form={form}
           layout="vertical"
@@ -93,45 +103,23 @@ export const AsignacionModal = ({
           </Form.Item>
 
           <Form.Item
-            name="sucursal_id"
-            label="Seleccionar Sucursal"
-            rules={[{ required: true, message: "Selecciona una sucursal" }]}
+            name="rol_id"
+            label="Seleccionar Rol"
+            rules={[{ required: true, message: "Selecciona un rol" }]}
           >
             <Select
-              placeholder="Buscar sucursal..."
+              placeholder="Elige un rol para este usuario en esta sucursal..."
               optionFilterProp="label"
               filterOption={(input, option) =>
                 (option?.label as string)
                   ?.toLowerCase()
                   .includes(input.toLowerCase()) || false
               }
-              options={sucursales.map((s) => ({
-                value: s.id,
-                label: `${s.nombre} (${s.codigo})`,
-              }))}
-            />
-          </Form.Item>
-
-          <Form.Item
-            name="rol_id"
-            label="Seleccionar Rol"
-            rules={[{ required: true, message: "Selecciona un rol" }]}
-          >
-            <Select
-              placeholder="Selecciona un rol..."
               options={roles.map((r) => ({
                 value: r.id,
                 label: r.name,
               }))}
             />
-          </Form.Item>
-
-          <Form.Item
-            name="es_administrador"
-            label="Permisos"
-            valuePropName="checked"
-          >
-            <Checkbox>Es administrador de esta sucursal</Checkbox>
           </Form.Item>
         </Form>
       </Spin>

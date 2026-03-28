@@ -33,33 +33,26 @@ const PermisosPage = () => {
   const handleOpenCreate = async () => {
     setFormMode("create");
     setSelectedPermiso(null);
-    await permisos.fetchAgrupados();
     setFormOpen(true);
   };
 
   const handleOpenEdit = async (permiso: PermisoItem) => {
     setFormMode("edit");
     setSelectedPermiso(permiso);
-    await permisos.fetchAgrupados();
     setFormOpen(true);
   };
 
   const handleSubmitPermiso = async (values: {
     name: string;
-    modulo?: string;
-    accion?: string;
     guard_name?: string;
   }) => {
-    // Construir el nombre si viene separado
-    let finalName = values.name;
-    if (values.modulo && values.accion) {
-      finalName = `${values.modulo}.${values.accion}`;
-    }
+    const guardName = values.guard_name?.trim() || "api";
+    const finalName = values.name.trim().toLowerCase();
 
     if (formMode === "create") {
       const ok = await permisos.createPermiso({
         name: finalName,
-        guard_name: values.guard_name ?? "api",
+        guard_name: guardName,
       });
       if (ok) setFormOpen(false);
       return;
@@ -69,7 +62,7 @@ const PermisosPage = () => {
     if (!selectedPermiso) return;
     const ok = await permisos.updatePermiso(selectedPermiso.id, {
       name: finalName,
-      guard_name: values.guard_name ?? "api",
+      guard_name: guardName,
     });
     if (ok) setFormOpen(false);
   };
@@ -176,22 +169,6 @@ const PermisosPage = () => {
         }
       />
 
-      <Row gutter={16} className="mb-6">
-        <Col xs={12} sm={6} md={4}>
-          <Statistic
-            title="Total Módulos"
-            value={permisos.moduloCount}
-            valueStyle={{ color: "var(--color-primary-600)" }}
-          />
-        </Col>
-        <Col xs={12} sm={6} md={4}>
-          <Statistic
-            title="Total de Acciones"
-            value={permisos.accionCount}
-            valueStyle={{ color: "var(--color-success-600)" }}
-          />
-        </Col>
-      </Row>
 
       <PermisoFilters
         search={permisos.table.state.search}
@@ -224,7 +201,14 @@ const PermisosPage = () => {
         mode={formMode}
         loading={false}
         submitting={permisos.submitting}
-        modulos={permisos.modulos}
+        initialValues={
+          formMode === "edit" && selectedPermiso
+            ? {
+                name: selectedPermiso.name,
+                guard_name: selectedPermiso.guard_name,
+              }
+            : { guard_name: "api" }
+        }
         onCancel={() => setFormOpen(false)}
         onSubmit={handleSubmitPermiso}
       />
