@@ -165,7 +165,14 @@ const RolesPage = () => {
       title: "Estado",
       key: "estado",
       width: 120,
-      render: () => <Tag color="success">Activo</Tag>,
+      render: (_, role) => {
+        const estado = roles.getRoleEstado(role);
+        return estado === "activo" ? (
+          <Tag color="success">Activo</Tag>
+        ) : (
+          <Tag color="error">Inactivo</Tag>
+        );
+      },
     },
     {
       title: "Acciones",
@@ -252,7 +259,9 @@ const RolesPage = () => {
 
       <RoleFilters
         search={roles.table.state.search}
+        filters={roles.table.state.filters}
         onSearch={roles.table.setSearch}
+        onFilterChange={roles.table.setFilters}
         onReset={roles.table.reset}
       />
 
@@ -293,6 +302,10 @@ const RolesPage = () => {
         open={permissionsOpen}
         role={selectedRoleDetail}
         onClose={() => setPermissionsOpen(false)}
+        onEdit={async (roleDetail) => {
+          setPermissionsOpen(false);
+          await handleOpenEdit(roleDetail);
+        }}
       />
 
       <RoleUsersModal

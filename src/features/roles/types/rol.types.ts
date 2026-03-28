@@ -28,6 +28,10 @@ export interface RolListItem {
   name: string;
   guard_name: string;
   users_count?: number;
+  activo?: boolean;
+  is_active?: boolean;
+  estado?: string;
+  deleted_at?: string | null;
   created_at?: string;
   updated_at?: string;
 }
@@ -58,4 +62,7 @@ export interface CopyRolDto {
 
 export interface RolFilters {
   search?: string;
+  estado?: "" | "activo" | "inactivo";
+  fecha_desde?: string;
+  fecha_hasta?: string;
 }

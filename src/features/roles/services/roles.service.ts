@@ -1,4 +1,5 @@
 import { http } from "@/shared/services/http.service";
+import type { ApiError } from "@/shared/types/api.types";
 import type { RequestParams } from "@/shared/types/api.types";
 import type {
   RolListItem,
@@ -9,6 +10,12 @@ import type {
   RolPermission,
 } from "../types/rol.types";
 
+const toPositiveNumber = (value: unknown): number | null => {
+  const parsed = Number(value);
+  if (!Number.isFinite(parsed) || parsed <= 0) return null;
+  return parsed;
+};
+
 const normalizePermissions = (raw: unknown): RolPermission[] => {
   if (!Array.isArray(raw)) return [];
 
@@ -16,13 +23,14 @@ const normalizePermissions = (raw: unknown): RolPermission[] => {
     .map((item) => {
       if (!item || typeof item !== "object") return null;
       const value = item as Record<string, unknown>;
+      const permissionId = toPositiveNumber(value.id);
 
-      if (typeof value.id !== "number" || typeof value.name !== "string") {
+      if (permissionId === null || typeof value.name !== "string") {
         return null;
       }
 
       return {
-        id: value.id,
+        id: permissionId,
         name: value.name,
         guard_name:
           typeof value.guard_name === "string" ? value.guard_name : "api",
@@ -37,13 +45,17 @@ const normalizePermissions = (raw: unknown): RolPermission[] => {
 
 const normalizeRoleDetail = (raw: unknown): RolDetalle => {
   const value = (raw ?? {}) as Record<string, unknown>;
+  const roleId = toPositiveNumber(value.id) ?? 0;
+  const usersCount =
+    value.users_count === undefined || value.users_count === null
+      ? undefined
+      : Number(value.users_count);
 
   return {
-    id: typeof value.id === "number" ? value.id : 0,
+    id: roleId,
     name: typeof value.name === "string" ? value.name : "",
     guard_name: typeof value.guard_name === "string" ? value.guard_name : "api",
-    users_count:
-      typeof value.users_count === "number" ? value.users_count : undefined,
+    users_count: Number.isFinite(usersCount) ? usersCount : undefined,
     created_at:
       typeof value.created_at === "string" ? value.created_at : undefined,
     updated_at:
@@ -51,6 +63,25 @@ const normalizeRoleDetail = (raw: unknown): RolDetalle => {
     permissions: normalizePermissions(value.permissions),
   };
 };
+
+const normalizePermissionIds = (permissions: number[] = []): number[] => {
+  return Array.from(
+    new Set(
+      permissions
+        .map((permissionId) => Number(permissionId))
+        .filter(
+          (permissionId) => Number.isInteger(permissionId) && permissionId > 0,
+        ),
+    ),
+  );
+};
+
+const buildSyncPayloads = (permissionIds: number[]) => [
+  { permissions: permissionIds },
+  { permission_ids: permissionIds },
+  { permissionIds: permissionIds },
+  { permissions_ids: permissionIds },
+];
 
 export const rolesService = {
   getAll: (params?: RequestParams) =>
@@ -70,11 +101,30 @@ export const rolesService = {
   update: (id: number, data: UpdateRolDto) =>
     http.put<RolDetalle, UpdateRolDto>(`/roles/${id}`, data),
 
-  syncPermissions: (id: number, data: SyncPermissionsDto) =>
-    http.post<RolDetalle, SyncPermissionsDto>(
-      `/roles/${id}/sync-permissions`,
-      data,
-    ),
+  syncPermissions: async (id: number, data: SyncPermissionsDto) => {
+    const permissionIds = normalizePermissionIds(data.permissions);
+    const payloads = buildSyncPayloads(permissionIds);
+
+    let lastValidationError: unknown = null;
+
+    for (const payload of payloads) {
+      try {
+        return await http.post<RolDetalle, typeof payload>(
+          `/roles/${id}/sync-permissions`,
+          payload,
+        );
+      } catch (error) {
+        const apiError = error as Partial<ApiError>;
+        if (apiError.status !== 422) {
+          throw error;
+        }
+
+        lastValidationError = error;
+      }
+    }
+
+    throw lastValidationError;
+  },
 
   remove: (id: number) => http.delete(`/roles/${id}`),
 };

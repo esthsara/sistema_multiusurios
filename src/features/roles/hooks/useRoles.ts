@@ -1,5 +1,6 @@
 import { useState, useEffect, useCallback } from "react";
 import { toast } from "react-toastify";
+import dayjs from "dayjs";
 import { rolesService } from "../services/roles.service";
 import { useTableState } from "@/shared/hooks/useTableState";
 import { permisosService } from "@/features/permisos/services/permisos.service";
@@ -28,7 +29,39 @@ export const useRoles = () => {
 
   const table = useTableState<RolFilters>({
     search: "",
+    estado: "",
+    fecha_desde: "",
+    fecha_hasta: "",
   });
+
+  const getRoleEstado = useCallback(
+    (role: RolListItem): "activo" | "inactivo" => {
+      if (typeof role.activo === "boolean") {
+        return role.activo ? "activo" : "inactivo";
+      }
+
+      if (typeof role.is_active === "boolean") {
+        return role.is_active ? "activo" : "inactivo";
+      }
+
+      if (typeof role.estado === "string") {
+        const value = role.estado.trim().toLowerCase();
+        if (["activo", "active", "1", "true"].includes(value)) {
+          return "activo";
+        }
+        if (["inactivo", "inactive", "0", "false"].includes(value)) {
+          return "inactivo";
+        }
+      }
+
+      if (role.deleted_at) {
+        return "inactivo";
+      }
+
+      return "activo";
+    },
+    [],
+  );
 
   const fetchRoles = useCallback(async () => {
     setLoading(true);
@@ -36,10 +69,42 @@ export const useRoles = () => {
       const res = await rolesService.getAll();
       const roles = res.data.items ?? [];
       const search = table.state.search.trim().toLowerCase();
+      const estado = table.state.filters.estado ?? "";
+      const fechaDesde = table.state.filters.fecha_desde ?? "";
+      const fechaHasta = table.state.filters.fecha_hasta ?? "";
 
-      const filtered = search
-        ? roles.filter((role) => role.name.toLowerCase().includes(search))
-        : roles;
+      const fromDate = fechaDesde
+        ? dayjs(fechaDesde, "YYYY-MM-DD", true).startOf("day")
+        : null;
+      const toDate = fechaHasta
+        ? dayjs(fechaHasta, "YYYY-MM-DD", true).endOf("day")
+        : null;
+
+      const filtered = roles.filter((role) => {
+        if (search && !role.name.toLowerCase().includes(search)) {
+          return false;
+        }
+
+        if (estado && getRoleEstado(role) !== estado) {
+          return false;
+        }
+
+        if (fromDate || toDate) {
+          if (!role.created_at) return false;
+          const createdAt = dayjs(role.created_at);
+          if (!createdAt.isValid()) return false;
+
+          if (fromDate && createdAt.isBefore(fromDate)) {
+            return false;
+          }
+
+          if (toDate && createdAt.isAfter(toDate)) {
+            return false;
+          }
+        }
+
+        return true;
+      });
 
       setData(filtered);
       setTotal(filtered.length);
@@ -48,7 +113,13 @@ export const useRoles = () => {
     } finally {
       setLoading(false);
     }
-  }, [table.state.search]);
+  }, [
+    table.state.search,
+    table.state.filters.estado,
+    table.state.filters.fecha_desde,
+    table.state.filters.fecha_hasta,
+    getRoleEstado,
+  ]);
 
   useEffect(() => {
     const timer = setTimeout(() => {
@@ -234,5 +305,6 @@ export const useRoles = () => {
     fetchUsersByRole,
     clearRoleUsers,
     getPermissionIds,
+    getRoleEstado,
   };
 };
