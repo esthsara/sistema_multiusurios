@@ -56,22 +56,21 @@ const AuditoriaPage = lazy(
 );
 const NotFoundPage = lazy(() => import("@/shared/components/NotFoundPage"));
 
+import { useEffect } from "react";
+import { useUIStore } from "@/shared/store/ui.store";
+
 /**
  * Este componente se muestra mientras se cargan las páginas de forma perezosa (lazy loading). Es una buena práctica mostrar algo al usuario para que sepa que la aplicación está trabajando en cargar el contenido.
  */
-const PageLoader = () => (
-  <div
-    className="flex items-center justify-center min-h-screen"
-    style={{ backgroundColor: "var(--color-bg-base-loader)" }}
-  >
-    <div
-      className="animate-spin rounded-full h-10 w-10
-                    border-2 border-[var(--color-primary-700)]
-                    border-t-transparent"
-    />
-  </div>
-  /* Cambiar spinner */
-);
+const PageLoader = () => {
+  useEffect(() => {
+    const { setGlobalLoading } = useUIStore.getState();
+    setGlobalLoading(true, "Cargando vista...");
+    return () => setGlobalLoading(false);
+  }, []);
+
+  return null;
+};
 
 /* Wrapper para envolver componentes con Suspense tiene carga perezosa es decir que no se cargan si no se necesitan  si no se carga se muestra hatsa mientras el pageloader*/
 const withSuspense = (Component: React.ComponentType) => (

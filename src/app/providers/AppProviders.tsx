@@ -7,7 +7,8 @@ import esES from "antd/locale/es_ES";
 import { lightTheme, darkTheme } from "@/config/theme.config";
 import { useTheme } from "@/shared/hooks/useTheme";
 import { useAuthStore } from "@/features/auth/store/auth.store";
-import Spinner from "@/shared/components/molecules/Spinner";
+import { GlobalLoader } from "@/shared/components/molecules/GlobalLoader";
+import { useUIStore } from "@/shared/store/ui.store";
 
 interface AppProvidersProps {
   children: React.ReactNode;
@@ -25,6 +26,10 @@ export const AppProviders = ({ children }: AppProvidersProps) => {
    */
   useEffect(() => {
     let isMounted = true;
+    const { setGlobalLoading } = useUIStore.getState();
+    
+    // Mostramos el GlobalLoader durante el inicio
+    setGlobalLoading(true, "Verificando sesión");
 
     const bootstrapAuth = async () => {
       try {
@@ -32,6 +37,7 @@ export const AppProviders = ({ children }: AppProvidersProps) => {
       } finally {
         if (isMounted) {
           setIsBootstrappingAuth(false);
+          setGlobalLoading(false);
         }
       }
     };
@@ -43,21 +49,19 @@ export const AppProviders = ({ children }: AppProvidersProps) => {
     };
   }, [initializeAuth]);
 
-  /**
-   * Pantalla de carga inicial — evita flash de login
-   * cuando el usuario ya tiene sesión activa.
-   */
-  if (isBootstrappingAuth) {
-    return <Spinner fullScreen text="Verificando sesión SARA..." size={40} />;
-  }
-
   return (
     <ConfigProvider
       key={isDark ? "theme-dark" : "theme-light"}
       locale={esES}
       theme={isDark ? darkTheme : lightTheme}
     >
-      {children}
+      <GlobalLoader />
+      
+      {/* 
+        Evitamos renderizar los children (router) hasta validar la sesión, 
+        previniendo redireccionamientos prematuros ("flickers") hacia el login.
+      */}
+      {!isBootstrappingAuth && children}
 
       <ToastContainer
         position="top-right"

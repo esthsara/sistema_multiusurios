@@ -10,7 +10,7 @@ const CONTROL_CHARS_REGEX = /[\u0000-\u001F\u007F]/g;
 const TAGS_REGEX = /<[^>]*>/g;
 
 /**
- * sanitizeInput — Normaliza texto de entrada para evitar payloads obvios.
+ * Normaliza texto de entrada para evitar payloads obvios.
  * No intenta ser un parser HTML completo.
  */
 export const sanitizeInput = (

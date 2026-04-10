@@ -1,7 +1,9 @@
 // src/shared/components/guards/AuthGuard.tsx
 import { Navigate, Outlet, useLocation } from "react-router-dom";
+import { useEffect } from "react";
 import { useAuth } from "@/shared/hooks/useAuth";
 import { APP_ROUTES } from "@/shared/constants/routes.constants";
+import { useUIStore } from "@/shared/store/ui.store";
 
 /**
  * AuthGuard — Protege rutas que requieren autenticación.
@@ -11,20 +13,25 @@ export const AuthGuard = () => {
   const { isAuthenticated, isLoading } = useAuth();
   const location = useLocation();
 
+  useEffect(() => {
+    // Sincronizamos el estado local de auth con el GlobalLoader
+    const { setGlobalLoading } = useUIStore.getState();
+    if (isLoading) {
+      setGlobalLoading(true, "Verificando accesos...");
+    } else {
+      setGlobalLoading(false);
+    }
+    
+    // Limpiamos en caso de desmontaje
+    return () => {
+      setGlobalLoading(false);
+    };
+  }, [isLoading]);
+
   if (isLoading) {
-    return (
-      <div
-        className="flex items-center justify-center min-h-screen"
-        style={{ backgroundColor: "var(--color-bg-base-loader)" }}
-      >
-        <div
-          className="animate-spin rounded-full h-8 w-8
-                        border-2 border-[var(--color-primary-700)]
-                        border-t-transparent"
-        />
-      </div>
-      /*Cambiar spiner aqui*/
-    );
+    // Retornamos null para no flashear rutas hijas incorrectamente,
+    // el GlobalLoader montado en AppProviders cubrirá toda la pantalla.
+    return null;
   }
 
   if (!isAuthenticated) {
