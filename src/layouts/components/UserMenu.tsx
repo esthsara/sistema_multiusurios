@@ -4,6 +4,7 @@ import { User, LogOut } from "lucide-react";
 import type { MenuProps } from "antd";
 import { useAuth } from "@/shared/hooks/useAuth";
 import { useAuthActions } from "@/features/auth/hooks/useAuthActions";
+import { safeText } from "@/shared/utils/sanitize";
 
 /* Componente para el menú del usuario en la barra de navegación  este junta las iniciales y lo covierte en uno solo*/
 interface UserMenuProps {
@@ -14,8 +15,12 @@ export const UserMenu = ({ collapsed }: UserMenuProps) => {
   const { user } = useAuth();
   const { logout } = useAuthActions();
 
+  const safeName = safeText(user?.persona.nombreCompleto, "Usuario", 120);
+  const safeEmail = safeText(user?.email, "Sin email", 120);
+  const safeRole = safeText(user?.roles[0]?.name, "Sin rol", 80);
+
   const initials =
-    user?.persona.nombreCompleto
+    safeName
       .split(" ")
       .slice(0, 2)
       .map((w) => w[0])
@@ -31,13 +36,13 @@ export const UserMenu = ({ collapsed }: UserMenuProps) => {
             className="font-semibold text-sm m-0"
             style={{ color: "var(--color-text-primary)" }}
           >
-            {user?.persona.nombreCompleto}
+            {safeName}
           </p>
           <p
             className="text-xs m-0"
             style={{ color: "var(--color-text-secondary)" }}
           >
-            {user?.email}
+            {safeEmail}
           </p>
         </div>
       ),
@@ -84,13 +89,13 @@ export const UserMenu = ({ collapsed }: UserMenuProps) => {
               className="text-xs font-semibold m-0 truncate"
               style={{ color: "var(--color-text-inverse)" }}
             >
-              {user?.persona.nombreCompleto}
+              {safeName}
             </p>
             <p
               className="text-xs m-0 truncate"
               style={{ color: "var(--color-primary-200)" }}
             >
-              {user?.roles[0]?.name ?? "Sin rol"}
+              {safeRole}
             </p>
           </div>
         )}

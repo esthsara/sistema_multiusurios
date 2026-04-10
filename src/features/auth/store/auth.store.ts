@@ -6,6 +6,8 @@ import {
   adaptBackendUser,
   extractPlainToken,
 } from "@/features/auth/adapters/auth.adapter";
+import { tokenManager } from "@/shared/utils/tokenManager";
+import { storageManager } from "@/shared/utils/storageManager";
 import type {
   AuthUser,
   AuthState,
@@ -52,16 +54,11 @@ interface AuthActions {
  */
 type AuthStore = AuthState & AuthActions;
 
-const AUTH_USER_CACHE_KEY = "auth_user_cache";
+let initializeAuthPromise: Promise<void> | null = null;
+let logoutPromise: Promise<void> | null = null;
 
 const readCachedUser = (): AuthUser | null => {
-  try {
-    const raw = sessionStorage.getItem(AUTH_USER_CACHE_KEY);
-    if (!raw) return null;
-    return JSON.parse(raw) as AuthUser;
-  } catch {
-    return null;
-  }
+  return storageManager.getCachedUser();
 };
 
 /* ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
@@ -72,6 +69,7 @@ const initialState: AuthState = {
   accessToken: null,
   isAuthenticated: false,
   isLoading: false,
+  isAuthInitialized: false,
 };
 
 /* ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
@@ -94,30 +92,28 @@ export const useAuthStore = create<AuthStore>()(
              * que actualmente lee el token desde sessionStorage.
              */
             if (accessToken) {
-              sessionStorage.setItem("access_token", accessToken);
+              tokenManager.setToken(accessToken);
             } else {
-              sessionStorage.removeItem("access_token");
+              tokenManager.removeToken();
             }
 
             if (user?.sucursalActiva?.id) {
-              sessionStorage.setItem(
-                "sucursal_activa_id",
-                String(user.sucursalActiva.id),
-              );
+              storageManager.setSucursalId(String(user.sucursalActiva.id));
             } else {
-              sessionStorage.removeItem("sucursal_activa_id");
+              storageManager.removeSucursalId();
             }
 
             if (user) {
-              sessionStorage.setItem(AUTH_USER_CACHE_KEY, JSON.stringify(user));
+              storageManager.setCachedUser(user);
             } else {
-              sessionStorage.removeItem(AUTH_USER_CACHE_KEY);
+              storageManager.removeCachedUser();
             }
 
             return {
               user,
               accessToken,
               isAuthenticated: !!user && !!accessToken,
+              isAuthInitialized: true,
             };
           },
           false,
@@ -127,10 +123,15 @@ export const useAuthStore = create<AuthStore>()(
       _reset: () =>
         set(
           () => {
-            sessionStorage.removeItem("access_token");
-            sessionStorage.removeItem("sucursal_activa_id");
-            sessionStorage.removeItem(AUTH_USER_CACHE_KEY);
-            return initialState;
+            const wasInitialized = get().isAuthInitialized;
+            tokenManager.removeToken();
+            storageManager.removeSucursalId();
+            storageManager.removeCachedUser();
+
+            return {
+              ...initialState,
+              isAuthInitialized: wasInitialized,
+            };
           },
           false,
           "auth/reset",
@@ -145,6 +146,7 @@ export const useAuthStore = create<AuthStore>()(
           const { user: backendUser, access_token, session_id } = response.data;
 
           const plainToken = extractPlainToken(access_token);
+          tokenManager.setLoginTime();
 
           /**
            * Guardamos el token en memoria (Zustand).
@@ -197,6 +199,7 @@ export const useAuthStore = create<AuthStore>()(
           const { user: backendUser, access_token, session_id } = response.data;
 
           const plainToken = extractPlainToken(access_token);
+          tokenManager.setLoginTime();
           get()._setUser(adaptBackendUser(backendUser, session_id), plainToken);
         } finally {
           get()._setLoading(false);
@@ -206,19 +209,28 @@ export const useAuthStore = create<AuthStore>()(
       /* ── Logout ── */
 
       logout: async () => {
-        get()._setLoading(true);
-        try {
-          await authService.logout();
-        } catch {
-          /**
-           * Si el logout falla en el backend (token ya expirado),
-           * limpiamos el estado igual. El usuario debe poder salir
-           * sin importar el estado del servidor.
-           */
-        } finally {
-          get()._reset();
-          get()._setLoading(false);
+        if (logoutPromise) {
+          return logoutPromise;
         }
+
+        logoutPromise = (async () => {
+          get()._setLoading(true);
+          try {
+            await authService.logout();
+          } catch {
+            /**
+             * Si el logout falla en el backend (token ya expirado),
+             * limpiamos el estado igual. El usuario debe poder salir
+             * sin importar el estado del servidor.
+             */
+          } finally {
+            get()._reset();
+            get()._setLoading(false);
+            logoutPromise = null;
+          }
+        })();
+
+        return logoutPromise;
       },
 
       /* ── initializeAuth ── */
@@ -238,64 +250,73 @@ export const useAuthStore = create<AuthStore>()(
        * Si responde 401 → limpia estado → AuthGuard redirige a login
        */
       initializeAuth: async () => {
+        if (get().isAuthInitialized) {
+          return;
+        }
+
+        if (initializeAuthPromise) {
+          return initializeAuthPromise;
+        }
+
         /**
          * Si no hay token, no tiene sentido consultar /auth/me.
          * Esto evita bucles de llamadas cuando el usuario no está autenticado.
          */
-        const token =
-          get().accessToken ?? sessionStorage.getItem("access_token");
-        if (!token) {
-          get()._reset();
-          return;
-        }
+        initializeAuthPromise = (async () => {
+          const token = tokenManager.getToken();
 
-        get()._setLoading(true);
-        try {
-          const meResponse = await authService.me();
-          const backendUser = meResponse.data;
-          const fallbackUser = get().user ?? readCachedUser();
-
-          const adaptedUser = adaptBackendUser(backendUser, null);
-          const hydratedUser: AuthUser = {
-            ...adaptedUser,
-            roles:
-              adaptedUser.roles.length > 0
-                ? adaptedUser.roles
-                : (fallbackUser?.roles ?? []),
-            permisos:
-              adaptedUser.permisos.length > 0
-                ? adaptedUser.permisos
-                : (fallbackUser?.permisos ?? []),
-            sucursales:
-              adaptedUser.sucursales.length > 0
-                ? adaptedUser.sucursales
-                : (fallbackUser?.sucursales ?? []),
-            sucursalActiva:
-              adaptedUser.sucursalActiva ??
-              fallbackUser?.sucursalActiva ??
-              null,
-          };
-
-          /**
-           * Recuperamos el token del sessionStorage (puente temporal).
-           * En una implementación con httpOnly cookies, este paso
-           * no sería necesario porque la cookie se envía automáticamente.
-           */
-          const storedToken = token;
-
-          if (storedToken) {
-            get()._setUser(hydratedUser, storedToken);
-          } else {
+          if (!token) {
             get()._reset();
+            set({ isAuthInitialized: true }, false, "auth/setInitialized");
+            return;
           }
-        } catch {
-          // 401 → sesión inválida → limpiamos
-          sessionStorage.removeItem("access_token");
-          sessionStorage.removeItem(AUTH_USER_CACHE_KEY);
-          get()._reset();
-        } finally {
-          get()._setLoading(false);
-        }
+
+          if (tokenManager.isSessionExpired()) {
+            get()._reset();
+
+            set({ isAuthInitialized: true }, false, "auth/setInitialized");
+            return;
+          }
+
+          get()._setLoading(true);
+          try {
+            const meResponse = await authService.me();
+            const backendUser = meResponse.data;
+            const fallbackUser = get().user ?? readCachedUser();
+
+            const adaptedUser = adaptBackendUser(backendUser, null);
+            const hydratedUser: AuthUser = {
+              ...adaptedUser,
+              roles:
+                adaptedUser.roles.length > 0
+                  ? adaptedUser.roles
+                  : (fallbackUser?.roles ?? []),
+              permisos:
+                adaptedUser.permisos.length > 0
+                  ? adaptedUser.permisos
+                  : (fallbackUser?.permisos ?? []),
+              sucursales:
+                adaptedUser.sucursales.length > 0
+                  ? adaptedUser.sucursales
+                  : (fallbackUser?.sucursales ?? []),
+              sucursalActiva:
+                adaptedUser.sucursalActiva ??
+                fallbackUser?.sucursalActiva ??
+                null,
+            };
+
+            get()._setUser(hydratedUser, token);
+          } catch {
+            // 401/errores de sesión inválida → limpiamos completamente
+            get()._reset();
+          } finally {
+            get()._setLoading(false);
+            set({ isAuthInitialized: true }, false, "auth/setInitialized");
+            initializeAuthPromise = null;
+          }
+        })();
+
+        return initializeAuthPromise;
       },
 
       /* ── Sucursal Activa ── */
@@ -314,7 +335,6 @@ export const useAuthStore = create<AuthStore>()(
          * En el interceptor de Axios leemos 'sucursal_activa_id'
          * para el header X-Sucursal-ID.
          */
-        sessionStorage.setItem("sucursal_activa_id", String(sucursal.id));
         get()._setUser(updatedUser, accessToken);
       },
 

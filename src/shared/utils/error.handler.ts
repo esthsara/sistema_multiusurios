@@ -2,6 +2,7 @@
 import axios, { type AxiosError } from "axios";
 import { toast } from "react-toastify";
 import type { ApiError } from "@/shared/types/api.types";
+import { safeText } from "@/shared/utils/sanitize";
 
 /**
  * ERROR_MESSAGES — Mensajes centralizados por código HTTP.
@@ -33,10 +34,13 @@ export const parseApiError = (error: unknown): ApiError => {
 
     if (axiosError.response) {
       return {
-        message:
+        message: safeText(
           axiosError.response.data?.message ??
-          ERROR_MESSAGES[axiosError.response.status] ??
+            ERROR_MESSAGES[axiosError.response.status] ??
+            "Error desconocido",
           "Error desconocido",
+          300,
+        ),
         errors: axiosError.response.data?.errors,
         status: axiosError.response.status,
       };
@@ -72,9 +76,11 @@ export const handleHttpError = (error: unknown, silent = false): ApiError => {
     // Errores de validación (422) — muestra el primer campo con error
     if (parsed.status === 422 && parsed.errors) {
       const firstError = Object.values(parsed.errors)[0]?.[0];
-      toast.error(firstError ?? parsed.message);
+      toast.error(safeText(firstError ?? parsed.message, parsed.message, 300));
     } else {
-      toast.error(parsed.message);
+      toast.error(
+        safeText(parsed.message, "Ocurrió un error inesperado.", 300),
+      );
     }
   }
 

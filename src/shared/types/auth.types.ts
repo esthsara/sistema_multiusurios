@@ -1,77 +1,86 @@
 // src/shared/types/auth.types.ts
 
-export type TipoPersona = 'FISICA' | 'MORAL'
-export type EstadoPersona = "ACTIVO" | "INACTIVO" | "BLOQUEADO"
-export type RoleName = string
+export type TipoPersona = "FISICA" | "MORAL";
+export type EstadoPersona = "ACTIVO" | "INACTIVO" | "BLOQUEADO";
+export type RoleName = string;
 
 /**
  *
  * listamos permisos conocidos para tener autocompletado y evitar errores de typo y tambien los permitimos como string dinamico para que el sistema sea flexible y no dependa de una lista fija en el frontend.
  */
 type KnownPermission =
-  | 'personas.ver'    | 'personas.crear'    | 'personas.editar'    | 'personas.eliminar'
-  | 'sucursales.ver'  | 'sucursales.crear'  | 'sucursales.editar'  | 'sucursales.eliminar'
-  | 'usuarios.ver'    | 'usuarios.crear'    | 'usuarios.editar'    | 'usuarios.eliminar'
-  | 'roles.ver'       | 'roles.crear'       | 'roles.editar'       | 'roles.eliminar'
-  | 'auditoria.ver'
+  | "personas.ver"
+  | "personas.crear"
+  | "personas.editar"
+  | "personas.eliminar"
+  | "sucursales.ver"
+  | "sucursales.crear"
+  | "sucursales.editar"
+  | "sucursales.eliminar"
+  | "usuarios.ver"
+  | "usuarios.crear"
+  | "usuarios.editar"
+  | "usuarios.eliminar"
+  | "roles.ver"
+  | "roles.crear"
+  | "roles.editar"
+  | "roles.eliminar"
+  | "auditoria.ver";
 
-type DynamicPermission = string & {}
-export type PermissionString = KnownPermission | DynamicPermission
-
-
+type DynamicPermission = string & {};
+export type PermissionString = KnownPermission | DynamicPermission;
 
 export interface BackendPersona {
-  id:                      number
-  tipo_persona:            TipoPersona
-  nombre:                  string | null
-  apellido:                string | null
-  razon_social:            string | null
-  identificacion_principal: string
-  fecha_nacimiento:        string | null
-  genero:                  string | null
-  foto_path:               string | null
-  estado:                  EstadoPersona
-  created_at:              string
-  updated_at:              string
-  deleted_at:              string | null
+  id: number;
+  tipo_persona: TipoPersona;
+  nombre: string | null;
+  apellido: string | null;
+  razon_social: string | null;
+  identificacion_principal: string;
+  fecha_nacimiento: string | null;
+  genero: string | null;
+  foto_path: string | null;
+  estado: EstadoPersona;
+  created_at: string;
+  updated_at: string;
+  deleted_at: string | null;
 }
 
 export interface BackendSucursal {
-  id:     number
-  nombre: string
-  clave:  string
+  id: number;
+  nombre: string;
+  clave: string;
 }
 
 export interface BackendRole {
-  id:          number
-  name:        RoleName
-  permissions: PermissionString[]
+  id: number;
+  name: RoleName;
+  permissions: PermissionString[];
 }
 
-
 export interface BackendUser {
-  id:                number
-  persona_id:        number
-  email:             string
-  username:          string
-  current_branch_id: number | null
-  activo:            boolean
-  created_at:        string
-  updated_at:        string
-  deleted_at:        string | null
-  current_branch:    BackendSucursal | null
-  persona:           BackendPersona
-  sucursales:        BackendSucursal[]
-  roles:             BackendRole[]
+  id: number;
+  persona_id: number;
+  email: string;
+  username: string;
+  current_branch_id: number | null;
+  activo: boolean;
+  created_at: string;
+  updated_at: string;
+  deleted_at: string | null;
+  current_branch: BackendSucursal | null;
+  persona: BackendPersona;
+  sucursales: BackendSucursal[];
+  roles: BackendRole[];
   /**
    * El backend devuelve 'permisos', no 'permissions'.
    */
-  permisos:          PermissionString[]
+  permisos: PermissionString[];
   contexto?: {
-    tipo:             string
-    business_actual:  number | null
-    business_ids:     number[]
-  }
+    tipo: string;
+    business_actual: number | null;
+    business_ids: number[];
+  };
 }
 
 /**
@@ -80,16 +89,16 @@ export interface BackendUser {
  */
 export interface AccessTokenObject {
   accessToken: {
-    id:              number
-    name:            string
-    abilities:       string[]
-    expires_at:      string | null
-    tokenable_id:    number
-    tokenable_type:  string
-    created_at:      string
-    updated_at:      string
-  }
-  plainTextToken: string
+    id: number;
+    name: string;
+    abilities: string[];
+    expires_at: string | null;
+    tokenable_id: number;
+    tokenable_type: string;
+    created_at: string;
+    updated_at: string;
+  };
+  plainTextToken: string;
 }
 
 /* ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
@@ -103,29 +112,29 @@ export interface AccessTokenObject {
  */
 
 export interface Persona {
-  id:                      number
-  tipoPersona:             TipoPersona
-  nombre:                  string | null
-  apellido:                string | null
-  razonSocial:             string | null
-  identificacionPrincipal: string
-  fechaNacimiento:         string | null
-  genero:                  string | null
-  fotoPatch:               string | null
-  estado:                  EstadoPersona
-  nombreCompleto:          string   // calculado en el adapter
+  id: number;
+  tipoPersona: TipoPersona;
+  nombre: string | null;
+  apellido: string | null;
+  razonSocial: string | null;
+  identificacionPrincipal: string;
+  fechaNacimiento: string | null;
+  genero: string | null;
+  fotoPatch: string | null;
+  estado: EstadoPersona;
+  nombreCompleto: string; // calculado en el adapter
 }
 
 export interface Sucursal {
-  id:     number
-  nombre: string
-  clave:  string
+  id: number;
+  nombre: string;
+  clave: string;
 }
 
 export interface Role {
-  id:          number
-  name:        RoleName
-  permisos:    PermissionString[]
+  id: number;
+  name: RoleName;
+  permisos: PermissionString[];
 }
 
 /**
@@ -134,31 +143,32 @@ export interface Role {
  * Nunca usa BackendUser directamente fuera del adapter.
  */
 export interface AuthUser {
-  id:             number
-  email:          string
-  username:       string
-  activo:         boolean
-  persona:        Persona
-  roles:          Role[]
-  permisos:       PermissionString[]
-  sucursales:     Sucursal[]
-  sucursalActiva: Sucursal | null
-  sessionId:      number | null
+  id: number;
+  email: string;
+  username: string;
+  activo: boolean;
+  persona: Persona;
+  roles: Role[];
+  permisos: PermissionString[];
+  sucursales: Sucursal[];
+  sucursalActiva: Sucursal | null;
+  sessionId: number | null;
   contexto?: {
-    tipo:           string
-    businessActual: number | null
-    businessIds:    number[]
-  }
+    tipo: string;
+    businessActual: number | null;
+    businessIds: number[];
+  };
 }
 
 /**
  * AuthState — Estado completo de autenticación en Zustand.
  */
 export interface AuthState {
-  user:            AuthUser | null
-  accessToken:     string | null
-  isAuthenticated: boolean
-  isLoading:       boolean
+  user: AuthUser | null;
+  accessToken: string | null;
+  isAuthenticated: boolean;
+  isLoading: boolean;
+  isAuthInitialized: boolean;
 }
 
 /* ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
@@ -171,37 +181,37 @@ export interface LoginDto {
    * No llamamos al campo 'email' porque el backend
    * explícitamente lo llama 'login'.
    */
-  login:    string
-  password: string
+  login: string;
+  password: string;
 }
 
 export interface RegisterFisicaDto {
-  tipo_persona:             'FISICA'
-  nombre:                   string
-  apellido:                 string
-  identificacion_principal: string
-  email:                    string
-  username:                 string
-  password:                 string
-  password_confirmation:    string
-  terms_accepted:           boolean
+  tipo_persona: "FISICA";
+  nombre: string;
+  apellido: string;
+  identificacion_principal: string;
+  email: string;
+  username: string;
+  password: string;
+  password_confirmation: string;
+  terms_accepted: boolean;
 }
 
 export interface RegisterMoralDto {
-  tipo_persona:             'MORAL'
-  razon_social:             string
-  identificacion_principal: string
-  email:                    string
-  username:                 string
-  password:                 string
-  password_confirmation:    string
-  terms_accepted:           boolean
+  tipo_persona: "MORAL";
+  razon_social: string;
+  identificacion_principal: string;
+  email: string;
+  username: string;
+  password: string;
+  password_confirmation: string;
+  terms_accepted: boolean;
 }
 
-export type RegisterDto = RegisterFisicaDto | RegisterMoralDto
+export type RegisterDto = RegisterFisicaDto | RegisterMoralDto;
 
 export interface ChangePasswordDto {
-  current_password:      string
-  password:              string
-  password_confirmation: string
+  current_password: string;
+  password: string;
+  password_confirmation: string;
 }

@@ -2,13 +2,30 @@
 import { Form, Input, Button, Card, Divider } from "antd";
 import { User, Lock } from "lucide-react";
 import { useAuthActions } from "@/features/auth/hooks/useAuthActions";
+import { sanitizeInput } from "@/shared/utils/sanitize";
 import type { LoginDto } from "@/shared/types/auth.types";
 
 const LoginPage = () => {
   const { login, isLoading } = useAuthActions();
   const [form] = Form.useForm<LoginDto>();
 
-  const onFinish = (values: LoginDto) => login(values);
+  const onFinish = (values: LoginDto) =>
+    login({
+      login: sanitizeInput(values.login, {
+        trim: true,
+        maxLength: 120,
+        stripTags: true,
+      }),
+      /**
+       * Password: no eliminamos caracteres válidos para no alterar
+       * credenciales legítimas, solo quitamos controles invisibles.
+       */
+      password: sanitizeInput(values.password, {
+        trim: false,
+        maxLength: 256,
+        stripTags: false,
+      }),
+    });
 
   return (
     <div

@@ -3,6 +3,7 @@ import { Select } from "antd";
 import { Building2 } from "lucide-react";
 import { useAuth } from "@/shared/hooks/useAuth";
 import { useAuthStore } from "@/features/auth/store/auth.store";
+import { safeText } from "@/shared/utils/sanitize";
 import type { Sucursal } from "@/shared/types/auth.types";
 
 interface BranchSelectorProps {
@@ -32,7 +33,7 @@ export const BranchSelector = ({ collapsed }: BranchSelectorProps) => {
             className="text-xs font-medium truncate"
             style={{ color: "var(--color-text-primary)" }}
           >
-            {sucursalActiva?.nombre ?? "Sin sucursal"}
+            {safeText(sucursalActiva?.nombre, "Sin sucursal", 80)}
           </span>
         )}
       </div>
@@ -56,7 +57,7 @@ export const BranchSelector = ({ collapsed }: BranchSelectorProps) => {
           }}
           options={sucursales.map((s: Sucursal) => ({
             value: s.id,
-            label: s.nombre,
+            label: safeText(s.nombre, "Sucursal", 80),
           }))}
           style={{
             minWidth: 140,

@@ -5,8 +5,12 @@ import axios, {
   type AxiosResponse,
   type AxiosError,
 } from "axios";
+import { toast } from "react-toastify";
 import { handleHttpError } from "@/shared/utils/error.handler";
 import { APP_ROUTES } from "@/shared/constants/routes.constants";
+import { tokenManager } from "@/shared/utils/tokenManager";
+import { storageManager } from "@/shared/utils/storageManager";
+import { useAuthStore } from "@/features/auth/store/auth.store";
 
 /**
  * Creamos una instancia nombrada en lugar de usar axios directamente.
@@ -38,7 +42,13 @@ apiClient.interceptors.request.use(
      * El accessToken vivirá en memoria (Zustand), NO en localStorage.
      * sessionStorage es solo temporal para este paso.
      */
-    const token = sessionStorage.getItem("access_token");
+    const token = tokenManager.getToken();
+    if (token && tokenManager.isSessionExpired()) {
+      void handleUnauthorized("Tu sesión ha expirado por inactividad.");
+      const error = new axios.CanceledError("SESSION_EXPIRED");
+      return Promise.reject(error);
+    }
+
     if (token) {
       config.headers.Authorization = `Bearer ${token}`;
     }
@@ -47,7 +57,7 @@ apiClient.interceptors.request.use(
      * Sucursal activa — Enviada en cada request para el backend.
      * En Paso 7 esto vendrá del store global de Zustand.
      */
-    const sucursalId = sessionStorage.getItem("sucursal_activa_id");
+    const sucursalId = storageManager.getSucursalId();
     if (sucursalId) {
       config.headers["X-Sucursal-ID"] = sucursalId;
     }
@@ -66,6 +76,63 @@ apiClient.interceptors.request.use(
  * si hay varias peticiones simultáneas que fallan con 401.
  */
 let isRedirectingToLogin = false;
+let redirectResetTimer: ReturnType<typeof setTimeout> | null = null;
+let unauthorizedPromise: Promise<void> | null = null;
+let hasNotifiedSessionExpired = false;
+
+const hardResetSession = () => {
+  tokenManager.removeToken();
+  storageManager.removeSucursalId();
+  storageManager.removeCachedUser();
+};
+
+const handleUnauthorized = async (
+  message = "Tu sesión ha expirado. Inicia sesión nuevamente.",
+) => {
+  if (unauthorizedPromise) {
+    return unauthorizedPromise;
+  }
+
+  unauthorizedPromise = (async () => {
+    if (isRedirectingToLogin) {
+      return;
+    }
+
+    isRedirectingToLogin = true;
+
+    if (!hasNotifiedSessionExpired) {
+      toast.warning(message);
+      hasNotifiedSessionExpired = true;
+    }
+
+    try {
+      const authStore = useAuthStore.getState();
+      await authStore.logout();
+    } catch {
+      hardResetSession();
+    }
+
+    if (window.location.pathname !== APP_ROUTES.LOGIN) {
+      // Pequeña espera para evitar redirección totalmente silenciosa.
+      window.setTimeout(() => {
+        window.location.replace(APP_ROUTES.LOGIN);
+      }, 250);
+    }
+
+    if (redirectResetTimer) {
+      clearTimeout(redirectResetTimer);
+    }
+
+    redirectResetTimer = setTimeout(() => {
+      isRedirectingToLogin = false;
+      hasNotifiedSessionExpired = false;
+      unauthorizedPromise = null;
+      redirectResetTimer = null;
+    }, 3000);
+  })();
+
+  return unauthorizedPromise;
+};
 
 apiClient.interceptors.response.use(
   /**
@@ -77,7 +144,7 @@ apiClient.interceptors.response.use(
 
   async (error: AxiosError) => {
     const status = error.response?.status;
-    const requestUrl = error.config?.url ?? "";
+    const requestUrl = error.config?.url || "";
     const isLoginRequest = requestUrl.includes("/auth/login");
 
     /* 401 — Sesión expirada */
@@ -91,25 +158,11 @@ apiClient.interceptors.response.use(
       }
 
       /**
-       * En Paso 6 aquí irá la lógica de Refresh Token.
-       * Si el refresh falla → logout y redirect a login.
-       * Por ahora solo hacemos el redirect.
+       * Aquí centralizamos el logout implícito cuando el token
+       * ya no es válido. Esto deja el flujo listo para migrar a
+       * refresh token o cookies httpOnly más adelante.
        */
-      if (!isRedirectingToLogin) {
-        isRedirectingToLogin = true;
-        sessionStorage.removeItem("access_token");
-        sessionStorage.removeItem("sucursal_activa_id");
-
-        /**
-         * Usamos window.location en lugar de useNavigate
-         * porque los interceptores viven fuera del árbol de React.
-         * No tienen acceso a hooks.
-         */
-        window.location.href = APP_ROUTES.LOGIN;
-        setTimeout(() => {
-          isRedirectingToLogin = false;
-        }, 3000);
-      }
+      await handleUnauthorized();
       return Promise.reject(error);
     }
 
