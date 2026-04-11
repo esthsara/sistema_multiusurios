@@ -14,7 +14,7 @@ export const useSucursales = () => {
   const [loading, setLoading] = useState(false);
 
   const table = useTableState<SucursalFilters>({
-    activa: "",
+    activa: true,
     fecha_desde: "",
     fecha_hasta: "",
   });
@@ -76,13 +76,16 @@ export const useSucursales = () => {
     }
   };
 
-  const remove = async (id: number) => {
+  const remove = async (sucursal: SucursalListItem) => {
     try {
-      await sucursalesService.remove(id);
-      toast.success("Sucursal eliminada correctamente");
+      await sucursalesService.toggleStatus(sucursal.id, {
+        activa: false,
+        motivo: "Enviada a papelera desde el listado",
+      });
+      toast.success("Sucursal enviada a papelera correctamente");
       fetchSucursales();
     } catch {
-      toast.error("Error al eliminar sucursal");
+      toast.error("Error al enviar la sucursal a papelera");
     }
   };
 

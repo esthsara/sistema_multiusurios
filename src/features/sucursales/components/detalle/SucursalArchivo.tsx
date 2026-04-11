@@ -58,14 +58,17 @@ export const SucursalArchivo = ({ sucursalId }: SucursalArchivoProps) => {
   const handleUploadFile = async () => {
     try {
       const values = await form.validateFields();
-      if (!values.archivo?.file) {
+      const selectedFile =
+        values.archivo?.file?.originFileObj ?? values.archivo?.file;
+
+      if (!(selectedFile instanceof File)) {
         return;
       }
       await handleUpload(
-        values.archivo.file,
+        selectedFile,
         values.tipo,
         values.nombre,
-        values.fecha_expiracion,
+
       );
       setModalOpen(false);
       form.resetFields();
@@ -139,8 +142,8 @@ export const SucursalArchivo = ({ sucursalId }: SucursalArchivoProps) => {
       ),
     },
     {
-      title: "Acciones",
-      key: "acciones",
+      title: "Descargar",
+      key: "descargar",
       width: 90,
       render: (_, record) => (
         <div className="flex gap-1">
@@ -196,6 +199,7 @@ export const SucursalArchivo = ({ sucursalId }: SucursalArchivoProps) => {
         loading={loading}
         pagination={false}
         size="small"
+        locale={{ emptyText: "Sin archivos registrados" }}
         style={{
           backgroundColor: "var(--color-bg-base)",
           borderRadius: "var(--radius-card)",
@@ -241,15 +245,9 @@ export const SucursalArchivo = ({ sucursalId }: SucursalArchivoProps) => {
             label="Archivo"
             rules={[{ required: true, message: "Selecciona un archivo" }]}
           >
-            <Upload beforeUpload={() => false} maxCount={1}>
+            <Upload beforeUpload={() => false} maxCount={1} accept="*/*">
               <Button icon={<Plus size={14} />}>Seleccionar archivo</Button>
             </Upload>
-          </Form.Item>
-          <Form.Item
-            name="fecha_expiracion"
-            label="Fecha de vencimiento (opcional)"
-          >
-            <Input type="date" />
           </Form.Item>
         </Form>
       </Modal>

@@ -12,10 +12,13 @@ export const sucursalDomiciliosService = {
     ),
 
   create: (sucursalId: number, data: CreateSucursalDomicilioDto) =>
-    http.post<SucursalDomicilio, CreateSucursalDomicilioDto>(
-      `/sucursales/${sucursalId}/domicilios`,
-      data,
-    ),
+    http.post<
+      SucursalDomicilio,
+      CreateSucursalDomicilioDto & { sucursal_id: number }
+    >("/domicilios", {
+      ...data,
+      sucursal_id: sucursalId,
+    }),
 
   update: (domicilioId: number, data: UpdateSucursalDomicilioDto) =>
     http.put<SucursalDomicilio, UpdateSucursalDomicilioDto>(

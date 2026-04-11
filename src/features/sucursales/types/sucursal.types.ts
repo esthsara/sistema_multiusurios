@@ -88,12 +88,26 @@ export interface SucursalArchivo {
   created_at: string;
 }
 
+export interface SucursalPersona {
+  id: number;
+  tipo_persona: string;
+  nombre: string | null;
+  apellido: string | null;
+  razon_social?: string | null;
+  identificacion_principal: string;
+  estado: string;
+  foto: string | null;
+  foto_path: string | null;
+  created_at?: string;
+  updated_at?: string;
+}
 export interface SucursalUsuario {
   id: number;
   username: string;
   email: string;
   activo: boolean;
   ultimo_acceso: string;
+  persona?: SucursalPersona;
   created_at: string;
   created_at_humano: string;
 }
@@ -110,6 +124,12 @@ export interface SucursalAdministrador {
     es_administrador: number;
     activo: number;
   };
+  //recien agregue esto
+  current_branch_id?: number;
+  created_at?: string;
+  updated_at?: string;
+  deleted_at?: string | null;
+  persona?: SucursalPersona;
 }
 
 export interface SucursalSelector {
@@ -156,7 +176,6 @@ export interface CreateSucursalDto {
 export interface UpdateSucursalDto {
   codigo?: string;
   nombre?: string;
-  horario?: string;
   logo?: File;
   email?: string;
   descripcion?: string;
@@ -181,11 +200,13 @@ export interface AsignarUsuarioDto {
 }
 
 export interface CreateSucursalContactoDto {
+  //sucursal_id: number;
   tipo: TipoContactoSucursal;
   valor: string;
 }
 
 export interface UpdateSucursalContactoDto {
+  //sucursal_id: number;
   tipo: TipoContactoSucursal;
   valor: string;
 }

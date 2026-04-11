@@ -1,11 +1,24 @@
 import { useCallback, useEffect, useState } from "react";
 import { toast } from "react-toastify";
 import { sucursalDomiciliosService } from "../services/sucursal-domicilios.service";
-import type { SucursalDomicilio } from "../types/sucursal.types";
+import { useFormModal } from "@/shared/hooks/useFormModal";
+import type {
+  SucursalDomicilio,
+  CreateSucursalDomicilioDto,
+  UpdateSucursalDomicilioDto,
+} from "../types/sucursal.types";
 
 export const useSucursalDomicilios = (sucursalId: number) => {
   const [domicilios, setDomicilios] = useState<SucursalDomicilio[]>([]);
   const [loading, setLoading] = useState(false);
+  const [deleteTarget, setDeleteTarget] = useState<SucursalDomicilio | null>(
+    null,
+  );
+  const [deleting, setDeleting] = useState(false);
+  const [markingPrincipalId, setMarkingPrincipalId] = useState<number | null>(
+    null,
+  );
+  const modal = useFormModal<SucursalDomicilio>();
 
   const fetch = useCallback(async () => {
     setLoading(true);
@@ -23,5 +36,82 @@ export const useSucursalDomicilios = (sucursalId: number) => {
     fetch();
   }, [fetch]);
 
-  return { domicilios, loading, refetch: fetch };
+  const handleSubmit = async (
+    values: CreateSucursalDomicilioDto | UpdateSucursalDomicilioDto,
+  ) => {
+    modal.setIsSubmitting(true);
+    try {
+      if (modal.isEditMode && modal.selectedItem) {
+        await sucursalDomiciliosService.update(
+          modal.selectedItem.id,
+          values as UpdateSucursalDomicilioDto,
+        );
+        toast.success("Domicilio actualizado");
+      } else {
+        await sucursalDomiciliosService.create(
+          sucursalId,
+          values as CreateSucursalDomicilioDto,
+        );
+        toast.success("Domicilio creado");
+      }
+      modal.close();
+      fetch();
+    } catch {
+      toast.error(
+        modal.isEditMode
+          ? "Error al actualizar domicilio"
+          : "Error al crear domicilio",
+      );
+    } finally {
+      modal.setIsSubmitting(false);
+    }
+  };
+
+  const handleDelete = async (domicilio: SucursalDomicilio) => {
+    setDeleteTarget(domicilio);
+  };
+
+  const confirmDelete = async () => {
+    if (!deleteTarget) return;
+    setDeleting(true);
+    try {
+      await sucursalDomiciliosService.remove(deleteTarget.id);
+      toast.success("Domicilio eliminado");
+      setDeleteTarget(null);
+      fetch();
+    } catch {
+      toast.error("Error al eliminar domicilio");
+    } finally {
+      setDeleting(false);
+    }
+  };
+
+  const handleMarkPrincipal = async (domicilio: SucursalDomicilio) => {
+    setMarkingPrincipalId(domicilio.id);
+    try {
+      await sucursalDomiciliosService.update(domicilio.id, {
+        principal: true,
+      });
+      toast.success("Domicilio marcado como principal");
+      fetch();
+    } catch {
+      toast.error("Error al marcar domicilio como principal");
+    } finally {
+      setMarkingPrincipalId(null);
+    }
+  };
+
+  return {
+    domicilios,
+    loading,
+    modal,
+    deleteTarget,
+    deleting,
+    markingPrincipalId,
+    handleSubmit,
+    handleDelete,
+    confirmDelete,
+    handleMarkPrincipal,
+    setDeleteTarget,
+  };
 };

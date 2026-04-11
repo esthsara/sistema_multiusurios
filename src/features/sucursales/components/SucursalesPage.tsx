@@ -1,7 +1,8 @@
-import { useState } from "react";
-import { Avatar, Button, Tooltip } from "antd";
+import { useEffect, useMemo, useRef, useState } from "react";
+import { Avatar, Button } from "antd";
 import type { TableColumnsType } from "antd";
 import { Eye, Pencil, Plus, PowerOff, RotateCcw, Trash2 } from "lucide-react";
+import apiClient from "@/config/axios.config";
 import { PageHeader } from "@/shared/components/molecules/PageHeader";
 import { DataTable } from "@/shared/components/organisms/DataTable";
 import { ConfirmModal } from "@/shared/components/molecules/ConfirmModal";
@@ -27,6 +28,31 @@ const SucursalesPage = () => {
     item: SucursalListItem | null;
     loading: boolean;
   }>({ open: false, type: null, item: null, loading: false });
+  const [logoSrcById, setLogoSrcById] = useState<Record<number, string>>({});
+  const createdObjectUrlsRef = useRef<string[]>([]);
+
+  const apiOrigin = useMemo(() => {
+    try {
+      return new URL(import.meta.env.VITE_API_URL).origin;
+    } catch {
+      return window.location.origin;
+    }
+  }, []);
+
+  const normalizeLogoUrl = (logo: string) => {
+    try {
+      const parsed = new URL(logo);
+      if (parsed.origin !== apiOrigin) {
+        return `${apiOrigin}${parsed.pathname}`;
+      }
+      return parsed.toString();
+    } catch {
+      if (logo.startsWith("/")) {
+        return `${apiOrigin}${logo}`;
+      }
+      return `${apiOrigin}/${logo}`;
+    }
+  };
 
   const openConfirm = (type: "toggle" | "delete", item: SucursalListItem) =>
     setConfirmState({ open: true, type, item, loading: false });
@@ -42,13 +68,89 @@ const SucursalesPage = () => {
     if (confirmState.type === "toggle") {
       await sucursales.toggleEstado(confirmState.item);
     } else {
-      await sucursales.remove(confirmState.item.id);
+      await sucursales.remove(confirmState.item);
     }
 
     closeConfirm();
   };
 
+  const getSucursalInitials = (nombre: string) => {
+    const parts = nombre.trim().split(/\s+/).filter(Boolean).slice(0, 2);
+
+    if (parts.length === 0) return "SC";
+    return parts.map((part) => part.charAt(0).toUpperCase()).join("");
+  };
+
+  useEffect(() => {
+    let isMounted = true;
+    const abortControllers: AbortController[] = [];
+
+    const clearObjectUrls = () => {
+      createdObjectUrlsRef.current.forEach((url) => URL.revokeObjectURL(url));
+      createdObjectUrlsRef.current = [];
+    };
+
+    const loadLogos = async () => {
+      clearObjectUrls();
+      const nextLogoMap: Record<number, string> = {};
+
+      for (const sucursal of sucursales.data) {
+        if (!sucursal.logo) continue;
+
+        try {
+          const controller = new AbortController();
+          abortControllers.push(controller);
+
+          const response = await apiClient.get<Blob>(
+            normalizeLogoUrl(sucursal.logo),
+            {
+              responseType: "blob",
+              signal: controller.signal,
+            },
+          );
+
+          const objectUrl = URL.createObjectURL(response.data);
+          createdObjectUrlsRef.current.push(objectUrl);
+          nextLogoMap[sucursal.id] = objectUrl;
+        } catch {
+          // Si falla (403/no existe), el avatar mostrará iniciales.
+        }
+      }
+
+      if (isMounted) {
+        setLogoSrcById(nextLogoMap);
+      }
+    };
+
+    void loadLogos();
+
+    return () => {
+      isMounted = false;
+      abortControllers.forEach((controller) => controller.abort());
+      clearObjectUrls();
+    };
+  }, [sucursales.data]);
+
   const columns: TableColumnsType<SucursalListItem> = [
+    {
+      title: "Logo",
+      key: "logo",
+      width: 90,
+      render: (_, r) => (
+        <Avatar
+          size={42}
+          src={logoSrcById[r.id] ?? undefined}
+          style={{
+            backgroundColor: "var(--color-primary-100)",
+            color: "var(--color-primary-700)",
+            fontWeight: 700,
+            border: "1px solid var(--color-border)",
+          }}
+        >
+          {getSucursalInitials(r.nombre)}
+        </Avatar>
+      ),
+    },
     {
       title: "Sucursal",
       key: "nombre",
@@ -61,47 +163,20 @@ const SucursalesPage = () => {
             : "descend"
           : null,
       render: (_, r) => (
-        <div className="flex items-center gap-2">
-          <Avatar
-            src={r.logo ?? undefined}
-            style={{
-              backgroundColor: "var(--color-primary-100)",
-              color: "var(--color-primary-700)",
-              fontWeight: 700,
-            }}
+        <div>
+          <p
+            className="m-0 font-medium"
+            style={{ color: "var(--color-text-primary)" }}
           >
-            {r.nombre.slice(0, 2).toUpperCase()}
-          </Avatar>
-          <div>
-            <p
-              className="m-0 font-medium"
-              style={{ color: "var(--color-text-primary)" }}
-            >
-              {r.nombre}
-            </p>
-            <p
-              className="m-0 text-xs"
-              style={{ color: "var(--color-text-secondary)" }}
-            >
-              {r.codigo}
-            </p>
-          </div>
+            {r.nombre}
+          </p>
+          <p
+            className="m-0 text-xs"
+            style={{ color: "var(--color-text-secondary)" }}
+          >
+            {r.codigo}
+          </p>
         </div>
-      ),
-    },
-    {
-      title: "Email",
-      dataIndex: "email",
-      key: "email",
-      width: 220,
-    },
-    {
-      title: "Dirección",
-      dataIndex: "direccion",
-      key: "direccion",
-      width: 260,
-      render: (value: string) => (
-        <span style={{ color: "var(--color-text-secondary)" }}>{value}</span>
       ),
     },
     {
@@ -122,15 +197,14 @@ const SucursalesPage = () => {
       render: (_, r) => <SucursalStatusBadge activa={r.activa} />,
     },
     {
-      title: "Registro",
-      key: "created_at",
-      width: 170,
+      title: "Nro usuarios",
+      key: "usuarios_count",
+      width: 130,
+      align: "center",
       render: (_, r) => (
-        <Tooltip title={r.created_at ?? ""}>
-          <span style={{ color: "var(--color-text-secondary)" }}>
-            {r.created_at_humano ?? "—"}
-          </span>
-        </Tooltip>
+        <span style={{ color: "var(--color-text-secondary)", fontWeight: 600 }}>
+          {r.usuarios_count ?? 0}
+        </span>
       ),
     },
     {
@@ -175,7 +249,7 @@ const SucursalesPage = () => {
           {
             key: "delete",
             permission: "sucursales.eliminar" as const,
-            label: "Eliminar",
+            label: "Enviar a papelera",
             icon: <Trash2 size={14} />,
             danger: true,
             onClick: () => openConfirm("delete", record),
@@ -190,19 +264,19 @@ const SucursalesPage = () => {
   const confirmConfig = {
     toggle: {
       title: confirmState.item?.activa
-        ? "¿Deseas desactivar esta sucursal?"
-        : "¿Deseas activar esta sucursal nuevamente?",
+        ? `¿Deseas desactivar ${confirmState.item?.nombre}?`
+        : `¿Deseas activar ${confirmState.item?.nombre}?`,
       description: confirmState.item?.activa
-        ? "La sucursal quedará inactiva para nuevas operaciones."
-        : "La sucursal volverá a estar disponible para operar.",
+        ? "La sucursal quedará inactiva para nuevas operaciones y asignaciones."
+        : "La sucursal volverá a estar disponible para operar y asignarse.",
       confirmText: confirmState.item?.activa ? "Desactivar" : "Activar",
       danger: confirmState.item?.activa,
     },
     delete: {
-      title: `¿Seguro que deseas eliminar ${confirmState.item?.nombre}?`,
+      title: `¿Enviar ${confirmState.item?.nombre} a papelera?`,
       description:
-        "Se realizará baja lógica (soft delete). Podrás restaurarla más adelante.",
-      confirmText: "Eliminar",
+        "Se desactivará la sucursal usando toggle-status y dejará de mostrarse en la vista principal.",
+      confirmText: "Enviar a papelera",
       danger: true,
     },
   };
@@ -245,7 +319,7 @@ const SucursalesPage = () => {
         data={sucursales.data}
         columns={columns}
         rowKey="id"
-        scrollX={1200}
+        scrollX={980}
         loading={sucursales.loading}
         pagination={{
           current: sucursales.table.state.page,

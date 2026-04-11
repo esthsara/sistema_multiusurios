@@ -1,10 +1,11 @@
-import { Form, Input, Modal, Switch } from "antd";
-import { useEffect } from "react";
+import { Form, Input, Modal, Switch, Upload, Button } from "antd";
+import { useEffect, useState } from "react";
 import type {
   CreateSucursalDto,
   SucursalListItem,
   UpdateSucursalDto,
 } from "../types/sucursal.types";
+import { UploadOutlined } from "@ant-design/icons";
 
 interface SucursalFormModalProps {
   open: boolean;
@@ -24,6 +25,7 @@ interface FormValues {
   horario_apertura: string;
   horario_cierre: string;
   activa: boolean;
+  logo?: File;
 }
 
 export const SucursalFormModal = ({
@@ -35,9 +37,13 @@ export const SucursalFormModal = ({
   onCancel,
 }: SucursalFormModalProps) => {
   const [form] = Form.useForm<FormValues>();
+  const [logoFile, setLogoFile] = useState<File | null>(null);
 
   useEffect(() => {
-    if (!open) return;
+    if (!open) {
+      setLogoFile(null);
+      return;
+    }
 
     if (isEditMode && selectedItem) {
       form.setFieldsValue({
@@ -64,7 +70,7 @@ export const SucursalFormModal = ({
   const handleOk = async () => {
     try {
       const values = await form.validateFields();
-      onSubmit(values);
+      onSubmit({ ...values, ...(logoFile ? { logo: logoFile } : {}) });
     } catch {
       // validación antd
     }
@@ -79,78 +85,140 @@ export const SucursalFormModal = ({
       okText={isEditMode ? "Guardar cambios" : "Crear sucursal"}
       cancelText="Cancelar"
       confirmLoading={isSubmitting}
-      width={760}
+      centered
+      destroyOnClose
+      width={780}
     >
+      <div
+        className="mb-4 rounded-xl border px-4 py-3"
+        style={{
+          background: "var(--color-bg-overlay)",
+          borderColor: "var(--color-border)",
+        }}
+      >
+        <p
+          className="m-0 text-sm"
+          style={{ color: "var(--color-text-secondary)" }}
+        >
+          {isEditMode
+            ? "Actualiza la información de la sucursal seleccionada."
+            : "Completa los datos para crear una nueva sucursal."}
+        </p>
+      </div>
+
       <Form<FormValues>
         form={form}
         layout="vertical"
         autoComplete="off"
         style={{ marginTop: 20 }}
+        disabled={isSubmitting}
       >
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-x-4">
-          <Form.Item
-            name="nombre"
-            label="Nombre"
-            rules={[{ required: true, message: "El nombre es requerido" }]}
+        <div
+          className="mb-4 rounded-xl border p-4"
+          style={{ borderColor: "var(--color-border)" }}
+        >
+          <p
+            className="mb-3 text-xs font-semibold uppercase tracking-wide"
+            style={{ color: "var(--color-text-secondary)" }}
           >
-            <Input placeholder="Sucursal Central" />
-          </Form.Item>
+            Datos generales
+          </p>
 
-          <Form.Item
-            name="codigo"
-            label="Código"
-            rules={[{ required: true, message: "El código es requerido" }]}
-          >
-            <Input placeholder="SC-001" disabled={isEditMode} />
-          </Form.Item>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-x-4">
+            <Form.Item
+              name="nombre"
+              label="Nombre"
+              rules={[{ required: true, message: "El nombre es requerido" }]}
+            >
+              <Input placeholder="Sucursal Central" />
+            </Form.Item>
 
-          <Form.Item
-            name="email"
-            label="Email"
-            rules={[
-              { required: true, message: "El email es requerido" },
-              { type: "email", message: "Email inválido" },
-            ]}
-          >
-            <Input placeholder="sucursal@empresa.com" />
-          </Form.Item>
+            <Form.Item
+              name="codigo"
+              label="Código"
+              rules={[{ required: true, message: "El código es requerido" }]}
+            >
+              <Input placeholder="SC-001" disabled={isEditMode} />
+            </Form.Item>
 
-          <Form.Item
-            name="direccion"
-            label="Dirección"
-            rules={[{ required: true, message: "La dirección es requerida" }]}
-          >
-            <Input placeholder="Av. Principal 123" />
-          </Form.Item>
+            <Form.Item
+              name="email"
+              label="Email"
+              rules={[
+                { required: true, message: "El email es requerido" },
+                { type: "email", message: "Email inválido" },
+              ]}
+            >
+              <Input placeholder="sucursal@empresa.com" />
+            </Form.Item>
 
-          <Form.Item
-            name="horario_apertura"
-            label="Horario apertura"
-            rules={[
-              { required: true, message: "La hora de apertura es requerida" },
-            ]}
-          >
-            <Input placeholder="08:00" />
-          </Form.Item>
+            <Form.Item
+              name="direccion"
+              label="Dirección"
+              rules={[{ required: true, message: "La dirección es requerida" }]}
+            >
+              <Input placeholder="Av. Principal 123" />
+            </Form.Item>
 
-          <Form.Item
-            name="horario_cierre"
-            label="Horario cierre"
-            rules={[
-              { required: true, message: "La hora de cierre es requerida" },
-            ]}
-          >
-            <Input placeholder="18:00" />
-          </Form.Item>
+            <Form.Item
+              name="horario_apertura"
+              label="Horario apertura"
+              rules={[
+                {
+                  required: true,
+                  message: "La hora de apertura es requerida",
+                },
+              ]}
+            >
+              <Input placeholder="08:00" />
+            </Form.Item>
+
+            <Form.Item
+              name="horario_cierre"
+              label="Horario cierre"
+              rules={[
+                { required: true, message: "La hora de cierre es requerida" },
+              ]}
+            >
+              <Input placeholder="18:00" />
+            </Form.Item>
+          </div>
         </div>
 
-        <Form.Item name="descripcion" label="Descripción">
-          <Input.TextArea rows={3} placeholder="Descripción opcional" />
-        </Form.Item>
+        <div
+          className="rounded-xl border p-4"
+          style={{ borderColor: "var(--color-border)" }}
+        >
+          <p
+            className="mb-3 text-xs font-semibold uppercase tracking-wide"
+            style={{ color: "var(--color-text-secondary)" }}
+          >
+            Configuración adicional
+          </p>
 
-        <Form.Item name="activa" label="Estado" valuePropName="checked">
-          <Switch checkedChildren="Activa" unCheckedChildren="Inactiva" />
-        </Form.Item>
+          <Form.Item name="descripcion" label="Descripción">
+            <Input.TextArea rows={3} placeholder="Descripción opcional" />
+          </Form.Item>
+
+          <Form.Item name="logo" label="Logo">
+            <Upload
+              accept="image/*"
+              maxCount={1}
+              beforeUpload={(file) => {
+                // Captura el File sin subirlo automáticamente
+                setLogoFile(file);
+                return false;
+              }}
+              onRemove={() => setLogoFile(null)}
+            >
+              <Button icon={<UploadOutlined />}>Seleccionar imagen</Button>
+            </Upload>
+          </Form.Item>
+
+          <Form.Item name="activa" label="Estado" valuePropName="checked">
+            <Switch checkedChildren="Activa" unCheckedChildren="Inactiva" />
+          </Form.Item>
+        </div>
       </Form>
     </Modal>
   );
