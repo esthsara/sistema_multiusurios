@@ -11,6 +11,7 @@ export const APP_ROUTES = {
   DASHBOARD: {
     ROOT: "/dashboard",
     HOME: "/dashboard/home",
+    PERFIL: "/dashboard/perfil",
     PERSONAS: {
       ROOT: "/dashboard/personas",
       NUEVA: "/dashboard/personas/nueva",

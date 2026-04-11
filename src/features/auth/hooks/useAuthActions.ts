@@ -6,9 +6,7 @@ import { APP_ROUTES } from "@/shared/constants/routes.constants";
 import { safeText } from "@/shared/utils/sanitize";
 import type { LoginDto, RegisterDto } from "@/shared/types/auth.types";
 
-/**
- * useAuthActions — Orquesta acciones de auth con navegación y toasts.
- */
+/* useAuthActions — Orquesta acciones de auth con navegación y toasts.*/
 export const useAuthActions = () => {
   const navigate = useNavigate();
   const location = useLocation();

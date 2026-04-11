@@ -1,8 +1,8 @@
 import type { AuthUser } from "@/shared/types/auth.types";
 
 const AUTH_USER_CACHE_KEY = "auth_user_cache";
-const SUCURSAL_ACTIVA_KEY = "sucursal_activa_id";
 
+//en este módulo centralizamos el acceso al sessionStorage para manejar el caché de usuario
 const getSessionStorage = (): Storage | null => {
   try {
     if (typeof window === "undefined") return null;
@@ -13,30 +13,6 @@ const getSessionStorage = (): Storage | null => {
 };
 
 export const storageManager = {
-  getSucursalId: (): string | null => {
-    try {
-      return getSessionStorage()?.getItem(SUCURSAL_ACTIVA_KEY) ?? null;
-    } catch {
-      return null;
-    }
-  },
-
-  setSucursalId: (id: string): void => {
-    try {
-      getSessionStorage()?.setItem(SUCURSAL_ACTIVA_KEY, id);
-    } catch {
-      // No-op.
-    }
-  },
-
-  removeSucursalId: (): void => {
-    try {
-      getSessionStorage()?.removeItem(SUCURSAL_ACTIVA_KEY);
-    } catch {
-      // No-op.
-    }
-  },
-
   getCachedUser: (): AuthUser | null => {
     try {
       const raw = getSessionStorage()?.getItem(AUTH_USER_CACHE_KEY);

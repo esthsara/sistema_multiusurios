@@ -33,14 +33,18 @@ export type PermissionString = KnownPermission | DynamicPermission;
 export interface BackendPersona {
   id: number;
   tipo_persona: TipoPersona;
+  tipo_texto?: string | null;
   nombre: string | null;
   apellido: string | null;
+  nombre_completo?: string | null;
   razon_social: string | null;
   identificacion_principal: string;
   fecha_nacimiento: string | null;
   genero: string | null;
+  foto?: string | null;
   foto_path: string | null;
   estado: EstadoPersona;
+  estado_texto?: string | null;
   created_at: string;
   updated_at: string;
   deleted_at: string | null;
@@ -49,37 +53,59 @@ export interface BackendPersona {
 export interface BackendSucursal {
   id: number;
   nombre: string;
-  clave: string;
+  clave?: string;
+  codigo?: string;
+  es_actual?: boolean;
 }
 
-export interface BackendRole {
+export interface BackendRoleObject {
   id: number;
   name: RoleName;
-  permissions: PermissionString[];
+  permissions?: PermissionString[];
+  permisos?: PermissionString[];
+}
+
+export type BackendRole = BackendRoleObject | string;
+
+export interface BackendBusiness {
+  id: number;
+  nombre: string;
+  codigo: string;
+  activa?: boolean;
+  email?: string | null;
+  descripcion?: string | null;
+  horario_apertura?: string | null;
+  horario_cierre?: string | null;
+  horario_completo?: string | null;
+  direccion?: string | null;
+  logo?: string | null;
+  logo_path?: string | null;
+  created_at?: string;
+  updated_at?: string;
 }
 
 export interface BackendUser {
   id: number;
-  persona_id: number;
+  persona_id?: number;
   email: string;
   username: string;
-  current_branch_id: number | null;
+  current_branch_id?: number | null;
   activo: boolean;
-  created_at: string;
-  updated_at: string;
-  deleted_at: string | null;
-  current_branch: BackendSucursal | null;
+  created_at?: string;
+  updated_at?: string;
+  deleted_at?: string | null;
+  current_branch?: BackendSucursal | null;
   persona: BackendPersona;
-  sucursales: BackendSucursal[];
-  roles: BackendRole[];
+  sucursales?: BackendSucursal[];
+  roles?: BackendRole[];
   /**
    * El backend devuelve 'permisos', no 'permissions'.
    */
-  permisos: PermissionString[];
+  permisos?: PermissionString[];
   contexto?: {
     tipo: string;
-    business_actual: number | null;
-    business_ids: number[];
+    business_actual: BackendBusiness | BackendSucursal | number | null;
+    business_ids?: number[];
   };
 }
 
@@ -114,6 +140,7 @@ export interface AccessTokenObject {
 export interface Persona {
   id: number;
   tipoPersona: TipoPersona;
+  tipoTexto?: string | null;
   nombre: string | null;
   apellido: string | null;
   razonSocial: string | null;
@@ -122,6 +149,7 @@ export interface Persona {
   genero: string | null;
   fotoPatch: string | null;
   estado: EstadoPersona;
+  estadoTexto?: string | null;
   nombreCompleto: string; // calculado en el adapter
 }
 
@@ -155,7 +183,7 @@ export interface AuthUser {
   sessionId: number | null;
   contexto?: {
     tipo: string;
-    businessActual: number | null;
+    businessActual: Sucursal | number | null;
     businessIds: number[];
   };
 }

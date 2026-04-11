@@ -1,17 +1,16 @@
 // src/shared/utils/sanitize.ts
-
+// Este módulo contiene funciones para sanitizar y normalizar datos de entrada, especialmente texto y URLs
 interface SanitizeInputOptions {
   trim?: boolean;
   maxLength?: number;
   stripTags?: boolean;
 }
-
+// Control chars: U+0000 to U+001F and U+007F y etiquetas HTML simples: <...>
 const CONTROL_CHARS_REGEX = /[\u0000-\u001F\u007F]/g;
 const TAGS_REGEX = /<[^>]*>/g;
 
 /**
- * Normaliza texto de entrada para evitar payloads obvios.
- * No intenta ser un parser HTML completo.
+ * Normaliza texto de entrada 
  */
 export const sanitizeInput = (
   value: unknown,
@@ -38,10 +37,7 @@ export const sanitizeInput = (
   return next;
 };
 
-/**
- * safeText — Garantiza texto seguro para render (React ya escapa HTML,
- * pero limpiamos caracteres de control y vacíos).
- */
+/**texto seguro*/
 export const safeText = (
   value: unknown,
   fallback = "",
@@ -56,17 +52,13 @@ export const safeText = (
   return normalized || fallback;
 };
 
-/**
- * safeImageUrl — Bloquea esquemas peligrosos en URLs dinámicas.
- */
+/**Bloquea esquemas peligrosos en URLs dinámicas.*/
 export const safeImageUrl = (value: unknown): string | undefined => {
   if (typeof value !== "string" || value.trim().length === 0) {
     return undefined;
   }
 
   const raw = value.trim();
-
-  // Rutas relativas del backend/CDN.
   if (raw.startsWith("/")) {
     return raw;
   }

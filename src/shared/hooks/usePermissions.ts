@@ -31,8 +31,12 @@ export const usePermissions = (): PermissionsApi => {
   const hasRole = useAuthStore((s) => s.hasRole);
   const user = useAuthStore((s) => s.user);
 
+  const isSuperAdminRole = (roleName: string) => {
+    return roleName.trim().toLowerCase().replace(/\s+/g, "-") === "super-admin";
+  };
+
   const isSuperAdmin =
-    user?.roles.some((r) => r.name === "super-admin") ?? false;
+    user?.roles.some((r) => isSuperAdminRole(r.name)) ?? false;
 
   return {
     can: (permission) => hasPermission(permission),

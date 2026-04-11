@@ -4,9 +4,38 @@ import { toast } from "react-toastify";
 import type { ApiError } from "@/shared/types/api.types";
 import { safeText } from "@/shared/utils/sanitize";
 
+const normalizeBackendMessage = (message: string): string => {
+  const normalized = message.trim();
+
+  if (/SQLSTATE\[23000\]/i.test(normalized)) {
+    return "No se pudo completar la operación crendenciales incorrectas";
+  }
+
+  if (/Integrity constraint violation/i.test(normalized)) {
+    return "No se pudo completar la operación ingrese nuevamente";
+  }
+
+  if (/Column '.*' cannot be null/i.test(normalized)) {
+    return "Faltan datos obligatorios para completar la operación.";
+  }
+
+  if (/Unauthorized/i.test(normalized)) {
+    return "No estás autorizado para realizar esta acción.";
+  }
+
+  if (/Token has expired/i.test(normalized)) {
+    return "Tu sesión ha expirado. Por favor inicia sesión nuevamente.";
+  }
+
+  if (/Network Error/i.test(normalized)) {
+    return "No se pudo conectar al servidor. Verifica tu conexión.";
+  }
+
+  return normalized;
+};
+
 /**
  * ERROR_MESSAGES — Mensajes centralizados por código HTTP.
- * Cambias el mensaje en un lugar y se actualiza en toda la app.
  */
 const ERROR_MESSAGES: Record<number, string> = {
   400: "Solicitud incorrecta. Verifica los datos enviados.",
@@ -35,9 +64,11 @@ export const parseApiError = (error: unknown): ApiError => {
     if (axiosError.response) {
       return {
         message: safeText(
-          axiosError.response.data?.message ??
-            ERROR_MESSAGES[axiosError.response.status] ??
-            "Error desconocido",
+          normalizeBackendMessage(
+            axiosError.response.data?.message ??
+              ERROR_MESSAGES[axiosError.response.status] ??
+              "Error desconocido",
+          ),
           "Error desconocido",
           300,
         ),
@@ -78,12 +109,12 @@ export const handleHttpError = (error: unknown, silent = false): ApiError => {
       const firstError = Object.values(parsed.errors)[0]?.[0];
       toast.error(safeText(firstError ?? parsed.message, parsed.message, 300));
     } else {
-      toast.error(
+      toast.error(parsed.message);
+      /*toast.error(
         safeText(parsed.message, "Ocurrió un error inesperado.", 300),
-      );
+      );*/
     }
   }
 
   return parsed;
 };
-/*Revisar si tiene el erro SARA */

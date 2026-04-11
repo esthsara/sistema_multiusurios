@@ -13,6 +13,9 @@ const DashboardLayout = lazy(() => import("@/layouts/DashboardLayout"));
 
 /* ── Páginas públicas ── */
 const LoginPage = lazy(() => import("@/features/auth/components/LoginPage"));
+const ProfilePage = lazy(
+  () => import("@/features/auth/components/ProfilePage"),
+);
 
 /* ── Páginas privadas ── */
 const HomePage = lazy(() => import("@/features/dashboard/components/HomePage"));
@@ -140,6 +143,10 @@ export const router = createBrowserRouter([
           {
             path: APP_ROUTES.DASHBOARD.HOME,
             element: withSuspense(HomePage),
+          },
+          {
+            path: APP_ROUTES.DASHBOARD.PERFIL,
+            element: withSuspense(ProfilePage),
           },
 
           /* Personas — requiere permiso */

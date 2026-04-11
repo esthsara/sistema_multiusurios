@@ -2,11 +2,11 @@
 
 @theme {
   /* Tonos de azules */
-  --color-primary-50: #7a91b1;
-  --color-primary-200: #bfdbfe;
-  --color-primary-400: #80b4f3;
-  --color-primary-600: #2563eb;
-  --color-primary-700: #1857df;
+  --color-primary-50: #677b97;
+  --color-primary-200: #b2ccec;
+  --color-primary-400: #709cd3;
+  --color-primary-600: #225ad4;
+  --color-primary-700: #1344ad;
 
   /* Éxito */
   --color-success-500: #45e43f;
@@ -64,7 +64,7 @@
   --color-primary-50: #fff5f5;
   --color-primary-200: #bfdbfe;
   --color-primary-400: #a3b4c7;
-  --color-primary-600: #4767a3;
+  --color-primary-600: #2d549c;
 
   /* Superficies oscuras */
   --color-bg-base: #1e293b;
@@ -389,4 +389,69 @@ body {
   display: inline-flex;
   align-items: center;
   gap: 8px;
+}
+
+/* ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+   DARK MODE PARA LA PARTE USURIOS
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ */
+
+.dark .ant-card {
+  background: var(--color-bg-base-2) !important;
+  border-color: var(--color-border) !important;
+}
+
+.dark .ant-card .ant-card-head {
+  border-bottom: 1px solid var(--color-border) !important;
+}
+
+.dark .ant-card .ant-card-head-title,
+.dark .ant-card .ant-card-body,
+.dark .ant-typography,
+.dark .ant-descriptions-item-content,
+.dark .ant-descriptions-item-label,
+.dark .ant-empty-description {
+  color: var(--color-text-primary) !important;
+}
+
+.dark .ant-descriptions-bordered .ant-descriptions-view,
+.dark .ant-descriptions-bordered .ant-descriptions-item-label,
+.dark .ant-descriptions-bordered .ant-descriptions-item-content {
+  border-color: var(--color-border) !important;
+}
+
+.dark .ant-descriptions-bordered .ant-descriptions-item-label {
+  background: var(--color-bg-overlay) !important;
+}
+
+.dark .ant-descriptions-bordered .ant-descriptions-item-content {
+  background: var(--color-bg-base-2) !important;
+}
+
+.dark .ant-list .ant-list-item {
+  border-bottom-color: var(--color-border) !important;
+}
+
+.dark .ant-tag {
+  background: color-mix(
+    in srgb,
+    var(--color-primary-600) 18%,
+    transparent
+  ) !important;
+  border-color: color-mix(
+    in srgb,
+    var(--color-primary-600) 40%,
+    var(--color-border)
+  ) !important;
+  color: var(--color-text-primary) !important;
+}
+
+.dark .ant-btn-default {
+  background: var(--color-bg-base-2) !important;
+  border-color: var(--color-border) !important;
+  color: var(--color-text-primary) !important;
+}
+
+.dark .ant-btn-default:hover {
+  border-color: var(--color-primary-400) !important;
+  color: var(--color-text-primary) !important;
 }

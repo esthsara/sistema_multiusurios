@@ -4,6 +4,7 @@ import { devtools } from "zustand/middleware";
 import { authService } from "@/features/auth/services/auth.service";
 import {
   adaptBackendUser,
+  adaptSucursal,
   extractPlainToken,
 } from "@/features/auth/adapters/auth.adapter";
 import { tokenManager } from "@/shared/utils/tokenManager";
@@ -18,13 +19,8 @@ import type {
   RoleName,
 } from "@/shared/types/auth.types";
 
-/* ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-   TIPOS DEL STORE
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ */
-
 /**
- nos sirve para definir claramente qué acciones y estado tiene nuestro store.
-
+ nos sirve para definir qué acciones y estado tiene nuestro store.
  */
 interface AuthActions {
   // Auth
@@ -33,8 +29,9 @@ interface AuthActions {
   logout: () => Promise<void>;
   initializeAuth: () => Promise<void>;
 
-  // Sucursal
-  setSucursalActiva: (sucursal: Sucursal) => void;
+  // Sucursal activa
+  setSucursalActiva: (sucursal: Sucursal) => Promise<void>;
+  syncSucursalesUsuario: () => Promise<void>;
 
   // Helpers de permisos (mueven lógica fuera de componentes)
   hasPermission: (permission: PermissionString) => boolean;
@@ -47,18 +44,57 @@ interface AuthActions {
   _reset: () => void;
 }
 
-/**
- * AuthStore — Intersección de State + Actions.
- * Intersección (&): el store tiene AMBAS formas.
- * (SARA OJITO REVISA ESTOOOO AAAAA)
- */
 type AuthStore = AuthState & AuthActions;
 
 let initializeAuthPromise: Promise<void> | null = null;
 let logoutPromise: Promise<void> | null = null;
 
+//para verificar si el rol es super-admin, con normalización de espacios y mayúsculas
+const isSuperAdminRole = (roleName: string) => {
+  return roleName.trim().toLowerCase().replace(/\s+/g, "-") === "super-admin";
+};
+
+//para leer el usuario en sessionStorage al iniciar la app, si existe
 const readCachedUser = (): AuthUser | null => {
   return storageManager.getCachedUser();
+};
+
+const hydrateUser = (
+  backendUser: Parameters<typeof adaptBackendUser>[0],
+  fallbackUser: AuthUser | null,
+  preferredSucursalId?: number | null,
+): AuthUser => {
+  const adaptedUser = adaptBackendUser(
+    backendUser,
+    fallbackUser?.sessionId ?? null,
+  );
+
+  const mergedSucursales =
+    adaptedUser.sucursales.length > 0
+      ? adaptedUser.sucursales
+      : (fallbackUser?.sucursales ?? []);
+
+  const preferredSucursal = preferredSucursalId
+    ? (mergedSucursales.find((s) => s.id === preferredSucursalId) ?? null)
+    : null;
+
+  return {
+    ...adaptedUser,
+    roles:
+      adaptedUser.roles.length > 0
+        ? adaptedUser.roles
+        : (fallbackUser?.roles ?? []),
+    permisos:
+      adaptedUser.permisos.length > 0
+        ? adaptedUser.permisos
+        : (fallbackUser?.permisos ?? []),
+    sucursales: mergedSucursales,
+    sucursalActiva:
+      preferredSucursal ??
+      adaptedUser.sucursalActiva ??
+      fallbackUser?.sucursalActiva ??
+      null,
+  };
 };
 
 /* ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
@@ -97,12 +133,6 @@ export const useAuthStore = create<AuthStore>()(
               tokenManager.removeToken();
             }
 
-            if (user?.sucursalActiva?.id) {
-              storageManager.setSucursalId(String(user.sucursalActiva.id));
-            } else {
-              storageManager.removeSucursalId();
-            }
-
             if (user) {
               storageManager.setCachedUser(user);
             } else {
@@ -125,7 +155,6 @@ export const useAuthStore = create<AuthStore>()(
           () => {
             const wasInitialized = get().isAuthInitialized;
             tokenManager.removeToken();
-            storageManager.removeSucursalId();
             storageManager.removeCachedUser();
 
             return {
@@ -162,6 +191,7 @@ export const useAuthStore = create<AuthStore>()(
            */
           const meResponse = await authService.me();
           const meUser = meResponse.data;
+          const fallbackUser = get().user ?? readCachedUser();
 
           const mergedUser = {
             ...backendUser,
@@ -182,9 +212,10 @@ export const useAuthStore = create<AuthStore>()(
             current_branch: meUser.current_branch ?? backendUser.current_branch,
           };
 
-          const fullUser = adaptBackendUser(mergedUser, session_id);
+          const fullUser = hydrateUser(mergedUser, fallbackUser);
 
           get()._setUser(fullUser, plainToken);
+          await get().syncSucursalesUsuario();
         } finally {
           get()._setLoading(false);
         }
@@ -201,6 +232,7 @@ export const useAuthStore = create<AuthStore>()(
           const plainToken = extractPlainToken(access_token);
           tokenManager.setLoginTime();
           get()._setUser(adaptBackendUser(backendUser, session_id), plainToken);
+          await get().syncSucursalesUsuario();
         } finally {
           get()._setLoading(false);
         }
@@ -284,28 +316,10 @@ export const useAuthStore = create<AuthStore>()(
             const backendUser = meResponse.data;
             const fallbackUser = get().user ?? readCachedUser();
 
-            const adaptedUser = adaptBackendUser(backendUser, null);
-            const hydratedUser: AuthUser = {
-              ...adaptedUser,
-              roles:
-                adaptedUser.roles.length > 0
-                  ? adaptedUser.roles
-                  : (fallbackUser?.roles ?? []),
-              permisos:
-                adaptedUser.permisos.length > 0
-                  ? adaptedUser.permisos
-                  : (fallbackUser?.permisos ?? []),
-              sucursales:
-                adaptedUser.sucursales.length > 0
-                  ? adaptedUser.sucursales
-                  : (fallbackUser?.sucursales ?? []),
-              sucursalActiva:
-                adaptedUser.sucursalActiva ??
-                fallbackUser?.sucursalActiva ??
-                null,
-            };
+            const hydratedUser = hydrateUser(backendUser, fallbackUser);
 
             get()._setUser(hydratedUser, token);
+            await get().syncSucursalesUsuario();
           } catch {
             // 401/errores de sesión inválida → limpiamos completamente
             get()._reset();
@@ -321,21 +335,69 @@ export const useAuthStore = create<AuthStore>()(
 
       /* ── Sucursal Activa ── */
 
-      setSucursalActiva: (sucursal) => {
+      syncSucursalesUsuario: async () => {
         const { user, accessToken } = get();
-        if (!user) return;
+        if (!user || !accessToken) return;
 
-        const updatedUser: AuthUser = {
-          ...user,
-          sucursalActiva: sucursal,
-        };
+        try {
+          const response = await authService.getUserBranches();
+          const payload = response.data;
 
-        /**
-         * Actualizamos también sessionStorage para el interceptor.
-         * En el interceptor de Axios leemos 'sucursal_activa_id'
-         * para el header X-Sucursal-ID.
-         */
-        get()._setUser(updatedUser, accessToken);
+          const sucursales = (payload.items ?? []).map((item) =>
+            adaptSucursal({
+              id: item.id,
+              nombre: item.nombre,
+              clave: item.clave,
+              codigo: item.codigo,
+            }),
+          );
+
+          const activeBranchId = payload.sucursal_actual;
+          const sucursalActiva =
+            (activeBranchId
+              ? sucursales.find((s) => s.id === activeBranchId)
+              : null) ??
+            sucursales.find((s) => s.id === user.sucursalActiva?.id) ??
+            sucursales[0] ??
+            null;
+
+          const updatedUser: AuthUser = {
+            ...user,
+            sucursales,
+            sucursalActiva,
+          };
+
+          get()._setUser(updatedUser, accessToken);
+        } catch {
+          // Si falla, mantenemos el estado actual para no romper la sesión.
+        }
+      },
+
+      setSucursalActiva: (sucursal) => {
+        const { user } = get();
+        if (!user) return Promise.resolve();
+        if (user.sucursalActiva?.id === sucursal.id) return Promise.resolve();
+
+        return (async () => {
+          get()._setLoading(true);
+          try {
+            await authService.switchBranch(sucursal.id);
+
+            const meResponse = await authService.me();
+            const backendUser = meResponse.data;
+            const fallbackUser = get().user ?? readCachedUser();
+            const hydratedUser = hydrateUser(
+              backendUser,
+              fallbackUser,
+              sucursal.id,
+            );
+
+            get()._setUser(hydratedUser, get().accessToken);
+            await get().syncSucursalesUsuario();
+          } finally {
+            get()._setLoading(false);
+          }
+        })();
       },
 
       /* ── Helpers de permisos ── */
@@ -344,7 +406,7 @@ export const useAuthStore = create<AuthStore>()(
         const { user } = get();
         if (!user) return false;
 
-        const isSuper = user.roles.some((r) => r.name === "super-admin");
+        const isSuper = user.roles.some((r) => isSuperAdminRole(r.name));
         if (isSuper) return true;
 
         return user.permisos.includes(permission);

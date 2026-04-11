@@ -1,6 +1,7 @@
 // src/layouts/components/BranchSelector.tsx
 import { Select } from "antd";
 import { Building2 } from "lucide-react";
+import { toast } from "react-toastify";
 import { useAuth } from "@/shared/hooks/useAuth";
 import { useAuthStore } from "@/features/auth/store/auth.store";
 import { safeText } from "@/shared/utils/sanitize";
@@ -12,6 +13,7 @@ interface BranchSelectorProps {
 /*esta seccion es para cambair de sucursal segun lo que me legue */
 export const BranchSelector = ({ collapsed }: BranchSelectorProps) => {
   const { sucursales, sucursalActiva } = useAuth();
+  const isLoading = useAuthStore((s) => s.isLoading);
   const setSucursalActiva = useAuthStore((s) => s.setSucursalActiva);
 
   // Si solo tiene una sucursal, mostramos solo el nombre
@@ -51,9 +53,17 @@ export const BranchSelector = ({ collapsed }: BranchSelectorProps) => {
           size="small"
           variant="borderless"
           value={sucursalActiva?.id}
-          onChange={(id: number) => {
+          loading={isLoading}
+          disabled={isLoading}
+          onChange={async (id: number) => {
             const found = sucursales.find((s: Sucursal) => s.id === id);
-            if (found) setSucursalActiva(found);
+            if (!found) return;
+
+            try {
+              await setSucursalActiva(found);
+            } catch {
+              toast.error("No se pudo cambiar la sucursal activa");
+            }
           }}
           options={sucursales.map((s: Sucursal) => ({
             value: s.id,

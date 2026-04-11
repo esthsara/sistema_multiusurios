@@ -30,6 +30,26 @@ interface RegisterResponseData {
 
 interface MeResponseData extends BackendUser {}
 
+interface UserBranchItem {
+  id: number;
+  nombre: string;
+  codigo?: string;
+  clave?: string;
+  es_actual?: boolean;
+}
+
+interface UserBranchesResponseData {
+  total: number;
+  items: UserBranchItem[];
+  sucursal_actual: number | null;
+}
+
+interface SwitchBranchResponseData {
+  sucursal_anterior?: UserBranchItem | null;
+  sucursal_actual?: UserBranchItem | null;
+  mensaje?: string;
+}
+
 export const authService = {
   login: async (dto: LoginDto) => {
     try {
@@ -58,6 +78,30 @@ export const authService = {
   me: async () => {
     try {
       const res = await apiClient.get<ApiResponse<MeResponseData>>("/auth/me");
+      return res.data;
+    } catch (error) {
+      throw handleHttpError(error, true);
+    }
+  },
+
+  getUserBranches: async () => {
+    try {
+      const res =
+        await apiClient.get<ApiResponse<UserBranchesResponseData>>(
+          "/users/branches",
+        );
+      return res.data;
+    } catch (error) {
+      throw handleHttpError(error, true);
+    }
+  },
+
+  switchBranch: async (sucursalId: number) => {
+    try {
+      const res = await apiClient.put<ApiResponse<SwitchBranchResponseData>>(
+        `/users/switch-branch/${sucursalId}`,
+        { sucursal_id: sucursalId },
+      );
       return res.data;
     } catch (error) {
       throw handleHttpError(error, true);

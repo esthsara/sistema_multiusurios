@@ -2,8 +2,10 @@
 import { Avatar, Dropdown } from "antd";
 import { User, LogOut } from "lucide-react";
 import type { MenuProps } from "antd";
+import { useNavigate } from "react-router-dom";
 import { useAuth } from "@/shared/hooks/useAuth";
 import { useAuthActions } from "@/features/auth/hooks/useAuthActions";
+import { APP_ROUTES } from "@/shared/constants/routes.constants";
 import { safeText } from "@/shared/utils/sanitize";
 
 /* Componente para el menú del usuario en la barra de navegación  este junta las iniciales y lo covierte en uno solo*/
@@ -14,6 +16,7 @@ interface UserMenuProps {
 export const UserMenu = ({ collapsed }: UserMenuProps) => {
   const { user } = useAuth();
   const { logout } = useAuthActions();
+  const navigate = useNavigate();
 
   const safeName = safeText(user?.persona.nombreCompleto, "Usuario", 120);
   const safeEmail = safeText(user?.email, "Sin email", 120);
@@ -53,6 +56,7 @@ export const UserMenu = ({ collapsed }: UserMenuProps) => {
       key: "perfil",
       icon: <User size={14} />,
       label: "Mi Perfil",
+      onClick: () => navigate(APP_ROUTES.DASHBOARD.PERFIL),
     },
     { type: "divider" },
     {

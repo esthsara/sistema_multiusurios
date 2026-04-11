@@ -15,6 +15,7 @@ import { useAuthStore } from "@/features/auth/store/auth.store";
 /**
  * Creamos una instancia nombrada en lugar de usar axios directamente.
  * Esto es el principio Open/Closed de SOLID.
+ * AxiosInstance es la interfaz que define los métodos HTTP (get, post, etc.)
  */
 /*Todas las peticiones al backend pasan por aquí*/
 const apiClient: AxiosInstance = axios.create({
@@ -23,43 +24,35 @@ const apiClient: AxiosInstance = axios.create({
   headers: {
     "Content-Type": "application/json",
     Accept: "application/json",
-    /*Le digo al backend desde qué sucursal estoy trabajando */
-    "X-Sucursal-ID": "",
   },
 });
 
-/* ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-   INTERCEPTOR DE REQUEST — Sale hacia el backend
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ */
+/* INTERCEPTOR DE REQUEST — */
 apiClient.interceptors.request.use(
   (config: InternalAxiosRequestConfig) => {
-    /**
-     * Token JWT — Lo leeremos del store de Zustand en Paso 7.
-     * Por ahora lo leemos de sessionStorage como puente temporal.
-     *
-     * NOTA TÉCNICA:
-     * En Paso 6 usaremos httpOnly cookies para el refresh token.
-     * El accessToken vivirá en memoria (Zustand), NO en localStorage.
-     * sessionStorage es solo temporal para este paso.
-     */
-    const token = tokenManager.getToken();
+    //const token = tokenManager.getToken();
+    //accedo al zustand para el token
+    const authStore = useAuthStore.getState();
+    const token = authStore.accessToken ?? tokenManager.getToken();
+
+    //si tenemos un token vencido, hacemos logout y redirigimos a login
+
     if (token && tokenManager.isSessionExpired()) {
       void handleUnauthorized("Tu sesión ha expirado por inactividad.");
       const error = new axios.CanceledError("SESSION_EXPIRED");
       return Promise.reject(error);
     }
 
+    ///si tenemos token válido, lo agregamos al header Authorization
     if (token) {
       config.headers.Authorization = `Bearer ${token}`;
     }
-
-    /**
-     * Sucursal activa — Enviada en cada request para el backend.
-     * En Paso 7 esto vendrá del store global de Zustand.
-     */
-    const sucursalId = storageManager.getSucursalId();
+    // Sucursal activa global (única fuente de verdad): Zustand/auth.user.sucursalActiva
+    const sucursalId = authStore.user?.sucursalActiva?.id;
     if (sucursalId) {
-      config.headers["X-Sucursal-ID"] = sucursalId;
+      config.headers["X-Sucursal-ID"] = String(sucursalId);
+    } else {
+      delete config.headers["X-Sucursal-ID"];
     }
 
     return config;
@@ -68,21 +61,19 @@ apiClient.interceptors.request.use(
 );
 
 /* ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-   INTERCEPTOR DE RESPONSE — Llega desde el backend
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ */
-
-/**
- * Flag para evitar múltiples redirects a login
- * si hay varias peticiones simultáneas que fallan con 401.
  */
-let isRedirectingToLogin = false;
-let redirectResetTimer: ReturnType<typeof setTimeout> | null = null;
-let unauthorizedPromise: Promise<void> | null = null;
-let hasNotifiedSessionExpired = false;
 
+//evitamos multiples redirecciones a login si varias peticiones fallan con 401 al mismo tiempo
+let isRedirectingToLogin = false;
+//resetea los flags que controlan la redirección a login
+let redirectResetTimer: ReturnType<typeof setTimeout> | null = null;
+//guarda la promesa de manejo de sesión expirada
+let unauthorizedPromise: Promise<void> | null = null;
+//evita mostrar múltiples toasts de sesión expirada
+let hasNotifiedSessionExpired = false;
+//para borrar
 const hardResetSession = () => {
   tokenManager.removeToken();
-  storageManager.removeSucursalId();
   storageManager.removeCachedUser();
 };
 
@@ -135,54 +126,41 @@ const handleUnauthorized = async (
 };
 
 apiClient.interceptors.response.use(
-  /**
-   * Respuesta exitosa (2xx) — la dejamos pasar sin modificar.
-   * Los servicios recibirán el AxiosResponse completo
-   * y extraerán response.data
-   */
   (response: AxiosResponse) => response,
 
   async (error: AxiosError) => {
     const status = error.response?.status;
     const requestUrl = error.config?.url || "";
+    const isAuthRequest = requestUrl.includes("/auth/");
     const isLoginRequest = requestUrl.includes("/auth/login");
 
     /* 401 — Sesión expirada */
     if (status === 401) {
-      /**
-       * En login con credenciales incorrectas NO redirigimos,
-       * dejamos que el módulo de auth muestre el toast local.
-       */
+      //En login con credenciales incorrectas NO redirigimos
       if (isLoginRequest) {
         return Promise.reject(error);
       }
-
-      /**
-       * Aquí centralizamos el logout implícito cuando el token
-       * ya no es válido. Esto deja el flujo listo para migrar a
-       * refresh token o cookies httpOnly más adelante.
-       */
       await handleUnauthorized();
       return Promise.reject(error);
     }
 
-    /* 403 — Sin permisos — muestra toast pero no redirige */
+    /* 403 — Sin permisos  */
     if (status === 403) {
+      if (isAuthRequest) {
+        return Promise.reject(error);
+      }
       handleHttpError(error);
       return Promise.reject(error);
     }
 
     /* 500, 502, 503 — Errores de servidor */
     if (status && status >= 500) {
+      if (isAuthRequest) {
+        return Promise.reject(error);
+      }
       handleHttpError(error);
       return Promise.reject(error);
     }
-
-    /**
-     * Otros errores (400, 404, 422) — los propagamos sin toast.
-     * El componente o servicio decide cómo mostrarlos
-     * (útil para validaciones de formulario).
-     */
     return Promise.reject(error);
   },
 );
