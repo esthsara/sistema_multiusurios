@@ -15,37 +15,40 @@ const baseTokens: ThemeConfig["token"] = {
 export const lightTheme: ThemeConfig = {
   token: {
     ...baseTokens,
-    colorPrimary: "#2563eb",
-    colorSuccess: "#16a34a",
-    colorWarning: "#d97706",
-    colorError: "#dc2626",
+    colorPrimary: "#3b6fcf",
+    colorSuccess: "#22c55e",
+    colorWarning: "#f59e0b",
+    colorError: "#ef4444",
+    // 🎨 FONDOS (neutros, no azulados)
     colorBgBase: "#ffffff",
     colorBgContainer: "#ffffff",
-    colorBgLayout: "#ffffff",
+    colorBgLayout: "#f8fafc",
+
     colorBorder: "#e2e8f0",
+
     colorText: "#1e293b",
-    colorTextSecondary: "#64748b",
+    colorTextSecondary: "#475569",
     colorTextDisabled: "#94a3b8",
-    colorTextPlaceholder: "#64748b ",
+    colorTextPlaceholder: "#64748b",
   },
   components: {
     Layout: {
-      siderBg: "#021024",
+      siderBg: "#0f172a", // consistente con sidebar
       triggerBg: "#1e293b",
       triggerColor: "#f8fafc",
     },
     Menu: {
       darkItemBg: "#0f172a",
       darkSubMenuItemBg: "#1e293b",
-      darkItemSelectedBg: "#2563eb",
+      darkItemSelectedBg: "#3b6fcf",
       darkItemColor: "#94a3b8",
       darkItemSelectedColor: "#ffffff",
       darkItemHoverColor: "#f8fafc",
     },
     Table: {
-      headerBg: "#f8fafc",
+      headerBg: "#f1f5f9",
       headerColor: "#1e293b",
-      rowHoverBg: "#f0f7ff",
+      rowHoverBg: "#eef4ff",
       borderColor: "#e2e8f0",
       colorBgContainer: "#ffffff",
       colorText: "#1e293b",
@@ -71,18 +74,24 @@ export const lightTheme: ThemeConfig = {
 export const darkTheme: ThemeConfig = {
   token: {
     ...baseTokens,
-    colorPrimary: "#3b82f6",
+    colorPrimary: "#5999e7",
     colorSuccess: "#22c55e",
     colorWarning: "#f59e0b",
     colorError: "#ef4444",
-    colorBgBase: "#1e293b",
+
+    // 🌑 FONDOS (gris oscuro elegante)
+    colorBgBase: "#0f172a",
     colorBgContainer: "#1e293b",
-    colorBgLayout: "#1e293b",
+    colorBgLayout: "#0f172a",
+
+    // BORDES
     colorBorder: "#334155",
+
+    // TEXTOS
     colorText: "#f1f5f9",
     colorTextSecondary: "#cbd5e1",
     colorTextDisabled: "#64748b",
-    colorTextPlaceholder: "#cbd5e1",
+    colorTextPlaceholder: "#94a3b8",
   },
   components: {
     Layout: {
