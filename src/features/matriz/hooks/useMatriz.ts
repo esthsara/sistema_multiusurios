@@ -1,247 +1,185 @@
-// src/features/roles-permisos/hooks/useMatriz.ts
-import { useState, useEffect, useCallback, useMemo } from 'react'
-import { toast }           from 'react-toastify'
-import { permisosService } from '../services/permiso.service'
-import { rolesService }    from '../services/roles.service'
-import type { PermisosPorModulo } from '../types/permiso.types'
-import type { RolListItem, RolDetalle } from '../types/rol.types'
-
-/**
- * MatrizCell — Estado de una celda en la matriz.
- * rolId × permisoId → tiene o no tiene el permiso
- */
-type MatrizState = Record<number, Set<number>>
-// MatrizState[rolId] = Set de permisoIds que tiene ese rol
-
-/**
- * PendingChange — Cambio pendiente de guardar
- */
-interface PendingChange {
-  rolId:      number
-  permisoId:  number
-  action:     'add' | 'remove'
-}
+import { useCallback, useEffect, useMemo, useState } from "react";
+import { toast } from "react-toastify";
+import { matrizService } from "../services/matriz.service";
+import type {
+  MatrizRol,
+  MatrizPermisosAgrupados,
+  MatrizEstado,
+  MatrizCambio,
+} from "../types/matriz.types";
 
 export const useMatriz = () => {
-  const [roles,         setRoles]        = useState<RolListItem[]>([])
-  const [rolesDetalle,  setRolesDetalle] = useState<RolDetalle[]>([])
-  const [permisosPorModulo, setPermisosPorModulo] = useState<PermisosPorModulo>({})
-  const [loading,       setLoading]      = useState(false)
-  const [saving,        setSaving]       = useState(false)
+  const [roles, setRoles] = useState<MatrizRol[]>([]);
+  const [permisosAgrupados, setPermisosAgrupados] =
+    useState<MatrizPermisosAgrupados>({});
+  const [loading, setLoading] = useState(true);
+  const [saving, setSaving] = useState(false);
 
-  /**
-   * matrizOriginal — estado guardado en el backend
-   * matrizLocal    — estado con cambios pendientes
-   */
-  const [matrizOriginal, setMatrizOriginal] = useState<MatrizState>({})
-  const [matrizLocal,    setMatrizLocal]    = useState<MatrizState>({})
+  // Estado actual de la matriz: Map<rolId, Set<permisoId>>
+  const [estado, setEstado] = useState<MatrizEstado>(new Map());
 
-  /* Filtros locales */
-  const [searchTerm,    setSearchTerm]    = useState('')
-  const [moduloFiltro,  setModuloFiltro]  = useState<string>('todos')
-  const [rolFiltro,     setRolFiltro]     = useState<string>('todos')
+  // Snapshot original para calcular el diff
+  const [original, setOriginal] = useState<MatrizEstado>(new Map());
 
-  /* ── Carga inicial ── */
-  const fetchData = useCallback(async () => {
-    setLoading(true)
+  // ── Carga inicial ──────────────────────────────────────────────────────────
+  const cargar = useCallback(async () => {
+    setLoading(true);
     try {
-      /**
-       * Cargamos en paralelo:
-       * 1. Lista de roles
-       * 2. Permisos agrupados por módulo
-       * 3. Detalle de cada rol (para saber sus permisos actuales)
-       */
       const [rolesRes, permisosRes] = await Promise.all([
-        rolesService.getAll(),
-        permisosService.getAgrupados(),
-      ])
+        matrizService.getRoles(),
+        matrizService.getPermisosAgrupados(),
+      ]);
 
-      const rolesList = rolesRes.data.items
-      setRoles(rolesList)
-      setPermisosPorModulo(permisosRes.data)
+      const listaRoles: MatrizRol[] = rolesRes.data ?? [];
+      setRoles(listaRoles);
+      setPermisosAgrupados(permisosRes.data ?? {});
 
-      /* Cargar detalle de cada rol para obtener sus permisos */
-      const detalles = await Promise.all(
-        rolesList.map(r => rolesService.getById(r.id))
-      )
-      const detallesData = detalles.map(d => d.data)
-      setRolesDetalle(detallesData)
+      // Construir el mapa inicial de permisos por rol
+      const mapa: MatrizEstado = new Map();
+      listaRoles.forEach((rol) => {
+        mapa.set(rol.id, new Set(rol.permissions.map((p) => p.id)));
+      });
 
-      /* Construir estado inicial de la matriz */
-      const estadoInicial: MatrizState = {}
-      detallesData.forEach(rol => {
-        estadoInicial[rol.id] = new Set(
-          rol.permissions.map(p => p.id)
-        )
-      })
-
-      setMatrizOriginal(estadoInicial)
-      setMatrizLocal(deepCopyMatriz(estadoInicial))
-
+      setEstado(mapa);
+      // Deep copy para el snapshot original
+      setOriginal(new Map([...mapa].map(([k, v]) => [k, new Set(v)])));
     } catch {
-      toast.error('Error al cargar la matriz')
+      toast.error("Error al cargar la matriz de permisos");
     } finally {
-      setLoading(false)
+      setLoading(false);
     }
-  }, [])
+  }, []);
 
-  useEffect(() => { fetchData() }, [fetchData])
+  useEffect(() => {
+    cargar();
+  }, [cargar]);
 
-  /* ── Helpers ── */
-
-  const deepCopyMatriz = (m: MatrizState): MatrizState => {
-    const copy: MatrizState = {}
-    Object.entries(m).forEach(([rolId, permisoSet]) => {
-      copy[Number(rolId)] = new Set(permisoSet)
-    })
-    return copy
-  }
-
-  /* ── Toggle de una celda ── */
+  // ── Toggle de un permiso para un rol ──────────────────────────────────────
   const togglePermiso = useCallback((rolId: number, permisoId: number) => {
-    setMatrizLocal(prev => {
-      const copy = deepCopyMatriz(prev)
-      if (!copy[rolId]) copy[rolId] = new Set()
-
-      if (copy[rolId].has(permisoId)) {
-        copy[rolId].delete(permisoId)
+    setEstado((prev) => {
+      const next = new Map([...prev].map(([k, v]) => [k, new Set(v)]));
+      const permisos = next.get(rolId) ?? new Set<number>();
+      if (permisos.has(permisoId)) {
+        permisos.delete(permisoId);
       } else {
-        copy[rolId].add(permisoId)
+        permisos.add(permisoId);
       }
-      return copy
-    })
-  }, [])
+      next.set(rolId, permisos);
+      return next;
+    });
+  }, []);
 
-  /* ── Calcular cambios pendientes ── */
-  const pendingChanges = useMemo((): PendingChange[] => {
-    const changes: PendingChange[] = []
-
-    Object.keys(matrizLocal).forEach(rolIdStr => {
-      const rolId       = Number(rolIdStr)
-      const localSet    = matrizLocal[rolId]  ?? new Set<number>()
-      const originalSet = matrizOriginal[rolId] ?? new Set<number>()
-
-      localSet.forEach(permisoId => {
-        if (!originalSet.has(permisoId)) {
-          changes.push({ rolId, permisoId, action: 'add' })
+  // ── Toggle de todos los permisos de un módulo para un rol ─────────────────
+  const toggleModulo = useCallback(
+    (rolId: number, permisoIds: number[], todos: boolean) => {
+      setEstado((prev) => {
+        const next = new Map([...prev].map(([k, v]) => [k, new Set(v)]));
+        const permisos = next.get(rolId) ?? new Set<number>();
+        if (todos) {
+          permisoIds.forEach((id) => permisos.delete(id));
+        } else {
+          permisoIds.forEach((id) => permisos.add(id));
         }
-      })
+        next.set(rolId, permisos);
+        return next;
+      });
+    },
+    [],
+  );
 
-      originalSet.forEach(permisoId => {
-        if (!localSet.has(permisoId)) {
-          changes.push({ rolId, permisoId, action: 'remove' })
+  // ── Calcular cambios pendientes (diff vs original) ─────────────────────────
+  const cambios = useMemo<MatrizCambio[]>(() => {
+    const lista: MatrizCambio[] = [];
+    const todosPermisos = Object.values(permisosAgrupados).flat();
+
+    roles.forEach((rol) => {
+      const estadoActual = estado.get(rol.id) ?? new Set<number>();
+      const estadoOrig = original.get(rol.id) ?? new Set<number>();
+
+      estadoActual.forEach((pid) => {
+        if (!estadoOrig.has(pid)) {
+          const permiso = todosPermisos.find((p) => p.id === pid);
+          lista.push({
+            rolId: rol.id,
+            rolName: rol.name,
+            permisoId: pid,
+            permisoName: permiso?.name ?? String(pid),
+            accion: "agregar",
+          });
         }
-      })
-    })
+      });
 
-    return changes
-  }, [matrizLocal, matrizOriginal])
+      estadoOrig.forEach((pid) => {
+        if (!estadoActual.has(pid)) {
+          const permiso = todosPermisos.find((p) => p.id === pid);
+          lista.push({
+            rolId: rol.id,
+            rolName: rol.name,
+            permisoId: pid,
+            permisoName: permiso?.name ?? String(pid),
+            accion: "quitar",
+          });
+        }
+      });
+    });
 
-  /* ── Verificar si una celda tiene cambio pendiente ── */
-  const hasPendingChange = useCallback((rolId: number, permisoId: number): boolean => {
-    const localHas    = matrizLocal[rolId]?.has(permisoId) ?? false
-    const originalHas = matrizOriginal[rolId]?.has(permisoId) ?? false
-    return localHas !== originalHas
-  }, [matrizLocal, matrizOriginal])
+    return lista;
+  }, [estado, original, roles, permisosAgrupados]);
 
-  /* ── Descartar cambios ── */
-  const discardChanges = useCallback(() => {
-    setMatrizLocal(deepCopyMatriz(matrizOriginal))
-  }, [matrizOriginal])
-
-  /* ── Guardar cambios ── */
-  const saveChanges = useCallback(async () => {
-    setSaving(true)
+  // ── Guardar todos los cambios ──────────────────────────────────────────────
+  const guardar = useCallback(async () => {
+    // Roles que tienen cambios
+    const rolesAfectados = [...new Set(cambios.map((c) => c.rolId))];
+    setSaving(true);
     try {
-      /**
-       * Agrupamos los cambios por rol y hacemos
-       * un syncPermissions por cada rol modificado.
-       * syncPermissions reemplaza TODOS los permisos del rol.
-       */
-      const rolesModificados = new Set(pendingChanges.map(c => c.rolId))
-
       await Promise.all(
-        Array.from(rolesModificados).map(rolId => {
-          const permisosIds = Array.from(matrizLocal[rolId] ?? new Set())
-          return rolesService.syncPermissions(rolId, { permissions: permisosIds })
-        })
-      )
-
-      /* Actualizar el estado original con lo que se guardó */
-      setMatrizOriginal(deepCopyMatriz(matrizLocal))
-      toast.success(`${pendingChanges.length} cambios guardados correctamente`)
+        rolesAfectados.map((rolId) => {
+          const permisoIds = [...(estado.get(rolId) ?? new Set<number>())];
+          return matrizService.sincronizarPermisos(rolId, permisoIds);
+        }),
+      );
+      // Actualizar snapshot
+      setOriginal(new Map([...estado].map(([k, v]) => [k, new Set(v)])));
+      toast.success(`${cambios.length} cambios guardados correctamente`);
     } catch {
-      toast.error('Error al guardar los cambios')
+      toast.error("Error al guardar los cambios");
     } finally {
-      setSaving(false)
+      setSaving(false);
     }
-  }, [pendingChanges, matrizLocal])
+  }, [cambios, estado]);
 
-  /* ── Contar permisos por rol por módulo (para el header de columna) ── */
-  const getCountForRole = useCallback((rolId: number): number => {
-    return matrizLocal[rolId]?.size ?? 0
-  }, [matrizLocal])
+  // ── Descartar cambios ──────────────────────────────────────────────────────
+  const descartar = useCallback(() => {
+    setEstado(new Map([...original].map(([k, v]) => [k, new Set(v)])));
+  }, [original]);
 
-  const getTotalPermisos = useMemo((): number => {
-    return Object.values(permisosPorModulo).reduce(
-      (acc, permisos) => acc + permisos.length, 0
-    )
-  }, [permisosPorModulo])
+  // ── Helper: ¿tiene el rol el permiso? ─────────────────────────────────────
+  const tienePermiso = useCallback(
+    (rolId: number, permisoId: number) =>
+      estado.get(rolId)?.has(permisoId) ?? false,
+    [estado],
+  );
 
-  /* ── Datos filtrados ── */
-  const modulosFiltrados = useMemo(() => {
-    let modulos = Object.entries(permisosPorModulo)
-
-    if (moduloFiltro !== 'todos') {
-      modulos = modulos.filter(([mod]) => mod === moduloFiltro)
-    }
-
-    if (searchTerm.trim()) {
-      const term = searchTerm.toLowerCase()
-      modulos = modulos
-        .map(([mod, permisos]) => [
-          mod,
-          permisos.filter(p =>
-            p.name.toLowerCase().includes(term) ||
-            p.accion.toLowerCase().includes(term) ||
-            mod.toLowerCase().includes(term)
-          ),
-        ] as [string, typeof permisos])
-        .filter(([, permisos]) => permisos.length > 0)
-    }
-
-    return modulos
-  }, [permisosPorModulo, moduloFiltro, searchTerm])
-
-  const rolesFiltrados = useMemo(() => {
-    if (rolFiltro === 'todos') return roles
-    return roles.filter(r => String(r.id) === rolFiltro)
-  }, [roles, rolFiltro])
+  // ── Helper: ¿tiene el rol TODOS los permisos de un módulo? ────────────────
+  const tieneModuloCompleto = useCallback(
+    (rolId: number, permisoIds: number[]) =>
+      permisoIds.every((id) => estado.get(rolId)?.has(id) ?? false),
+    [estado],
+  );
 
   return {
-    /* Datos */
     roles,
-    rolesFiltrados,
-    rolesDetalle,
-    permisosPorModulo,
-    modulosFiltrados,
-    getTotalPermisos,
-    /* Estado matriz */
-    matrizLocal,
-    matrizOriginal,
-    /* Cambios */
-    pendingChanges,
-    hasPendingChange,
-    togglePermiso,
-    discardChanges,
-    saveChanges,
-    getCountForRole,
-    /* UI */
+    permisosAgrupados,
+    modulos: Object.keys(permisosAgrupados),
     loading,
     saving,
-    /* Filtros */
-    searchTerm,     setSearchTerm,
-    moduloFiltro,   setModuloFiltro,
-    rolFiltro,      setRolFiltro,
-  }
-}
+    cambios,
+    hayCambios: cambios.length > 0,
+    tienePermiso,
+    tieneModuloCompleto,
+    togglePermiso,
+    toggleModulo,
+    guardar,
+    descartar,
+  };
+};
