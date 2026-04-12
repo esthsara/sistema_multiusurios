@@ -166,9 +166,9 @@ const PersonasPage = () => {
           style={{
             backgroundColor:
               r.tipo_persona === "FISICA"
-                ? "rgba(59,130,246,0.1)"
-                : "rgba(38, 39, 58, 0.1)",
-            color: r.tipo_persona === "FISICA" ? "#a8a9e9" : "#6366f1",
+                ? "var(--color-alert-primary-bg)"
+                : "var(--color-bg-subtle)",
+            color: r.tipo_persona === "FISICA" ? "var(--color-primary-400)" : "var(--color-text-secondary)",
           }}
         >
           {r.tipo_texto}

@@ -70,8 +70,7 @@ export const UsuarioDatosGenerales = ({
           <div
             className="relative rounded-2xl p-3"
             style={{
-              background:
-                "linear-gradient(135deg, rgba(59,130,246,0.12), rgba(99,102,241,0.08))",
+              background: "var(--gradient-primary)",
             }}
           >
             <Avatar

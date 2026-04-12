@@ -56,8 +56,8 @@ export const ConfirmModal = ({
                         flex items-center justify-center"
           style={{
             backgroundColor: danger
-              ? "rgba(239,68,68,0.1)"
-              : "rgba(245,158,11,0.1)",
+              ? "var(--color-alert-danger-bg)"
+              : "var(--color-alert-warning-bg)",
           }}
         >
           <AlertTriangle

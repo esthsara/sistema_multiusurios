@@ -87,7 +87,7 @@ export const RoleCopyModal = ({
             autoFocus
             style={{
               borderRadius: 8,
-              borderColor: "#E5E7EB",
+              borderColor: "var(--color-border)",
             }}
           />
         </Form.Item>

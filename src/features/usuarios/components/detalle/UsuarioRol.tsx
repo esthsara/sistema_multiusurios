@@ -128,8 +128,8 @@ export const UsuarioRol = ({ usuario, onCambiarRol }: UsuarioRolProps) => {
           <div
             className="rounded-xl p-3"
             style={{
-              backgroundColor: "rgba(34,197,94,0.07)",
-              border: "1px solid rgba(34,197,94,0.2)",
+              backgroundColor: "var(--color-alert-success-bg)",
+              border: "1px solid color-mix(in srgb, var(--color-success-500) 20%, transparent)",
             }}
           >
             <div className="flex items-center gap-2 mb-3">
@@ -152,7 +152,7 @@ export const UsuarioRol = ({ usuario, onCambiarRol }: UsuarioRolProps) => {
                   style={{
                     backgroundColor: "var(--color-bg-base)",
                     color: "var(--color-text-primary)",
-                    border: "1px solid rgba(34,197,94,0.28)",
+                    border: "1px solid color-mix(in srgb, var(--color-success-500) 28%, transparent)",
                   }}
                 >
                   <strong
@@ -182,8 +182,8 @@ export const UsuarioRol = ({ usuario, onCambiarRol }: UsuarioRolProps) => {
           <div
             className="rounded-xl p-3"
             style={{
-              backgroundColor: "rgba(239,68,68,0.07)",
-              border: "1px solid rgba(239,68,68,0.2)",
+              backgroundColor: "var(--color-alert-danger-bg)",
+              border: "1px solid color-mix(in srgb, var(--color-danger-500) 20%, transparent)",
             }}
           >
             <div className="flex items-center gap-2 mb-3">
@@ -203,7 +203,7 @@ export const UsuarioRol = ({ usuario, onCambiarRol }: UsuarioRolProps) => {
                   style={{
                     backgroundColor: "var(--color-bg-base)",
                     color: "var(--color-text-primary)",
-                    border: "1px solid rgba(239,68,68,0.28)",
+                    border: "1px solid color-mix(in srgb, var(--color-danger-500) 28%, transparent)",
                   }}
                 >
                   <strong

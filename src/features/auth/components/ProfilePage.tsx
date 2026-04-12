@@ -131,7 +131,7 @@ const ProfilePage = () => {
               <Badge
                 count={user?.activo ? 1 : 0}
                 size="small"
-                color={user?.activo ? "#22c55e" : "#ef4444"}
+                color={user?.activo ? "var(--color-success-500)" : "var(--color-danger-500)"}
               >
                 <Avatar
                   size={72}

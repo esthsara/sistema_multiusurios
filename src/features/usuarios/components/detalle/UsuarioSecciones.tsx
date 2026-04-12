@@ -37,29 +37,29 @@ const MODULO_LABELS: Record<string, string> = {
 };
 
 const ACCION_COLORS: Record<string, string> = {
-  ver: "rgba(59,130,246,0.1)",
-  crear: "rgba(34,197,94,0.1)",
-  editar: "rgba(234,179,8,0.1)",
-  eliminar: "rgba(239,68,68,0.1)",
-  eliminar_permanente: "rgba(239,68,68,0.15)",
-  exportar: "rgba(168,85,247,0.1)",
-  asignar: "rgba(34,197,94,0.1)",
-  quitar: "rgba(239,68,68,0.1)",
-  ver_sucursal: "rgba(59,130,246,0.1)",
-  subir: "rgba(34,197,94,0.1)",
+  ver: "var(--color-alert-primary-bg)",
+  crear: "var(--color-alert-success-bg)",
+  editar: "var(--color-alert-warning-bg)",
+  eliminar: "var(--color-alert-danger-bg)",
+  eliminar_permanente: "var(--color-alert-danger-bg)",
+  exportar: "var(--color-alert-primary-bg)",
+  asignar: "var(--color-alert-success-bg)",
+  quitar: "var(--color-alert-danger-bg)",
+  ver_sucursal: "var(--color-alert-primary-bg)",
+  subir: "var(--color-alert-success-bg)",
 };
 
 const ACCION_TEXT_COLORS: Record<string, string> = {
-  ver: "#3b82f6",
-  crear: "#16a34a",
-  editar: "#ca8a04",
-  eliminar: "#dc2626",
-  eliminar_permanente: "#dc2626",
-  exportar: "#9333ea",
-  asignar: "#16a34a",
-  quitar: "#dc2626",
-  ver_sucursal: "#3b82f6",
-  subir: "#16a34a",
+  ver: "var(--color-primary-600)",
+  crear: "var(--color-success-600)",
+  editar: "var(--color-warning-600)",
+  eliminar: "var(--color-danger-600)",
+  eliminar_permanente: "var(--color-danger-600)",
+  exportar: "var(--color-primary-600)",
+  asignar: "var(--color-success-600)",
+  quitar: "var(--color-danger-600)",
+  ver_sucursal: "var(--color-primary-600)",
+  subir: "var(--color-success-600)",
 };
 
 export const UsuarioSecciones = ({ usuario }: UsuarioSeccionesProps) => {

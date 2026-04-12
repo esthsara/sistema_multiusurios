@@ -155,7 +155,7 @@
 .saas-sidebar-menu.ant-menu-dark .ant-menu-item:hover,
 .saas-sidebar-menu.ant-menu-dark .ant-menu-submenu-title:hover {
   color: var(--color-text-inverse) !important;
-  background: rgba(144, 174, 219, 0.24) !important;
+  background: var(--color-alert-primary-bg) !important;
 }
 
 /* Menu Item Selected State */
@@ -164,7 +164,7 @@
   .ant-menu-submenu-selected
   > .ant-menu-submenu-title {
   color: var(--color-text-inverse) !important;
-  background: rgba(59, 130, 246, 0.3) !important;
+  background: color-mix(in srgb, var(--color-primary-600) 30%, transparent) !important;
   font-weight: 600;
 }
 
@@ -186,7 +186,7 @@
 .saas-sidebar-menu.ant-menu-dark .ant-menu-sub.ant-menu-inline {
   margin: 4px 0 8px 8px;
   padding: 4px 0 4px 8px;
-  border-left: 2px solid rgba(147, 197, 253, 0.35);
+  border-left: 2px solid color-mix(in srgb, var(--color-primary-400) 35%, transparent);
   background: transparent;
 }
 
@@ -203,13 +203,13 @@
   .ant-menu-sub.ant-menu-inline
   .ant-menu-item:hover {
   color: var(--color-text-inverse);
-  background: rgba(59, 130, 246, 0.2) !important;
+  background: color-mix(in srgb, var(--color-primary-600) 20%, transparent) !important;
 }
 
 .saas-sidebar-menu.ant-menu-dark
   .ant-menu-sub.ant-menu-inline
   .ant-menu-item-selected {
-  background: rgba(59, 130, 246, 0.28) !important;
+  background: color-mix(in srgb, var(--color-primary-600) 28%, transparent) !important;
   color: var(--color-text-inverse) !important;
   font-weight: 600;
 }
@@ -224,7 +224,7 @@
   margin: 0;
   padding: 10px;
   background: var(--color-bg-sidebar);
-  border-top: 1px solid rgba(191, 219, 254, 0.2);
+  border-top: 1px solid color-mix(in srgb, var(--color-primary-200) 20%, transparent);
 }
 
 /* ═══════════════════════════════════════════════════════════════

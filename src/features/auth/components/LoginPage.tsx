@@ -43,7 +43,7 @@ const LoginPage = () => {
           variant="outlined"
           className="shadow-2xl"
           style={{
-            backgroundColor: "rgba(10, 20, 40, 0.53)",
+            backgroundColor: "color-mix(in srgb, var(--color-bg-sidebar) 53%, transparent)",
             border: "1px solid var(--color-border)",
             borderRadius: "var(--radius-card)",
             backdropFilter: "blur(10px)",
@@ -52,7 +52,7 @@ const LoginPage = () => {
           {/* Header */}
           {/* Sara no te olvides con el modo claro */}
           <div className="text-center mb-6">
-            <h1 className="text-xl font-bold m-0" style={{ color: "#ffffff" }}>
+            <h1 className="text-xl font-bold m-0" style={{ color: "var(--color-text-inverse)" }}>
               Bienvenido
             </h1>
 

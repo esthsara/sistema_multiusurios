@@ -81,9 +81,9 @@ export const PersonaTypeSelector = ({
             <div
               className="w-14 h-14 rounded-full flex items-center
                             justify-center"
-              style={{ backgroundColor: "rgba(99,102,241,0.1)" }}
+              style={{ backgroundColor: "var(--color-alert-primary-bg)" }}
             >
-              <Building2 size={28} style={{ color: "#0004ff" }} />
+              <Building2 size={28} style={{ color: "var(--color-primary-700)" }} />
             </div>
             <div>
               <p
@@ -103,7 +103,7 @@ export const PersonaTypeSelector = ({
             <button
               className="w-full py-2 rounded-lg text-sm font-medium
                          transition-colors text-white"
-              style={{ backgroundColor: "#6366f1" }}
+              style={{ backgroundColor: "var(--color-primary-700)" }}
             >
               Seleccionar
             </button>
