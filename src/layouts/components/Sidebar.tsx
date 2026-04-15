@@ -282,6 +282,7 @@ const SidebarContent = ({
     className={`saas-sidebar-shell ${isCollapsed ? "is-collapsed" : ""} ${
       isMobile ? "is-mobile" : ""
     }`}
+    
   >
     {/* Ambient Background */}
     <div className="saas-sidebar-ambient" aria-hidden />

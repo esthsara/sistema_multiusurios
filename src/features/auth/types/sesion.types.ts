@@ -8,7 +8,4 @@ export interface SesionItem {
   activa: boolean;
 }
 
-export interface SesionFilters {
-  usuario_id?: number;
-  search?: string;
-}
+

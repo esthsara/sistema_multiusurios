@@ -1,5 +1,6 @@
-import { useMemo } from "react";
+import { useMemo, useState } from "react";
 import {
+  Alert,
   Avatar,
   Badge,
   Button,
@@ -7,6 +8,8 @@ import {
   Descriptions,
   Divider,
   Empty,
+  Form,
+  Input,
   List,
   Space,
   Tag,
@@ -29,9 +32,13 @@ import {
   Users,
 } from "lucide-react";
 import { useNavigate } from "react-router-dom";
+import { toast } from "react-toastify";
 import { useAuth } from "@/shared/hooks/useAuth";
 import { useAuthActions } from "@/features/auth/hooks/useAuthActions";
+import { authService } from "@/features/auth/services/auth.service";
+import type { ChangePasswordDto } from "@/shared/types/auth.types";
 import { safeText } from "@/shared/utils/sanitize";
+import { sanitizeInput } from "@/shared/utils/sanitize";
 import { tokenManager } from "@/shared/utils/tokenManager";
 
 const { Title, Text, Paragraph } = Typography;
@@ -87,6 +94,8 @@ const ProfilePage = () => {
   const navigate = useNavigate();
   const { user, sucursalActiva, isAuthenticated } = useAuth();
   const { logout } = useAuthActions();
+  const [passwordForm] = Form.useForm<ChangePasswordDto>();
+  const [isChangingPassword, setIsChangingPassword] = useState(false);
 
   const displayName = safeText(user?.persona.nombreCompleto, "Usuario", 140);
   const email = safeText(user?.email, "Sin email", 140);
@@ -107,14 +116,62 @@ const ProfilePage = () => {
   const branchList = useMemo(() => user?.sucursales ?? [], [user?.sucursales]);
   const loginTime = tokenManager.getLoginTime();
 
+  const handleChangePassword = async (values: ChangePasswordDto) => {
+    setIsChangingPassword(true);
+    try {
+      const dto: ChangePasswordDto = {
+        current_password: sanitizeInput(values.current_password, {
+          trim: false,
+          maxLength: 256,
+          stripTags: false,
+        }),
+        new_password: sanitizeInput(values.new_password, {
+          trim: false,
+          maxLength: 256,
+          stripTags: false,
+        }),
+        new_password_confirmation: sanitizeInput(
+          values.new_password_confirmation,
+          {
+            trim: false,
+            maxLength: 256,
+            stripTags: false,
+          },
+        ),
+      };
+
+      await authService.changePassword(dto);
+      passwordForm.resetFields();
+      toast.success("Contraseña actualizada. Debes iniciar sesión nuevamente.");
+      await logout();
+    } catch (error) {
+      const apiError = error as {
+        errors?: Record<string, string[]>;
+        message?: string;
+      };
+
+      const firstError = apiError.errors
+        ? Object.values(apiError.errors)[0]?.[0]
+        : null;
+
+      toast.error(
+        safeText(
+          firstError ?? apiError.message,
+          "No se pudo cambiar la contraseña",
+          200,
+        ),
+      );
+    } finally {
+      setIsChangingPassword(false);
+    }
+  };
+
   const photoLabel = user?.persona.fotoPatch
     ? safeText(user.persona.fotoPatch, "Sin foto", 120)
     : "Sin foto";
 
   return (
-    <div
-      className="min-h-screen px-4 py-6 md:px-6 md:py-8 lg:px-8"
-    >
+    <div className="min-h-screen px-4 py-6 md:px-6 md:py-8 lg:px-8">
       <div className="mx-auto flex w-full max-w-7xl flex-col gap-[10px]">
         <Card
           className="shadow-none"
@@ -131,7 +188,11 @@ const ProfilePage = () => {
               <Badge
                 count={user?.activo ? 1 : 0}
                 size="small"
-                color={user?.activo ? "var(--color-success-500)" : "var(--color-danger-500)"}
+                color={
+                  user?.activo
+                    ? "var(--color-success-500)"
+                    : "var(--color-danger-500)"
+                }
               >
                 <Avatar
                   size={72}
@@ -347,6 +408,123 @@ const ProfilePage = () => {
                   {branchList.length}
                 </Descriptions.Item>
               </Descriptions>
+
+              <Divider
+                style={{
+                  margin: "18px 0",
+                  borderColor: "var(--color-border)",
+                }}
+              />
+
+              <div style={infoItemStyle}>
+                <Title
+                  level={5}
+                  style={{ marginTop: 0, color: "var(--color-text-primary)" }}
+                >
+                  Cambiar contraseña
+                </Title>
+                <Paragraph
+                  style={{ marginTop: 8, color: "var(--color-text-secondary)" }}
+                >
+                  Por seguridad se solicita tu contraseña actual antes de
+                  registrar una nueva.
+                </Paragraph>
+
+                <Alert
+                  type="info"
+                  showIcon
+                  style={{ marginBottom: 14 }}
+                  message="Al cambiarla, tu sesión actual se cerrará automáticamente."
+                />
+
+                <Form
+                  form={passwordForm}
+                  layout="vertical"
+                  requiredMark={false}
+                  autoComplete="off"
+                  onFinish={handleChangePassword}
+                >
+                  <Form.Item
+                    name="current_password"
+                    label="Contraseña actual"
+                    rules={[
+                      {
+                        required: true,
+                        message: "Ingresa tu contraseña actual",
+                      },
+                    ]}
+                  >
+                    <Input.Password
+                      size="large"
+                      placeholder="••••••••"
+                      prefix={<KeyRound size={16} />}
+                    />
+                  </Form.Item>
+
+                  <Form.Item
+                    name="new_password"
+                    label="Nueva contraseña"
+                    rules={[
+                      {
+                        required: true,
+                        message: "Ingresa la nueva contraseña",
+                      },
+                      {
+                        min: 8,
+                        message: "Debe tener al menos 8 caracteres",
+                      },
+                    ]}
+                  >
+                    <Input.Password
+                      size="large"
+                      placeholder="Nueva contraseña"
+                      prefix={<KeyRound size={16} />}
+                    />
+                  </Form.Item>
+
+                  <Form.Item
+                    name="new_password_confirmation"
+                    label="Confirmar nueva contraseña"
+                    dependencies={["new_password"]}
+                    rules={[
+                      {
+                        required: true,
+                        message: "Confirma la nueva contraseña",
+                      },
+                      ({ getFieldValue }) => ({
+                        validator(_, value) {
+                          if (
+                            !value ||
+                            getFieldValue("new_password") === value
+                          ) {
+                            return Promise.resolve();
+                          }
+                          return Promise.reject(
+                            new Error("Las contraseñas no coinciden"),
+                          );
+                        },
+                      }),
+                    ]}
+                  >
+                    <Input.Password
+                      size="large"
+                      placeholder="Repite la nueva contraseña"
+                      prefix={<Shield size={16} />}
+                    />
+                  </Form.Item>
+
+                  <Button
+                    type="primary"
+                    htmlType="submit"
+                    loading={isChangingPassword}
+                    style={{ height: 42, fontWeight: 600 }}
+                  >
+                    {isChangingPassword
+                      ? "Actualizando..."
+                      : "Actualizar contraseña"}
+                  </Button>
+                </Form>
+              </div>
             </Card>
           </div>
 

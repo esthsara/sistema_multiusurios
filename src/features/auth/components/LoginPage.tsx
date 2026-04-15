@@ -43,16 +43,19 @@ const LoginPage = () => {
           variant="outlined"
           className="shadow-2xl"
           style={{
-            backgroundColor: "color-mix(in srgb, var(--color-bg-sidebar) 53%, transparent)",
+            backgroundColor:
+              "color-mix(in srgb, var(--color-bg-card) 53%, transparent)",
             border: "1px solid var(--color-border)",
             borderRadius: "var(--radius-card)",
             backdropFilter: "blur(10px)",
           }}
         >
           {/* Header */}
-          {/* Sara no te olvides con el modo claro */}
           <div className="text-center mb-6">
-            <h1 className="text-xl font-bold m-0" style={{ color: "var(--color-text-inverse)" }}>
+            <h1
+              className="text-xl font-bold m-0"
+              style={{ color: "var(--color-text-inverse)" }}
+            >
               Bienvenido
             </h1>
 
@@ -132,7 +135,7 @@ const LoginPage = () => {
                 ¿Olvidaste tu contraseña?
               </a>
             </div>
-            {/* SARA Funcionalidad de contraseña no te olvides   */}
+            {/* SARA  */}
 
             <Form.Item className="mb-0">
               <Button

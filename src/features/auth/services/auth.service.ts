@@ -5,50 +5,17 @@ import type {
   LoginDto,
   RegisterDto,
   ChangePasswordDto,
-  BackendUser,
-  AccessTokenObject,
+
 } from "@/shared/types/auth.types";
 import type { ApiResponse } from "@/shared/types/api.types";
 
-/* ── Tipos de respuesta crudos del backend  ── */
-
-interface LoginResponseData {
-  user: BackendUser;
-  access_token: AccessTokenObject; // Login siempre devuelve objeto
-  token_type: string;
-  sucursal_actual: unknown | null;
-  session_id: number;
-}
-
-interface RegisterResponseData {
-  user: BackendUser;
-  access_token: string; // Register devuelve string
-  token_type: string;
-  sucursal_asignada: unknown | null;
-  session_id: number;
-}
-
-interface MeResponseData extends BackendUser {}
-
-interface UserBranchItem {
-  id: number;
-  nombre: string;
-  codigo?: string;
-  clave?: string;
-  es_actual?: boolean;
-}
-
-interface UserBranchesResponseData {
-  total: number;
-  items: UserBranchItem[];
-  sucursal_actual: number | null;
-}
-
-interface SwitchBranchResponseData {
-  sucursal_anterior?: UserBranchItem | null;
-  sucursal_actual?: UserBranchItem | null;
-  mensaje?: string;
-}
+import type {
+  LoginResponseData,
+  RegisterResponseData,
+  MeResponseData,
+  UserBranchesResponseData,
+  SwitchBranchResponseData,
+} from "../types/auth.types";
 
 export const authService = {
   login: async (dto: LoginDto) => {

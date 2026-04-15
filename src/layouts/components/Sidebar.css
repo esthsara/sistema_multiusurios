@@ -1,4 +1,18 @@
 /* ═══════════════════════════════════════════════════════════════
+   KEYFRAMES
+═══════════════════════════════════════════════════════════════ */
+
+@keyframes saas-pulse-ring {
+  0%,  100% { opacity: 0.35; transform: scale(1); }
+  50%        { opacity: 0.75; transform: scale(1.1); }
+}
+
+@keyframes saas-item-enter {
+  from { opacity: 0; transform: translateX(-5px); }
+  to   { opacity: 1; transform: translateX(0); }
+}
+
+/* ═══════════════════════════════════════════════════════════════
    SIDEBAR CONTAINER
 ═══════════════════════════════════════════════════════════════ */
 
@@ -20,6 +34,8 @@
   transition: width 240ms cubic-bezier(0.4, 0, 0.2, 1) !important;
 }
 
+/* ─ Shell ─────────────────────────────────────────────────────── */
+
 .saas-sidebar-shell {
   position: relative;
   display: flex;
@@ -30,80 +46,123 @@
   background: var(--color-bg-sidebar);
 }
 
+/* Dot-grid atmosphere */
+.saas-sidebar-shell::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background-image: radial-gradient(
+    circle,
+    color-mix(in srgb, var(--color-primary-600) 22%, transparent) 1px,
+    transparent 1px
+  );
+  background-size: 22px 22px;
+  pointer-events: none;
+  z-index: 0;
+  opacity: 0.65;
+}
+
+/* Glowing right-edge strip */
+.saas-sidebar-shell::after {
+  content: '';
+  position: absolute;
+  right: 0;
+  top: 8%;
+  bottom: 8%;
+  width: 1px;
+  background: linear-gradient(
+    to bottom,
+    transparent 0%,
+    var(--color-primary-600) 30%,
+    var(--color-primary-400) 65%,
+    transparent 100%
+  );
+  pointer-events: none;
+  z-index: 10;
+  opacity: 0.6;
+}
+
 /* ═══════════════════════════════════════════════════════════════
-   HEADER & BRANDING
+   HEADER — suppress old decorators
 ═══════════════════════════════════════════════════════════════ */
 
-.saas-sidebar-ambient {
-  position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  height: 62px;
-  z-index: 1;
-  pointer-events: none;
-  background: var(--color-bg-base-2);
-}
-
-.saas-sidebar-curve {
-  position: absolute;
-  top: 62px;
-  right: -51px;
-  width: 100px;
-  height: 80px;
-  z-index: 5;
-  color: var(--color-bg-base-2);
-  pointer-events: none;
-}
-
-.saas-sidebar-curve svg {
-  width: 50%;
-  height: 50%;
-  display: block;
-}
+.saas-sidebar-ambient { display: none; }
+.saas-sidebar-curve   { display: none; }
 
 .saas-sidebar-header {
   position: relative;
   z-index: 6;
-  min-height: 82px;
+  min-height: 68px;
   display: flex;
   align-items: center;
-  justify-content: center;
-  padding: 14px 10px;
+  padding: 0 16px;
+  border-bottom: 1px solid color-mix(in srgb, var(--color-primary-600) 28%, transparent);
+  background: color-mix(in srgb, var(--color-primary-700) 14%, transparent);
+  flex-shrink: 0;
 }
 
+/* ─ Logo Mark ─────────────────────────────────────────────────── */
+
 .saas-sidebar-logo-mark {
+  position: relative;
   width: 36px;
   height: 36px;
-  border-radius: 50px;
+  border-radius: 10px;
   display: flex;
   align-items: center;
   justify-content: center;
   flex-shrink: 0;
-  background: var(--color-primary-400)
+  background: var(--color-primary-600);
+  border: 1px solid color-mix(in srgb, var(--color-primary-400) 55%, transparent);
+  z-index: 1;
 }
+
+/* Pulsing ring 1 */
+.saas-sidebar-logo-mark::before {
+  content: '';
+  position: absolute;
+  inset: -5px;
+  border-radius: 14px;
+  border: 1px solid color-mix(in srgb, var(--color-primary-400) 38%, transparent);
+  animation: saas-pulse-ring 3s ease-in-out infinite;
+  pointer-events: none;
+}
+
+/* Pulsing ring 2 */
+.saas-sidebar-logo-mark::after {
+  content: '';
+  position: absolute;
+  inset: -11px;
+  border-radius: 18px;
+  border: 1px solid color-mix(in srgb, var(--color-primary-400) 14%, transparent);
+  animation: saas-pulse-ring 3s ease-in-out infinite 0.6s;
+  pointer-events: none;
+}
+
+/* ─ Brand Text ─────────────────────────────────────────────────── */
 
 .saas-sidebar-brand {
   display: flex;
   align-items: center;
-  gap: 12px;
+  gap: 14px;
   width: 100%;
 }
 
 .saas-sidebar-brand-title {
   display: block;
-  color: var(--color-primary-400);
-  font-size: 0.98rem;
+  color: var(--color-primary-50);
+  font-size: 0.9rem;
   font-weight: 700;
-  line-height: 1.2;
-  letter-spacing: -0.01em;
+  line-height: 1.4;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
 }
 
 .saas-sidebar-brand-subtitle {
-  margin: 2px 0 0;
+  margin: 3px 0 0;
   color: var(--color-primary-400);
-  font-size: 0.7rem;
-  letter-spacing: 0.08em;
+  font-size: 0.62rem;
+  letter-spacing: 0.18em;
   text-transform: uppercase;
   font-weight: 500;
 }
@@ -116,77 +175,127 @@
   position: relative;
   z-index: 2;
   flex: 1;
-  margin-top: 22px;
   overflow-y: auto;
   overflow-x: hidden;
   scrollbar-width: thin;
-  scrollbar-color: rgba(254, 191, 207, 0.35) transparent;
+  scrollbar-color: color-mix(in srgb, var(--color-primary-600) 40%, transparent) transparent;
 }
 
 .saas-sidebar-menu.ant-menu {
   border-inline-end: none !important;
   background: transparent !important;
-  padding: 12px 8px;
+  padding: 10px 12px;
   font-size: 0.875rem;
 }
 
-/* Menu Item Base Styles */
+/* ─ Base Item ─────────────────────────────────────────────────── */
+
 .saas-sidebar-menu.ant-menu-dark .ant-menu-item,
 .saas-sidebar-menu.ant-menu-dark .ant-menu-submenu-title {
+  position: relative;
   height: 44px;
   line-height: 44px;
-  border-radius: 12px;
-  margin: 6px 0;
-  padding: 0 12px !important;
-  color: var(--color-primary-50);/*sara*/
+  border-radius: 8px;
+  margin: 3px 0;
+  padding: 0 14px !important;
+  color: var(--color-primary-200);
+  transition: color 150ms ease, background 150ms ease;
+  overflow: visible;
 }
 
-/* Menu Icons */
+/* Left accent bar — hidden by default */
+.saas-sidebar-menu.ant-menu-dark .ant-menu-item::before,
+.saas-sidebar-menu.ant-menu-dark .ant-menu-submenu-title::before {
+  content: '';
+  position: absolute;
+  left: -12px;
+  top: 50%;
+  transform: translateY(-50%) scaleY(0);
+  width: 3px;
+  height: 55%;
+  border-radius: 0 2px 2px 0;
+  background: var(--color-primary-400);
+  transition: transform 150ms ease, opacity 150ms ease;
+  opacity: 0;
+  pointer-events: none;
+}
+
+/* ─ Icons ────────────────────────────────────────────────────── */
+
 .saas-sidebar-menu.ant-menu-dark .ant-menu-item .ant-menu-item-icon,
 .saas-sidebar-menu.ant-menu-dark .ant-menu-submenu-title .ant-menu-item-icon {
   min-width: 18px;
   display: inline-flex;
   justify-content: center;
-  color: var(--color-primary-200);
-  margin-right: 12px;
+  color: var(--color-primary-400);
+  margin-right: 10px;
+  transition: color 150ms ease;
 }
 
-/* Menu Item Hover State */
+/* ─ Hover ─────────────────────────────────────────────────────── */
+
 .saas-sidebar-menu.ant-menu-dark .ant-menu-item:hover,
 .saas-sidebar-menu.ant-menu-dark .ant-menu-submenu-title:hover {
-  color: var(--color-text-inverse) !important;
-  background: var(--color-alert-primary-bg) !important;
+  color: var(--color-primary-50) !important;
+  background: color-mix(in srgb, var(--color-primary-600) 16%, transparent) !important;
 }
 
-/* Menu Item Selected State */
+.saas-sidebar-menu.ant-menu-dark .ant-menu-item:hover::before,
+.saas-sidebar-menu.ant-menu-dark .ant-menu-submenu-title:hover::before {
+  transform: translateY(-50%) scaleY(1);
+  opacity: 0.55;
+}
+
+.saas-sidebar-menu.ant-menu-dark .ant-menu-item:hover .ant-menu-item-icon,
+.saas-sidebar-menu.ant-menu-dark .ant-menu-submenu-title:hover .ant-menu-item-icon {
+  color: var(--color-primary-200);
+}
+
+/* ─ Selected ──────────────────────────────────────────────────── */
+
 .saas-sidebar-menu.ant-menu-dark .ant-menu-item-selected,
 .saas-sidebar-menu.ant-menu-dark
   .ant-menu-submenu-selected
   > .ant-menu-submenu-title {
-  color: var(--color-text-inverse) !important;
-  background: color-mix(in srgb, var(--color-primary-600) 30%, transparent) !important;
+  color: var(--color-primary-50) !important;
+  background: color-mix(in srgb, var(--color-primary-600) 28%, transparent) !important;
   font-weight: 600;
 }
 
-/* Submenu Arrow */
-.saas-sidebar-menu.ant-menu-dark .ant-menu-submenu-arrow {
-  color: var(--color-primary-200) !important;
+.saas-sidebar-menu.ant-menu-dark .ant-menu-item-selected::before,
+.saas-sidebar-menu.ant-menu-dark
+  .ant-menu-submenu-selected
+  > .ant-menu-submenu-title::before {
+  transform: translateY(-50%) scaleY(1);
+  opacity: 1;
+  background: var(--color-primary-400);
 }
 
-/* Remove after pseudo element border */
+.saas-sidebar-menu.ant-menu-dark .ant-menu-item-selected .ant-menu-item-icon {
+  color: var(--color-primary-400);
+}
+
+/* ─ Submenu Arrow ─────────────────────────────────────────────── */
+
+.saas-sidebar-menu.ant-menu-dark .ant-menu-submenu-arrow {
+  color: var(--color-primary-400) !important;
+}
+
+/* ─ Remove AntD active border ─────────────────────────────────── */
+
 .saas-sidebar-menu .ant-menu-item::after,
 .saas-sidebar-menu .ant-menu-submenu-title::after {
   border-inline-end: none !important;
 }
 
 /* ─────────────────────────────────────────
-   SUBMENU (Nested Items)
-───────────────────────────────────────── */
+   SUB-MENU (Nested Items)
+─────────────────────────────────────────── */
 
 .saas-sidebar-menu.ant-menu-dark .ant-menu-sub.ant-menu-inline {
-  margin: 4px 0 8px 8px;
-  padding: 4px 0 4px 8px;
-  border-left: 2px solid color-mix(in srgb, var(--color-primary-400) 35%, transparent);
+  margin: 2px 0 6px 8px;
+  padding: 2px 0 2px 8px;
+  border-left: 1px solid color-mix(in srgb, var(--color-primary-600) 45%, transparent);
   background: transparent;
 }
 
@@ -194,23 +303,23 @@
   height: 38px;
   line-height: 38px;
   font-size: 0.8rem;
-  border-radius: 8px;
-  margin: 4px 0;
-  color: var(--color-primary-200);
+  border-radius: 6px;
+  margin: 2px 0;
+  color: color-mix(in srgb, var(--color-primary-200) 75%, transparent);
 }
 
 .saas-sidebar-menu.ant-menu-dark
   .ant-menu-sub.ant-menu-inline
   .ant-menu-item:hover {
-  color: var(--color-text-inverse);
-  background: color-mix(in srgb, var(--color-primary-600) 20%, transparent) !important;
+  color: var(--color-primary-50);
+  background: color-mix(in srgb, var(--color-primary-600) 14%, transparent) !important;
 }
 
 .saas-sidebar-menu.ant-menu-dark
   .ant-menu-sub.ant-menu-inline
   .ant-menu-item-selected {
-  background: color-mix(in srgb, var(--color-primary-600) 28%, transparent) !important;
-  color: var(--color-text-inverse) !important;
+  background: color-mix(in srgb, var(--color-primary-600) 22%, transparent) !important;
+  color: var(--color-primary-50) !important;
   font-weight: 600;
 }
 
@@ -221,10 +330,10 @@
 .saas-sidebar-footer {
   position: relative;
   z-index: 2;
-  margin: 0;
-  padding: 10px;
-  background: var(--color-bg-sidebar);
-  border-top: 1px solid color-mix(in srgb, var(--color-primary-200) 20%, transparent);
+  padding: 12px;
+  border-top: 1px solid color-mix(in srgb, var(--color-primary-600) 28%, transparent);
+  background: color-mix(in srgb, var(--color-primary-700) 10%, transparent);
+  flex-shrink: 0;
 }
 
 /* ═══════════════════════════════════════════════════════════════
@@ -232,7 +341,9 @@
 ═══════════════════════════════════════════════════════════════ */
 
 .saas-sidebar-shell.is-collapsed .saas-sidebar-header {
-  min-height: 72px;
+  min-height: 68px;
+  justify-content: center;
+  padding: 0;
 }
 
 .saas-sidebar-shell.is-collapsed .saas-sidebar-brand-title,
@@ -254,15 +365,15 @@
 }
 
 /* ═══════════════════════════════════════════════════════════════
-   MOBILE RESPONSIVE
+   MOBILE
 ═══════════════════════════════════════════════════════════════ */
 
 .saas-sidebar-mobile-overlay {
   position: fixed;
   inset: 0;
   z-index: 40;
-  background: transparent;
-  backdrop-filter: none;
+  background: color-mix(in srgb, var(--color-bg-sidebar) 55%, transparent);
+  backdrop-filter: blur(3px);
 }
 
 .saas-sidebar-mobile-panel {
@@ -273,12 +384,11 @@
   z-index: 50;
   width: min(86vw, 300px);
   min-width: 250px;
-  padding: 0;
 }
 
 .saas-sidebar-shell.is-mobile {
   border-radius: 0;
-  box-shadow: none;
+  box-shadow: 4px 0 32px color-mix(in srgb, var(--color-primary-700) 35%, transparent);
 }
 
 @media (max-width: 768px) {

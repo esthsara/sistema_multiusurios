@@ -7,8 +7,10 @@ import {
   adaptSucursal,
   extractPlainToken,
 } from "@/features/auth/adapters/auth.adapter";
+
 import { tokenManager } from "@/shared/utils/tokenManager";
 import { storageManager } from "@/shared/utils/storageManager";
+
 import type {
   AuthUser,
   AuthState,
@@ -43,13 +45,14 @@ interface AuthActions {
   _setUser: (user: AuthUser | null, token: string | null) => void;
   _reset: () => void;
 }
-
+//conbinamos tipos
 type AuthStore = AuthState & AuthActions;
 
+//guardamos una promesa para no reutilizarla y evitar llamadas concurrentes a initializeAuth o logout
 let initializeAuthPromise: Promise<void> | null = null;
 let logoutPromise: Promise<void> | null = null;
 
-//para verificar si el rol es super-admin, con normalización de espacios y mayúsculas
+//para verificar si el rol es super-admin, con normalización de espacios y mayúsculas " Super Admin " → "super-admin"
 const isSuperAdminRole = (roleName: string) => {
   return roleName.trim().toLowerCase().replace(/\s+/g, "-") === "super-admin";
 };
@@ -59,6 +62,7 @@ const readCachedUser = (): AuthUser | null => {
   return storageManager.getCachedUser();
 };
 
+//
 const hydrateUser = (
   backendUser: Parameters<typeof adaptBackendUser>[0],
   fallbackUser: AuthUser | null,
@@ -111,6 +115,7 @@ const initialState: AuthState = {
 /* ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
    STORE
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ */
+
 export const useAuthStore = create<AuthStore>()(
   devtools(
     (set, get) => ({
