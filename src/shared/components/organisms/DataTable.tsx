@@ -3,10 +3,18 @@ import { Table, Empty } from "antd";
 import type { TableProps } from "antd";
 import type { DataTableProps } from "@/shared/types/table.types";
 
+
 /**
- * DataTable<T> — Tabla genérica reutilizable.
+ * DataTable<T> — Tabla genérica reutilizable con soporte light/dark mode
  * T extends object — restricción para garantizar que T es un objeto
  * y que podemos usarlo como tipo de dato de la tabla.
+ *
+ * Características:
+ * • Colores usando variables CSS globales (compatibles con light/dark mode)
+ * • Primera columna optimizada para avatares/fotos (60px)
+ * • Hover effect en filas
+ * • Responsive (mobile, tablet, desktop)
+ * • Paginación mejorada
  */
 
 export const DataTable = <T extends object>({
@@ -64,6 +72,9 @@ export const DataTable = <T extends object>({
           ? (record) => ({
               onClick: () => onRowClick(record),
               className: "cursor-pointer",
+              style: {
+                transition: "all var(--transition-base)",
+              },
             })
           : undefined
       }
@@ -80,12 +91,7 @@ export const DataTable = <T extends object>({
               showLessItems: true,
               showTotal: (total, range) =>
                 `${range[0]}-${range[1]} de ${total} registros`,
-              pageSizeOptions: ["5", "10", "20", "50", "100"],
-
-              style: {
-                marginTop: 16,
-                padding: "8px 12px",
-              },
+              pageSizeOptions: ["6", "12", "24", "48"],
             }
           : false
       }
@@ -96,7 +102,7 @@ export const DataTable = <T extends object>({
       }}
       style={{
         backgroundColor: "var(--color-bg-base-2)",
-        borderRadius: "var(--radius-md)",
+        borderRadius: "var(--radius-lg)",
       }}
     />
   );

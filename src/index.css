@@ -34,11 +34,13 @@
   --color-bg-base-loader: #ffffff;
   --color-bg-base: #ffffff;
   --color-bg-base-2: #f8fafc;
+  --color-bg-hero: #3b6fcf;
   
   --color-bg-overlay: #eef2f7;
   --color-bg-subtle: #e2e8f0;
   --color-bg-sidebar: #0f172a;
   --color-bg-filter: #dfebf8;
+  --color-bg-card: #0f172a;
 
   /* Bordes */
   --color-border: #afbdcf;
@@ -85,7 +87,8 @@
   --color-bg-overlay: #334155;
   --color-bg-subtle: #1e293b;
   --color-bg-filter: #1e293bd3;
-
+  --color-bg-card: #606e91;
+  --color-bg-hero: #486594;
 
   /* Bordes y focus */
   --color-border: #6a7686;
@@ -227,9 +230,14 @@ body {
 /* ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
    TABLA DATATABLE — ESTILOS AISLADOS
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ */
-.app-data-table .ant-table-cell .row-actions-wrap {
-  justify-content: center !important;
+/* ═══════════════════════════════════════════════════════════════
+   DATA TABLE — Redesigned with Light/Dark Mode Support
+═══════════════════════════════════════════════════════════════ */
+
+.app-data-table .ant-table-wrapper {
+  background: var(--color-bg-base) !important;
 }
+
 .app-data-table .ant-table {
   background: var(--color-bg-base) !important;
   color: var(--color-text-primary) !important;
@@ -237,236 +245,335 @@ body {
   transition:
     background-color var(--transition-base),
     color var(--transition-base);
+  font-size: 0.875rem;
 }
+
+/* ─────────────────────────────────────────────────────────────
+   TABLE CONTAINER
+───────────────────────────────────────────────────────────────── */
 
 .app-data-table .ant-table-container {
   border: 1px solid var(--color-border) !important;
-  border-radius: var(--radius-card) !important;
+  border-radius: var(--radius-lg) !important;
   overflow: hidden;
-  transition: border-color var(--transition-base);
+  transition: all var(--transition-base);
+  background: var(--color-bg-base) !important;
+  box-shadow: 0 2px 8px color-mix(in srgb, var(--color-primary-600) 8%, transparent);
 }
 
+/* ─────────────────────────────────────────────────────────────
+   HEADER — Columnas
+───────────────────────────────────────────────────────────────── */
+
 .app-data-table .ant-table-thead > tr > th {
-  background: var(--color-bg-overlay) !important;
-  color: var(--color-text-primary) !important;
+  background: color-mix(in srgb, var(--color-primary-600) 8%, var(--color-bg-hero)) !important;
+  color: var(--color-text-inverse) !important;
   border-bottom: 1px solid var(--color-border) !important;
   font-weight: 600;
+  font-size: 0.75rem;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
   white-space: nowrap;
-  padding: 12px 16px !important;
+  padding: 16px !important;
   transition:
     background-color var(--transition-base),
     color var(--transition-base),
     border-color var(--transition-base);
 }
 
-.app-data-table .ant-table-thead > tr > th:not(:last-child),
-.app-data-table .ant-table-tbody > tr > td:not(:last-child) {
-  border-right: 1px solid
-    color-mix(in srgb, var(--color-border) 60%, transparent) !important;
+.app-data-table .ant-table-thead > tr > th:first-child {
+  width: 60px;
+  text-align: center;
 }
 
-.app-data-table .ant-table-thead > tr > th:last-child,
-.app-data-table .ant-table-tbody > tr > td:last-child {
-  border-right: none !important;
-}
+/* ─────────────────────────────────────────────────────────────
+   BODY — Filas
+───────────────────────────────────────────────────────────────── */
 
 .app-data-table .ant-table-tbody > tr > td {
   background: var(--color-bg-base) !important;
   color: var(--color-text-primary) !important;
   border-bottom: 1px solid var(--color-border) !important;
-  padding: 12px 16px !important;
+  padding: 14px 16px !important;
   transition:
-    background-color var(--transition-base),
+    background-color calc(var(--transition-base) / 2),
     color var(--transition-base),
     border-color var(--transition-base);
+  vertical-align: middle;
 }
 
+.app-data-table .ant-table-tbody > tr > td:first-child {
+  text-align: center;
+  padding: 12px !important;
+}
+
+/* ─────────────────────────────────────────────────────────────
+   ROW HOVER — Efecto al pasar el mouse
+───────────────────────────────────────────────────────────────── */
+
 .app-data-table .ant-table-tbody > tr:hover > td {
-  background: color-mix(
-    in srgb,
-    var(--color-primary-600) 10%,
-    var(--color-bg-base)
-  ) !important;
+  background: color-mix(in srgb, var(--color-primary-600) 12%, var(--color-bg-base)) !important;
   transition: background-color calc(var(--transition-base) / 2);
 }
+
+.app-data-table .ant-table-tbody > tr:hover {
+  box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--color-primary-600) 20%, transparent);
+}
+
+/* ─────────────────────────────────────────────────────────────
+   SORTER — Iconos de ordenamiento
+───────────────────────────────────────────────────────────────── */
 
 .app-data-table .ant-table-column-sorter,
 .app-data-table .ant-table-column-sorter-up,
 .app-data-table .ant-table-column-sorter-down {
-  color: var(--color-text-secondary) !important;
+  color: var(--color-primary-400) !important;
+  transition: color var(--transition-base) !important;
 }
 
-/* Paginación */
-.app-data-table .ant-pagination .ant-pagination-item,
-.app-data-table .ant-pagination .ant-pagination-prev .ant-pagination-item-link,
-.app-data-table .ant-pagination .ant-pagination-next .ant-pagination-item-link {
-  background: var(--color-bg-base) !important;
-  border-color: var(--color-border) !important;
-  color: var(--color-text-primary) !important;
-  border-radius: 999px !important;
-  min-width: 34px;
-  height: 34px;
-  line-height: 32px;
-  transition:
-    background-color var(--transition-base),
-    color var(--transition-base),
-    border-color var(--transition-base),
-    box-shadow var(--transition-base);
+.app-data-table .ant-table-column-sorter-up.active,
+.app-data-table .ant-table-column-sorter-down.active {
+  color: var(--color-primary-600) !important;
 }
+
+/* ─────────────────────────────────────────────────────────────
+   PAGINATION
+───────────────────────────────────────────────────────────────── */
 
 .app-data-table .ant-pagination {
   display: flex;
   flex-wrap: wrap;
   align-items: center;
-  gap: 6px;
+  justify-content: flex-end;
+  gap: 4px;
+  margin-top: 16px;
+  padding: 0;
 }
 
-.app-data-table .ant-pagination .ant-pagination-item a,
-.app-data-table .ant-pagination .ant-pagination-options,
-.app-data-table .ant-pagination .ant-select-selection-item,
-.app-data-table .ant-pagination .ant-select-arrow,
-.app-data-table .ant-pagination .ant-pagination-total-text {
+.app-data-table .ant-pagination-total-text {
+  color: var(--color-text-secondary) !important;
+  font-size: 0.875rem;
+  margin-right: auto;
+  order: -1;
+}
+
+.app-data-table .ant-table-measure-row {
+  display: none !important;
+  visibility: hidden !important;
+  height: 0 !important;
+}
+.app-data-table .ant-pagination-item,
+.app-data-table .ant-pagination-prev .ant-pagination-item-link,
+.app-data-table .ant-pagination-next .ant-pagination-item-link {
+  background: var(--color-bg-base) !important;
+  border: 1px solid var(--color-border) !important;
+  color: var(--color-text-primary) !important;
+  border-radius: 50px !important;
+  min-width: 20px;
+  height: 20px;
+  line-height: 34px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  transition:
+    background-color var(--transition-base),
+    color var(--transition-base),
+    border-color var(--transition-base),
+    box-shadow var(--transition-base);
+  font-weight: 500;
+}
+
+.app-data-table .ant-pagination-item a,
+.app-data-table .ant-pagination-options,
+.app-data-table .ant-select-selection-item,
+.app-data-table .ant-select-arrow,
+.app-data-table .ant-pagination-total-text {
   color: var(--color-text-primary) !important;
 }
 
-.app-data-table .ant-pagination .ant-pagination-item-active {
+/* Página activa */
+.app-data-table .ant-pagination-item-active {
   border-color: var(--color-primary-600) !important;
-  background: color-mix(
-    in srgb,
-    var(--color-primary-600) 16%,
-    var(--color-bg-base)
-  ) !important;
-  box-shadow: 0 2px 8px
-    color-mix(in srgb, var(--color-primary-600) 28%, transparent);
+  background: color-mix(in srgb, var(--color-primary-600) 14%, var(--color-bg-base)) !important;
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--color-primary-600) 12%, transparent);
 }
 
-.app-data-table .ant-pagination .ant-pagination-item-active a {
+.app-data-table .ant-pagination-item-active a {
+  color: var(--color-primary-600) !important;
+  font-weight: 700;
+}
+
+/* Hover en paginación */
+.app-data-table .ant-pagination-item:hover,
+.app-data-table .ant-pagination-prev:hover .ant-pagination-item-link,
+.app-data-table .ant-pagination-next:hover .ant-pagination-item-link {
+  border-color: var(--color-primary-600) !important;
+  background: color-mix(in srgb, var(--color-primary-600) 8%, var(--color-bg-base)) !important;
+}
+
+.app-data-table .ant-pagination-item:hover a {
   color: var(--color-primary-600) !important;
 }
 
+/* ─────────────────────────────────────────────────────────────
+   PAGE SIZE CHANGER
+───────────────────────────────────────────────────────────────── */
+
 .app-data-table .ant-pagination-options-size-changer {
-  background: var(--color-bg-base) !important;
-  border-color: var(--color-border) !important;
+  background: transparent !important;
+  border-color: transparent !important;
   color: var(--color-text-primary) !important;
+  display: flex;
+  align-items: center;
+  gap: 6px;
 }
 
 .app-data-table .ant-pagination-options-size-changer .ant-select-selector {
   background: var(--color-bg-base) !important;
-  border-color: var(--color-border) !important;
+  border: 1px solid var(--color-border) !important;
+  border-radius: 8px !important;
   color: var(--color-text-primary) !important;
-  border-radius: 999px !important;
+  min-width: 50px; 
+  height: 32px; 
+  line-height: 34px;
+  transition: all var(--transition-base);
+}
+
+.app-data-table .ant-pagination-options-size-changer .ant-select-selector:hover {
+  border-color: var(--color-primary-600) !important;
 }
 
 .app-data-table .ant-pagination-options-size-changer .ant-select-arrow,
-.app-data-table
-  .ant-pagination-options-size-changer
-  .ant-select-selection-item {
+.app-data-table .ant-pagination-options-size-changer .ant-select-selection-item {
   color: var(--color-text-primary) !important;
 }
 
-.app-data-table .ant-pagination .ant-pagination-item:hover,
-.app-data-table
-  .ant-pagination
-  .ant-pagination-prev:hover
-  .ant-pagination-item-link,
-.app-data-table
-  .ant-pagination
-  .ant-pagination-next:hover
-  .ant-pagination-item-link {
-  border-color: var(--color-primary-600) !important;
-}
+/* ─────────────────────────────────────────────────────────────
+   ROW ACTIONS
+───────────────────────────────────────────────────────────────── */
 
 .row-actions-wrap {
   display: flex;
   align-items: center;
-  justify-content: flex-end;
-  gap: 2px;
+  justify-content: center;
+  gap: 4px;
 }
 
 .row-action-btn,
 .row-actions-trigger {
-  border-radius: 999px !important;
+  border-radius: 8px !important;
+  min-width: 32px !important;
+  height: 32px !important;
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
   transition: all var(--transition-base) !important;
+  color: var(--color-text-secondary) !important;
+  border: 1px solid transparent !important;
+  background: transparent !important;
 }
 
 .row-action-btn:hover,
 .row-actions-trigger:hover {
-  background: color-mix(
-    in srgb,
-    var(--color-primary-600) 14%,
-    transparent
-  ) !important;
+  background: color-mix(in srgb, var(--color-primary-600) 14%, transparent) !important;
+  color: var(--color-primary-600) !important;
+  border-color: color-mix(in srgb, var(--color-primary-600) 25%, transparent) !important;
+}
+
+.row-action-btn.ant-btn-primary {
+  background: color-mix(in srgb, var(--color-primary-600) 12%, transparent) !important;
+  border-color: color-mix(in srgb, var(--color-primary-600) 25%, transparent) !important;
+  color: var(--color-primary-600) !important;
+}
+
+.row-action-btn.ant-btn-primary:hover {
+  background: color-mix(in srgb, var(--color-primary-600) 18%, transparent) !important;
+  border-color: var(--color-primary-600) !important;
 }
 
 .row-actions-dropdown-item {
   display: inline-flex;
   align-items: center;
   gap: 8px;
-}
-
-/* ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-   DARK MODE PARA LA PARTE USURIOS
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ */
-
-.dark .ant-card {
-  background: var(--color-bg-base-2) !important;
-  border-color: var(--color-border) !important;
-}
-
-.dark .ant-card .ant-card-head {
-  border-bottom: 1px solid var(--color-border) !important;
-}
-
-.dark .ant-card .ant-card-head-title,
-.dark .ant-card .ant-card-body,
-.dark .ant-typography,
-.dark .ant-descriptions-item-content,
-.dark .ant-descriptions-item-label,
-.dark .ant-empty-description {
   color: var(--color-text-primary) !important;
 }
 
-.dark .ant-descriptions-bordered .ant-descriptions-view,
-.dark .ant-descriptions-bordered .ant-descriptions-item-label,
-.dark .ant-descriptions-bordered .ant-descriptions-item-content {
-  border-color: var(--color-border) !important;
+/* ─────────────────────────────────────────────────────────────
+   EMPTY STATE
+───────────────────────────────────────────────────────────────── */
+
+.app-data-table .ant-empty {
+  padding: 48px 16px !important;
 }
 
-.dark .ant-descriptions-bordered .ant-descriptions-item-label {
-  background: var(--color-bg-overlay) !important;
+.app-data-table .ant-empty-description {
+  color: var(--color-text-secondary) !important;
+  font-size: 0.875rem;
 }
 
-.dark .ant-descriptions-bordered .ant-descriptions-item-content {
-  background: var(--color-bg-base-2) !important;
+.app-data-table .ant-spin-nested-loading > div:first-child {
+  background: var(--color-bg-base) !important;
 }
 
-.dark .ant-list .ant-list-item {
-  border-bottom-color: var(--color-border) !important;
+/* ─────────────────────────────────────────────────────────────
+   RESPONSIVE — Mobile
+───────────────────────────────────────────────────────────────── */
+
+@media (max-width: 768px) {
+  .app-data-table .ant-table {
+    font-size: 0.8125rem;
+  }
+
+  .app-data-table .ant-table-thead > tr > th {
+    padding: 12px 8px !important;
+    font-size: 0.7rem;
+    letter-spacing: 0.06em;
+  }
+
+  .app-data-table .ant-table-tbody > tr > td {
+    padding: 12px 8px !important;
+  }
+
+  .app-data-table .ant-pagination {
+    margin-top: 16px;
+    gap: 4px;
+  }
+
+  .app-data-table .ant-pagination-item,
+  .app-data-table .ant-pagination-prev .ant-pagination-item-link,
+  .app-data-table .ant-pagination-next .ant-pagination-item-link {
+    min-width: 32px;
+    height: 32px;
+    line-height: 30px;
+    font-size: 0.8125rem;
+  }
+
+  .app-data-table .ant-pagination-total-text {
+    font-size: 0.75rem;
+    margin-bottom: 8px;
+    order: -1;
+    flex-basis: 100%;
+  }
+
+  .row-action-btn,
+  .row-actions-trigger {
+    min-width: 28px !important;
+    height: 28px !important;
+  }
 }
 
-.dark .ant-tag {
-  background: color-mix(
-    in srgb,
-    var(--color-primary-600) 18%,
-    transparent
-  ) !important;
-  border-color: color-mix(
-    in srgb,
-    var(--color-primary-600) 40%,
-    var(--color-border)
-  ) !important;
-  color: var(--color-text-primary) !important;
-}
+@media (max-width: 576px) {
+  .app-data-table .ant-table-thead > tr > th {
+    padding: 10px 4px !important;
+  }
 
-.dark .ant-btn-default {
-  background: var(--color-bg-base-2) !important;
-  border-color: var(--color-border) !important;
-  color: var(--color-text-primary) !important;
-}
+  .app-data-table .ant-table-tbody > tr > td {
+    padding: 10px 4px !important;
+  }
 
-.dark .ant-btn-default:hover {
-  border-color: var(--color-primary-400) !important;
-  color: var(--color-text-primary) !important;
+  .app-data-table .ant-pagination-options-size-changer {
+    display: none;
+  }
 }
 
 /* ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
