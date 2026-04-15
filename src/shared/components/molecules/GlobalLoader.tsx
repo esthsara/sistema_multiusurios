@@ -18,38 +18,101 @@ export const GlobalLoader: React.FC = () => {
   return (
     <div
       onTransitionEnd={onTransitionEnd}
-      className={`fixed inset-0 z-[9999] flex flex-col items-center justify-center gap-5 transition-opacity duration-300 ${
+      className={`fixed inset-0 z-[9999] flex flex-col items-center justify-center transition-all duration-500 ${
         globalLoading ? "opacity-100" : "opacity-0"
       }`}
       style={{
-        backgroundColor: "var(--color-bg-filter)",
-        backdropFilter: "blur(8px)",
+        background: "var(--color-bg-base)",
       }}
     >
-      {/* Spinner */}
+      {/* GRID tipo sidebar */}
+      <div
+        className="absolute inset-0"
+        style={{
+          backgroundImage: `
+            radial-gradient(
+              circle,
+              color-mix(in srgb, var(--color-primary-600) 18%, transparent) 1px,
+              transparent 1px
+            )
+          `,
+          backgroundSize: "22px 22px",
+          opacity: 0.4,
+        }}
+      />
+
+      {/* Línea lateral glow (igual que sidebar) */}
+      <div
+        className="absolute right-6 top-[15%] bottom-[15%] w-[1px]"
+        style={{
+          background: `
+            linear-gradient(
+              to bottom,
+              transparent,
+              var(--color-primary-600),
+              transparent
+            )
+          `,
+          opacity: 0.5,
+        }}
+      />
+
+      {/* CORE */}
       <div className="relative flex items-center justify-center">
-        {/* Glow usando tu primary */}
+        {/* Glow base */}
         <div
-          className="absolute w-20 h-20 rounded-full blur-2xl animate-pulse"
-          style={{ backgroundColor: "var(--color-primary-600)" }}
+          className="absolute w-32 h-32 rounded-full blur-3xl animate-pulse"
+          style={{
+            background:
+              "radial-gradient(circle, var(--color-primary-500), transparent)",
+            opacity: 0.5,
+          }}
         />
 
-        {/* Spinner */}
+        {/* Anillo externo fino */}
         <div
-          className="w-14 h-14 rounded-full border-[3px] animate-spin"
+          className="absolute w-24 h-24 rounded-full animate-spin"
           style={{
-            borderColor: "var(--color-border)",
-            borderTopColor: "var(--color-primary-600)",
+            border: "1px solid transparent",
+            borderTop: "1px solid var(--color-primary-400)",
+            borderRight: "1px solid var(--color-primary-300)",
+            animationDuration: "1.4s",
+          }}
+        />
+
+        {/* Anillo interno inverso */}
+        <div
+          className="absolute w-16 h-16 rounded-full animate-spin"
+          style={{
+            border: "1px solid transparent",
+            borderBottom: "1px solid var(--color-primary-500)",
+            borderLeft: "1px solid var(--color-primary-300)",
+            animationDirection: "reverse",
+            animationDuration: "1s",
+          }}
+        />
+
+        {/* Núcleo */}
+        <div
+          className="w-4 h-4 rounded-full"
+          style={{
+            background: "var(--color-primary-500)",
+            boxShadow: `
+              0 0 10px var(--color-primary-500),
+              0 0 25px var(--color-primary-600)
+            `,
           }}
         />
       </div>
 
-      {/* Texto */}
+      {/* TEXTO */}
       <p
-        className="text-sm font-medium tracking-wide"
-        style={{ color: "var(--color-text-primary)" }}
+        className="mt-6 text-xs tracking-[0.25em] uppercase animate-pulse"
+        style={{
+          color: "var(--color-primary-300)",
+        }}
       >
-        {loadingText || "Cargando..."}
+        {loadingText || "Cargando sistema"}
       </p>
     </div>
   );
