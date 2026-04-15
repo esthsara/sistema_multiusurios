@@ -88,6 +88,11 @@ export const PersonaDomicilios = ({ personaId }: PersonaDomiciliosProps) => {
                 size="small"
                 type="text"
                 icon={<Star size={14} />}
+                className="rounded-lg"
+                style={{
+                  backgroundColor: "var(--color-bg-subtle)",
+                  border: "1px solid var(--color-border)",
+                }}
                 loading={markingPrincipalId === r.id}
                 onClick={() => handleMarkPrincipal(r)}
               ></Button>
@@ -108,6 +113,11 @@ export const PersonaDomicilios = ({ personaId }: PersonaDomiciliosProps) => {
                 type="text"
                 size="small"
                 icon={<Pencil size={14} />}
+                className="rounded-lg"
+                style={{
+                  backgroundColor: "var(--color-bg-subtle)",
+                  border: "1px solid var(--color-border)",
+                }}
                 onClick={() => openEdit(record)}
               />
             </Tooltip>
@@ -119,6 +129,11 @@ export const PersonaDomicilios = ({ personaId }: PersonaDomiciliosProps) => {
                 size="small"
                 danger
                 icon={<Trash2 size={14} />}
+                className="rounded-lg"
+                style={{
+                  backgroundColor: "var(--color-alert-danger-bg)",
+                  border: "1px solid var(--color-danger-200)",
+                }}
                 onClick={() => setDeleteTarget(record)}
               />
             </Tooltip>
@@ -146,25 +161,33 @@ export const PersonaDomicilios = ({ personaId }: PersonaDomiciliosProps) => {
               modal.openCreate();
               form.resetFields();
             }}
+            className="rounded-lg shadow-sm"
           >
             Agregar Domicilio
           </Button>
         </Can>
       </div>
 
-      <Table
-        dataSource={domicilios}
-        columns={columns}
-        rowKey="id"
-        loading={loading}
-        pagination={false}
-        size="small"
-        scroll={{ x: 600 }}
+      <div
         style={{
           backgroundColor: "var(--color-bg-base)",
+          border: "1px solid var(--color-border)",
           borderRadius: "var(--radius-card)",
+          overflow: "hidden",
+          boxShadow: "0 6px 20px rgba(2, 6, 23, 0.04)",
         }}
-      />
+      >
+        <Table
+          dataSource={domicilios}
+          columns={columns}
+          rowKey="id"
+          loading={loading}
+          pagination={false}
+          size="small"
+          scroll={{ x: 600 }}
+          style={{ backgroundColor: "transparent" }}
+        />
+      </div>
 
       <Modal
         open={modal.isOpen}

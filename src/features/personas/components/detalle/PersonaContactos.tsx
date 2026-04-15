@@ -109,6 +109,11 @@ export const PersonaContactos = ({ personaId }: PersonaContactosProps) => {
               type="text"
               size="small"
               icon={<Eye size={14} />}
+              className="rounded-lg"
+              style={{
+                backgroundColor: "var(--color-bg-subtle)",
+                border: "1px solid var(--color-border)",
+              }}
               onClick={() => setViewItem(record)}
             />
           </Tooltip>
@@ -118,6 +123,11 @@ export const PersonaContactos = ({ personaId }: PersonaContactosProps) => {
                 type="text"
                 size="small"
                 icon={<Pencil size={14} />}
+                className="rounded-lg"
+                style={{
+                  backgroundColor: "var(--color-bg-subtle)",
+                  border: "1px solid var(--color-border)",
+                }}
                 onClick={() => openEdit(record)}
               />
             </Tooltip>
@@ -129,6 +139,11 @@ export const PersonaContactos = ({ personaId }: PersonaContactosProps) => {
                 size="small"
                 danger
                 icon={<Trash2 size={14} />}
+                className="rounded-lg"
+                style={{
+                  backgroundColor: "var(--color-alert-danger-bg)",
+                  border: "1px solid var(--color-danger-200)",
+                }}
                 onClick={() => setDeleteTarget(record)}
               />
             </Tooltip>
@@ -154,24 +169,32 @@ export const PersonaContactos = ({ personaId }: PersonaContactosProps) => {
             size="small"
             icon={<Plus size={14} />}
             onClick={openCreate}
+            className="rounded-lg shadow-sm"
           >
             Nuevo Contacto
           </Button>
         </Can>
       </div>
 
-      <Table
-        dataSource={contactos}
-        columns={columns}
-        rowKey="id"
-        loading={loading}
-        pagination={false}
-        size="small"
+      <div
         style={{
           backgroundColor: "var(--color-bg-base)",
+          border: "1px solid var(--color-border)",
           borderRadius: "var(--radius-card)",
+          overflow: "hidden",
+          boxShadow: "0 6px 20px rgba(2, 6, 23, 0.04)",
         }}
-      />
+      >
+        <Table
+          dataSource={contactos}
+          columns={columns}
+          rowKey="id"
+          loading={loading}
+          pagination={false}
+          size="small"
+          style={{ backgroundColor: "transparent" }}
+        />
+      </div>
 
       {/* Modal Crear/Editar */}
       <Modal
@@ -244,7 +267,8 @@ export const PersonaContactos = ({ personaId }: PersonaContactosProps) => {
             >
               <Input
                 placeholder={
-                  tipoSeleccionado && inputPlaceholderByTipo[tipoSeleccionado] !== ""
+                  tipoSeleccionado &&
+                  inputPlaceholderByTipo[tipoSeleccionado] !== ""
                     ? inputPlaceholderByTipo[tipoSeleccionado]
                     : "Ej: valor"
                 }

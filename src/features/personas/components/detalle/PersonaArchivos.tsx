@@ -104,6 +104,11 @@ export const PersonaArchivos = ({ personaId }: PersonaArchivosProps) => {
             type="text"
             size="small"
             icon={<Eye size={15} />}
+            className="rounded-lg"
+            style={{
+              backgroundColor: "var(--color-bg-subtle)",
+              border: "1px solid var(--color-border)",
+            }}
             onClick={() => handlePreview(r)}
           />
         </Tooltip>
@@ -140,6 +145,11 @@ export const PersonaArchivos = ({ personaId }: PersonaArchivosProps) => {
               type="text"
               size="small"
               icon={<Download size={14} />}
+              className="rounded-lg"
+              style={{
+                backgroundColor: "var(--color-bg-subtle)",
+                border: "1px solid var(--color-border)",
+              }}
               onClick={() => handleDownload(record.id)}
             />
           </Tooltip>
@@ -150,6 +160,11 @@ export const PersonaArchivos = ({ personaId }: PersonaArchivosProps) => {
                 size="small"
                 danger
                 icon={<Trash2 size={14} />}
+                className="rounded-lg"
+                style={{
+                  backgroundColor: "var(--color-alert-danger-bg)",
+                  border: "1px solid var(--color-danger-200)",
+                }}
                 onClick={() => setDeleteTarget(record)}
               />
             </Tooltip>
@@ -174,24 +189,32 @@ export const PersonaArchivos = ({ personaId }: PersonaArchivosProps) => {
             size="small"
             icon={<Plus size={14} />}
             onClick={() => setModalOpen(true)}
+            className="rounded-lg shadow-sm"
           >
             Subir Archivo
           </Button>
         </Can>
       </div>
 
-      <Table
-        dataSource={archivos}
-        columns={columns}
-        rowKey="id"
-        loading={loading}
-        pagination={false}
-        size="small"
+      <div
         style={{
           backgroundColor: "var(--color-bg-base)",
+          border: "1px solid var(--color-border)",
           borderRadius: "var(--radius-card)",
+          overflow: "hidden",
+          boxShadow: "0 6px 20px rgba(2, 6, 23, 0.04)",
         }}
-      />
+      >
+        <Table
+          dataSource={archivos}
+          columns={columns}
+          rowKey="id"
+          loading={loading}
+          pagination={false}
+          size="small"
+          style={{ backgroundColor: "transparent" }}
+        />
+      </div>
 
       <Modal
         open={modalOpen}
@@ -228,7 +251,10 @@ export const PersonaArchivos = ({ personaId }: PersonaArchivosProps) => {
               label="Tipo de documento"
               rules={[{ required: true, message: "Selecciona el tipo" }]}
             >
-              <Select options={TIPO_OPTIONS} placeholder="Ej: Seleccionar tipo" />
+              <Select
+                options={TIPO_OPTIONS}
+                placeholder="Ej: Seleccionar tipo"
+              />
             </Form.Item>
           </div>
           <Form.Item
@@ -237,7 +263,13 @@ export const PersonaArchivos = ({ personaId }: PersonaArchivosProps) => {
             rules={[{ required: true, message: "Selecciona un archivo" }]}
           >
             <Upload beforeUpload={() => false} maxCount={1}>
-              <Button size="large" icon={<Plus size={14} />}>Seleccionar archivo</Button>
+              <Button
+                size="large"
+                icon={<Plus size={14} />}
+                className="rounded-lg"
+              >
+                Seleccionar archivo
+              </Button>
             </Upload>
           </Form.Item>
         </Form>

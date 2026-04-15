@@ -3,7 +3,7 @@ import { useState, useEffect, useCallback } from "react";
 import { Table, Tag, Badge, Button } from "antd";
 import { RotateCcw } from "lucide-react";
 import { toast } from "react-toastify";
-import type { TableColumnsType } from "antd";
+import type { TableColumnsType, TablePaginationConfig } from "antd";
 import { http } from "@/shared/services/http.service";
 import type { AuditoriaItem } from "../../types/persona-detalle.types";
 
@@ -24,6 +24,19 @@ export const PersonaAuditoria = ({ personaId }: PersonaAuditoriaProps) => {
   const [total, setTotal] = useState(0);
   const [page, setPage] = useState(1);
   const [loading, setLoading] = useState(false);
+
+  const tablePagination: TablePaginationConfig = {
+    current: page,
+    pageSize: 10,
+    total,
+    onChange: setPage,
+    showSizeChanger: false,
+    showQuickJumper: false,
+    size: "small" as const,
+    position: ["bottomRight"],
+    showTotal: (t: number, range: [number, number]) =>
+      `${range[0]}-${range[1]} de ${t}`,
+  };
 
   const fetch = useCallback(async () => {
     setLoading(true);
@@ -119,30 +132,36 @@ export const PersonaAuditoria = ({ personaId }: PersonaAuditoriaProps) => {
           onClick={fetch}
           loading={loading}
           size="small"
+          className="rounded-lg shadow-sm"
+          style={{
+            backgroundColor: "var(--color-bg-base)",
+            borderColor: "var(--color-border)",
+          }}
         >
           Refrescar
         </Button>
       </div>
 
-      <Table
-        dataSource={items}
-        columns={columns}
-        rowKey="id"
-        loading={loading}
-        size="small"
-        scroll={{ x: 700 }}
-        pagination={{
-          current: page,
-          pageSize: 10,
-          total,
-          onChange: setPage,
-          showTotal: (t, r) => `${r[0]}-${r[1]} de ${t}`,
-        }}
+      <div
         style={{
           backgroundColor: "var(--color-bg-base)",
+          border: "1px solid var(--color-border)",
           borderRadius: "var(--radius-card)",
+          overflow: "hidden",
+          boxShadow: "0 6px 20px rgba(2, 6, 23, 0.04)",
         }}
-      />
+      >
+        <Table
+          dataSource={items}
+          columns={columns}
+          rowKey="id"
+          loading={loading}
+          size="small"
+          scroll={{ x: 700 }}
+          pagination={tablePagination}
+          style={{ backgroundColor: "transparent" }}
+        />
+      </div>
     </div>
   );
 };
