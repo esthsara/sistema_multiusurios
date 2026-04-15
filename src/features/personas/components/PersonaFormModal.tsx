@@ -86,24 +86,36 @@ export const PersonaFormModal = ({
       okButtonProps={{ loading: isSubmitting }}
       cancelButtonProps={{ disabled: isSubmitting }}
       destroyOnHidden
-      width={520}
+      width={760}
+      centered
     >
       <Form
         form={form}
         layout="vertical"
+        size="large"
         requiredMark={false}
         className="mt-4"
         preserve={false}
       >
+        <div
+          className="rounded-xl border p-5 bg-white dark:bg-transparent"
+          style={{ borderColor: "var(--color-border)" }}
+        >
+          <p
+            className="mb-4 text-xs font-semibold uppercase tracking-wide"
+            style={{ color: "var(--color-text-secondary)" }}
+          >
+            Datos generales
+          </p>
         {tipo === "FISICA" && (
           <>
-            <div className="grid grid-cols-2 gap-x-4">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-x-4">
               <Form.Item
                 name="nombre"
                 label="Nombre"
                 rules={[{ required: true, message: "Ingresa el nombre" }]}
               >
-                <Input placeholder="Ana" />
+                <Input placeholder="Ej: Juan" />
               </Form.Item>
 
               <Form.Item
@@ -111,7 +123,7 @@ export const PersonaFormModal = ({
                 label="Apellido"
                 rules={[{ required: true, message: "Ingresa el apellido" }]}
               >
-                <Input placeholder="Martínez" />
+                <Input placeholder="Ej: Pérez" />
               </Form.Item>
             </div>
 
@@ -120,20 +132,20 @@ export const PersonaFormModal = ({
               label="Identificación"
               rules={[{ required: true, message: "Ingresa la identificación" }]}
             >
-              <Input placeholder="01000" />
+              <Input placeholder="Ej: V-12345678" />
             </Form.Item>
 
-            <div className="grid grid-cols-2 gap-x-4">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-x-4">
               <Form.Item name="fecha_nacimiento" label="Fecha de nacimiento">
                 <DatePicker
                   className="w-full"
-                  placeholder="YYYY-MM-DD"
+                  placeholder="Ej: 1990-12-31"
                   format="YYYY-MM-DD"
                 />
               </Form.Item>
 
               <Form.Item name="genero" label="Género">
-                <Select placeholder="Seleccionar">
+                <Select placeholder="Seleccionar género">
                   <Select.Option value="M">Masculino</Select.Option>
                   <Select.Option value="F">Femenino</Select.Option>
                   <Select.Option value="Otro">Otro</Select.Option>
@@ -150,18 +162,19 @@ export const PersonaFormModal = ({
               label="Razón Social"
               rules={[{ required: true, message: "Ingresa la razón social" }]}
             >
-              <Input placeholder="Empresa S.R.L." />
+              <Input placeholder="Ej: Empresa S.A. de C.V." />
             </Form.Item>
 
             <Form.Item
               name="identificacion_principal"
-              label="Identificación"
+              label="Identificación corporativa (RUC / CIF / NIT)"
               rules={[{ required: true, message: "Ingresa la identificación" }]}
             >
-              <Input placeholder="987654321" />
+              <Input placeholder="Ej: 123456789" />
             </Form.Item>
           </>
         )}
+        </div>
       </Form>
     </Modal>
   );

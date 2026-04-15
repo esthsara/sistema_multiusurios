@@ -151,15 +151,9 @@ const PersonasPage = () => {
       ),
     },
     {
-      title: "Identificador",
-      dataIndex: "identificacion_principal",
-      key: "identificacion",
-      width: 150,
-    },
-    {
       title: "Tipo",
       key: "tipo",
-      width: 100,
+      width: 130,
       render: (_, r) => (
         <span
           className="text-xs px-2 py-1 rounded-full font-medium"
@@ -168,7 +162,10 @@ const PersonasPage = () => {
               r.tipo_persona === "FISICA"
                 ? "var(--color-alert-primary-bg)"
                 : "var(--color-bg-subtle)",
-            color: r.tipo_persona === "FISICA" ? "var(--color-primary-400)" : "var(--color-text-secondary)",
+            color:
+              r.tipo_persona === "FISICA"
+                ? "var(--color-primary-400)"
+                : "var(--color-text-secondary)",
           }}
         >
           {r.tipo_texto}
@@ -178,13 +175,13 @@ const PersonasPage = () => {
     {
       title: "Estado",
       key: "estado",
-      width: 100,
+      width: 130,
       render: (_, r) => <PersonaStatusBadge estado={r.estado} />,
     },
     {
       title: "Registro",
       key: "fecha",
-      width: 130,
+      width: 150,
       render: (_, r) => (
         <Tooltip title={r.fecha_registro}>
           <span

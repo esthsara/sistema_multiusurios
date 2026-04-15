@@ -174,12 +174,14 @@ export const PersonaDomicilios = ({ personaId }: PersonaDomiciliosProps) => {
         okText={modal.isEditMode ? "Actualizar" : "Crear"}
         cancelText="Cancelar"
         okButtonProps={{ loading: modal.isSubmitting }}
-        width={520}
+        width={760}
+        centered
         destroyOnClose
       >
         <Form
           form={form}
           layout="vertical"
+          size="large"
           requiredMark={false}
           className="mt-4"
         >
@@ -196,7 +198,7 @@ export const PersonaDomicilios = ({ personaId }: PersonaDomiciliosProps) => {
               label="País"
               rules={[{ required: true, message: "Ingresa el país" }]}
             >
-              <Input placeholder="Bolivia" />
+              <Input placeholder="Ej: Bolivia" />
             </Form.Item>
           </div>
           <div className="grid grid-cols-2 gap-x-4">
@@ -205,10 +207,10 @@ export const PersonaDomicilios = ({ personaId }: PersonaDomiciliosProps) => {
               label="Ciudad"
               rules={[{ required: true, message: "Ingresa la ciudad" }]}
             >
-              <Input placeholder="Santa Cruz" />
+              <Input placeholder="Ej: Santa Cruz" />
             </Form.Item>
             <Form.Item name="codigo_postal" label="Código Postal">
-              <Input placeholder="12345" />
+              <Input placeholder="Ej: 12345" />
             </Form.Item>
           </div>
           <Form.Item
@@ -216,7 +218,7 @@ export const PersonaDomicilios = ({ personaId }: PersonaDomiciliosProps) => {
             label="Dirección"
             rules={[{ required: true, message: "Ingresa la dirección" }]}
           >
-            <Input placeholder="Av. Principal #123" />
+            <Input placeholder="Ej: Av. Principal #123" />
           </Form.Item>
           <Form.Item
             name="principal"

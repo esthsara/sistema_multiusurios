@@ -182,7 +182,8 @@ export const PersonaContactos = ({ personaId }: PersonaContactosProps) => {
         okText={modal.isEditMode ? "Actualizar" : "Crear"}
         cancelText="Cancelar"
         okButtonProps={{ loading: modal.isSubmitting }}
-        width={420}
+        width={760}
+        centered
         destroyOnClose
       >
         {/* Vista previa del contacto actual si es edición */}
@@ -206,48 +207,50 @@ export const PersonaContactos = ({ personaId }: PersonaContactosProps) => {
           </div>
         )}
 
-        <Form form={form} layout="vertical" requiredMark={false}>
-          <Form.Item
-            name="tipo"
-            label="Tipo"
-            rules={[{ required: true, message: "Selecciona el tipo" }]}
-          >
-            <Select options={TIPO_OPTIONS} placeholder="Seleccionar tipo" />
-          </Form.Item>
-          <Form.Item
-            name="valor"
-            label="Valor"
-            rules={[
-              { required: true, message: "Ingresa el valor" },
-              {
-                validator: async (_, value: string) => {
-                  if (!value || !tipoSeleccionado) return;
+        <Form form={form} layout="vertical" size="large" requiredMark={false}>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-x-4">
+            <Form.Item
+              name="tipo"
+              label="Tipo"
+              rules={[{ required: true, message: "Selecciona el tipo" }]}
+            >
+              <Select options={TIPO_OPTIONS} placeholder="Seleccionar tipo" />
+            </Form.Item>
+            <Form.Item
+              name="valor"
+              label="Valor"
+              rules={[
+                { required: true, message: "Ingresa el valor" },
+                {
+                  validator: async (_, value: string) => {
+                    if (!value || !tipoSeleccionado) return;
 
-                  if (tipoSeleccionado === "EMAIL") {
-                    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-                    if (!emailRegex.test(value.trim())) {
-                      throw new Error("Ingresa un email válido");
+                    if (tipoSeleccionado === "EMAIL") {
+                      const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+                      if (!emailRegex.test(value.trim())) {
+                        throw new Error("Ingresa un email válido");
+                      }
                     }
-                  }
 
-                  if (tipoSeleccionado === "TELEFONO") {
-                    const phoneRegex = /^[+]?[-()\d\s]{6,20}$/;
-                    if (!phoneRegex.test(value.trim())) {
-                      throw new Error("Ingresa un teléfono válido");
+                    if (tipoSeleccionado === "TELEFONO") {
+                      const phoneRegex = /^[+]?[-()\d\s]{6,20}$/;
+                      if (!phoneRegex.test(value.trim())) {
+                        throw new Error("Ingresa un teléfono válido");
+                      }
                     }
-                  }
+                  },
                 },
-              },
-            ]}
-          >
-            <Input
-              placeholder={
-                tipoSeleccionado
-                  ? inputPlaceholderByTipo[tipoSeleccionado]
-                  : "Ingresa un valor"
-              }
-            />
-          </Form.Item>
+              ]}
+            >
+              <Input
+                placeholder={
+                  tipoSeleccionado && inputPlaceholderByTipo[tipoSeleccionado] !== ""
+                    ? inputPlaceholderByTipo[tipoSeleccionado]
+                    : "Ej: valor"
+                }
+              />
+            </Form.Item>
+          </div>
         </Form>
       </Modal>
 
@@ -257,7 +260,8 @@ export const PersonaContactos = ({ personaId }: PersonaContactosProps) => {
         title="Detalle del Contacto"
         onCancel={() => setViewItem(null)}
         footer={<Button onClick={() => setViewItem(null)}>Volver</Button>}
-        width={380}
+        width={760}
+        centered
       >
         {viewItem && (
           <div className="grid grid-cols-2 gap-3 py-2">
