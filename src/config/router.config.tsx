@@ -13,12 +13,12 @@ const DashboardLayout = lazy(() => import("@/layouts/DashboardLayout"));
 
 /* ── Páginas públicas ── */
 const LoginPage = lazy(() => import("@/features/auth/components/LoginPage"));
-const ProfilePage = lazy(
-  () => import("@/features/auth/components/ProfilePage"),
-);
 
 /* ── Páginas privadas ── */
 const HomePage = lazy(() => import("@/features/dashboard/components/HomePage"));
+const ProfilePage = lazy(
+  () => import("@/features/auth/components/ProfilePage"),
+);
 const PersonasPage = lazy(
   () => import("@/features/personas/components/PersonasPage"),
 );
@@ -145,7 +145,7 @@ export const router = createBrowserRouter([
             element: withSuspense(HomePage),
           },
           {
-            path: APP_ROUTES.DASHBOARD.PERFIL,
+            path: APP_ROUTES.DASHBOARD.PROFILE,
             element: withSuspense(ProfilePage),
           },
 

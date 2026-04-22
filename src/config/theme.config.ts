@@ -74,7 +74,7 @@ export const lightTheme: ThemeConfig = {
 export const darkTheme: ThemeConfig = {
   token: {
     ...baseTokens,
-    colorPrimary: "#5999e7",
+    colorPrimary: "#486594",
     colorSuccess: "#22c55e",
     colorWarning: "#f59e0b",
     colorError: "#ef4444",
