@@ -77,11 +77,13 @@ export const UsuarioFormModal = ({
       cancelText="Cancelar"
       confirmLoading={isSubmitting}
       width={760}
+      centered
     >
       <Spin spinning={loadingPersonas}>
         <Form
           form={form}
           layout="vertical"
+          size="large"
           autoComplete="off"
           style={{ marginTop: 24 }}
         >
@@ -146,7 +148,7 @@ export const UsuarioFormModal = ({
                 },
               ]}
             >
-              <Input placeholder="usuario123" />
+              <Input placeholder="Ej: admin123" />
             </Form.Item>
 
             {/* Email */}
@@ -158,7 +160,7 @@ export const UsuarioFormModal = ({
                 { type: "email", message: "Email inválido" },
               ]}
             >
-              <Input type="email" placeholder="usuario@ejemplo.com" />
+              <Input type="email" placeholder="Ej: juan@email.com" />
             </Form.Item>
           </div>
 

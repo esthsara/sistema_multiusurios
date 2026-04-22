@@ -1,28 +1,36 @@
 // src/features/usuarios/components/detalle/UsuarioSucursales.tsx
-import { Table, Tag, Avatar, Badge } from "antd";
-import { Building2 } from "lucide-react";
+import { Table, Tag, Avatar, Badge, Button } from "antd";
+import { Building2, ExternalLink } from "lucide-react";
+import { useNavigate } from "react-router-dom";
 import type { TableColumnsType } from "antd";
 import type {
   UsuarioDetalle,
   UsuarioSucursalBackend,
 } from "../../types/usuario.types";
+import { APP_ROUTES } from "@/shared/constants/routes.constants";
 
 interface UsuarioSucursalesProps {
   usuario: UsuarioDetalle;
 }
 
 export const UsuarioSucursales = ({ usuario }: UsuarioSucursalesProps) => {
+  const navigate = useNavigate();
+
   const columns: TableColumnsType<UsuarioSucursalBackend> = [
     {
       title: "Sucursal",
       key: "nombre",
+      width: 280,
       render: (_, r) => (
         <div className="flex items-center gap-2">
           <Avatar
             size={32}
             src={r.logo ?? undefined}
             icon={<Building2 size={16} />}
-            style={{ backgroundColor: "var(--color-primary-100)" }}
+            style={{
+              backgroundColor: "var(--color-primary-100)",
+              color: "var(--color-primary-600)",
+            }}
           />
           <div>
             <p
@@ -58,15 +66,19 @@ export const UsuarioSucursales = ({ usuario }: UsuarioSucursalesProps) => {
     {
       title: "Horario",
       key: "horario",
-      width: 150,
-      render: (_, r) => (
-        <span
-          className="text-xs"
-          style={{ color: "var(--color-text-secondary)" }}
-        >
-          {r.horario}
-        </span>
-      ),
+      width: 160,
+      render: (_, r) => {
+        const horario =
+          r.horario_completo ??
+          [r.horario_apertura, r.horario_cierre].filter(Boolean).join(" - ") ??
+          r.horario;
+
+        return (
+          <Tag color="blue" className="rounded-full px-3 py-0.5">
+            {horario || "—"}
+          </Tag>
+        );
+      },
     },
     {
       title: "Estado",
@@ -80,16 +92,27 @@ export const UsuarioSucursales = ({ usuario }: UsuarioSucursalesProps) => {
       ),
     },
     {
-      title: "Registro",
-      key: "created_at",
-      width: 130,
+      title: "Acciones",
+      key: "acciones",
+      width: 150,
       render: (_, r) => (
-        <span
-          className="text-xs"
-          style={{ color: "var(--color-text-secondary)" }}
+        <Button
+          type="text"
+          size="small"
+          icon={<ExternalLink size={14} />}
+          className="rounded-lg"
+          style={{
+            color: "var(--color-primary-600)",
+            backgroundColor: "var(--color-bg-subtle)",
+            border: "1px solid var(--color-border)",
+            fontWeight: 500,
+          }}
+          onClick={() =>
+            navigate(APP_ROUTES.DASHBOARD.SUCURSALES.DETALLE(r.id))
+          }
         >
-          {r.created_at_humano}
-        </span>
+          Ver sucursal
+        </Button>
       ),
     },
   ];
@@ -103,7 +126,9 @@ export const UsuarioSucursales = ({ usuario }: UsuarioSucursalesProps) => {
         >
           Sucursales Asignadas
         </h3>
-        <Tag>{usuario.sucursales.length} sucursales</Tag>
+        <Tag color="blue" className="rounded-full px-3 py-0.5">
+          {usuario.sucursales.length} sucursales
+        </Tag>
       </div>
 
       {usuario.sucursales.length === 0 ? (
@@ -115,17 +140,24 @@ export const UsuarioSucursales = ({ usuario }: UsuarioSucursalesProps) => {
           <p className="text-sm">Este usuario no tiene sucursales asignadas</p>
         </div>
       ) : (
-        <Table
-          dataSource={usuario.sucursales}
-          columns={columns}
-          rowKey="id"
-          pagination={false}
-          size="small"
+        <div
           style={{
             backgroundColor: "var(--color-bg-base)",
+            border: "1px solid var(--color-border)",
             borderRadius: "var(--radius-card)",
+            overflow: "hidden",
+            boxShadow: "0 6px 20px rgba(2, 6, 23, 0.04)",
           }}
-        />
+        >
+          <Table
+            dataSource={usuario.sucursales}
+            columns={columns}
+            rowKey="id"
+            pagination={false}
+            size="small"
+            style={{ backgroundColor: "transparent" }}
+          />
+        </div>
       )}
     </div>
   );

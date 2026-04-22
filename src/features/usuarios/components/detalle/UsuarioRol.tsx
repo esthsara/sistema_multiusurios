@@ -240,7 +240,8 @@ export const UsuarioRol = ({ usuario, onCambiarRol }: UsuarioRolProps) => {
         okText="Cambiar Rol"
         cancelText="Cancelar"
         okButtonProps={{ loading, disabled: !rolSeleccionado }}
-        width={400}
+        width={600}
+        centered
       >
         <div className="my-4">
           <p
@@ -253,7 +254,8 @@ export const UsuarioRol = ({ usuario, onCambiarRol }: UsuarioRolProps) => {
             </strong>
           </p>
           <Select
-            placeholder="Seleccionar nuevo rol"
+            size="large"
+            placeholder="Ej: Administrador"
             className="w-full"
             value={rolSeleccionado ?? undefined}
             onChange={setRolSeleccionado}

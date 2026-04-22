@@ -17,6 +17,9 @@ export interface UsuarioSucursalBackend {
   email: string;
   direccion: string;
   horario: string;
+  horario_apertura?: string;
+  horario_cierre?: string;
+  horario_completo?: string;
   logo: string | null;
   created_at: string;
   created_at_humano: string;
