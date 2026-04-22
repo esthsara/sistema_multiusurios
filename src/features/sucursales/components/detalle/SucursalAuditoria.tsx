@@ -1,27 +1,17 @@
-import { useCallback, useEffect, useState } from "react";
-import { Button, Table, Tag, Badge, DatePicker } from "antd";
-import type { TableColumnsType } from "antd";
-import { RotateCcw } from "lucide-react";
+import { useCallback, useEffect, useMemo, useState } from "react";
+import { Button, DatePicker, Tag } from "antd";
+import { Activity, Clock3, RotateCcw, Building2 } from "lucide-react";
 import { toast } from "react-toastify";
 import { auditoriaService } from "@/features/auditoria/services/auditoria.service";
 import type { AuditoriaListItem } from "@/features/auditoria/types/auditoria.types";
 import dayjs, { type Dayjs } from "dayjs";
 
+import { AuditoriaTable } from "./Auditoria/AuditoriaTable";
+import { AuditoriaViewModal } from "./Auditoria/AuditoriaViewModal";
+
 interface SucursalAuditoriaProps {
   sucursalId: number;
 }
-
-const ACCION_COLOR: Record<string, string> = {
-  LOGIN_SUCCESS: "green",
-  LOGOUT: "orange",
-  CREATE: "blue",
-  UPDATE: "cyan",
-  DELETE: "red",
-  CONTACTO_CREADO: "blue",
-  CONTACTO_ELIMINADO: "red",
-  DOMICILIO_CREADO: "gold",
-  DOMICILIO_ACTUALIZADO: "cyan",
-};
 
 export const SucursalAuditoria = ({ sucursalId }: SucursalAuditoriaProps) => {
   const [items, setItems] = useState<AuditoriaListItem[]>([]);
@@ -29,6 +19,20 @@ export const SucursalAuditoria = ({ sucursalId }: SucursalAuditoriaProps) => {
   const [page, setPage] = useState(1);
   const [fechaInicio, setFechaInicio] = useState<Dayjs | null>(null);
   const [loading, setLoading] = useState(false);
+  const [selected, setSelected] = useState<AuditoriaListItem | null>(null);
+  const pageSize = 8;
+
+  const stats = useMemo(() => {
+    const uniqueActions = new Set(items.map((item) => item.accion)).size;
+    const lastItem = items[0] ?? null;
+
+    return {
+      total,
+      actions: uniqueActions,
+      lastAction: lastItem?.accion_texto ?? "Sin registros",
+      lastWhen: lastItem?.created_at_humano ?? "—",
+    };
+  }, [items, total]);
 
   const fetch = useCallback(async () => {
     setLoading(true);
@@ -39,7 +43,7 @@ export const SucursalAuditoria = ({ sucursalId }: SucursalAuditoriaProps) => {
           ? fechaInicio.format("YYYY-MM-DD")
           : undefined,
         page,
-        per_page: 10,
+        per_page: pageSize,
       });
       setItems(res.data);
       setTotal(res.meta.total);
@@ -54,74 +58,122 @@ export const SucursalAuditoria = ({ sucursalId }: SucursalAuditoriaProps) => {
     fetch();
   }, [fetch]);
 
-  const columns: TableColumnsType<AuditoriaListItem> = [
-    {
-      title: "Fecha",
-      key: "fecha",
-      width: 130,
-      render: (_, r) => (
-        <span
-          className="text-xs"
-          style={{ color: "var(--color-text-secondary)" }}
-        >
-          {r.fecha}
-        </span>
-      ),
-    },
-    {
-      title: "Usuario",
-      key: "usuario",
-      width: 150,
-      render: (_, r) => (
-        <div>
-          <p
-            className="text-sm font-medium m-0"
-            style={{ color: "var(--color-text-primary)" }}
-          >
-            {r.usuario.nombre}
-          </p>
-          <p
-            className="text-xs m-0"
-            style={{ color: "var(--color-text-secondary)" }}
-          >
-            {r.usuario.email}
-          </p>
-        </div>
-      ),
-    },
-    {
-      title: "Acción",
-      key: "accion",
-      width: 140,
-      render: (_, r) => (
-        <Tag color={ACCION_COLOR[r.accion] ?? "default"}>{r.accion_texto}</Tag>
-      ),
-    },
-    {
-      title: "Entidad",
-      key: "entidad",
-      width: 100,
-      render: (_, r) => <Badge status="default" text={r.entidad_nombre} />,
-    },
-    {
-      title: "IP",
-      dataIndex: "ip",
-      key: "ip",
-      width: 110,
-      render: (ip) => (
-        <span
-          className="text-xs font-mono"
-          style={{ color: "var(--color-text-secondary)" }}
-        >
-          {ip ?? "-"}
-        </span>
-      ),
-    },
-  ];
-
   return (
-    <div>
-      <div className="flex justify-between mb-3">
+    <div className="space-y-4">
+      <div
+        className="p-4 rounded-xl"
+        style={{
+          background:
+            "linear-gradient(135deg, rgba(34,197,94,0.10), rgba(59,130,246,0.08))",
+          border: "1px solid var(--color-border)",
+        }}
+      >
+        <div className="flex flex-wrap items-start justify-between gap-3">
+          <div>
+            <h3
+              className="text-base font-semibold m-0"
+              style={{ color: "var(--color-text-primary)" }}
+            >
+              Historial de sucursal
+            </h3>
+            <p
+              className="text-xs m-0 mt-1"
+              style={{ color: "var(--color-text-secondary)" }}
+            >
+              Actividades registradas para esta sucursal.
+            </p>
+          </div>
+
+          <Button
+            icon={<RotateCcw size={14} />}
+            onClick={fetch}
+            loading={loading}
+          >
+            Refrescar
+          </Button>
+        </div>
+
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 mt-4">
+          <div
+            className="rounded-lg p-3"
+            style={{
+              backgroundColor: "var(--color-bg-subtle)",
+              border: "1px solid var(--color-border)",
+            }}
+          >
+            <div className="flex items-center justify-between">
+              <span
+                className="text-xs"
+                style={{ color: "var(--color-text-secondary)" }}
+              >
+                Eventos
+              </span>
+              <Activity
+                size={14}
+                style={{ color: "var(--color-primary-500)" }}
+              />
+            </div>
+            <p className="text-lg font-semibold m-0 mt-1">{stats.total}</p>
+          </div>
+
+          <div
+            className="rounded-lg p-3"
+            style={{
+              backgroundColor: "var(--color-bg-subtle)",
+              border: "1px solid var(--color-border)",
+            }}
+          >
+            <div className="flex items-center justify-between">
+              <span
+                className="text-xs"
+                style={{ color: "var(--color-text-secondary)" }}
+              >
+                Acciones únicas
+              </span>
+              <Building2
+                size={14}
+                style={{ color: "var(--color-primary-500)" }}
+              />
+            </div>
+            <p className="text-lg font-semibold m-0 mt-1">{stats.actions}</p>
+          </div>
+
+          <div
+            className="rounded-lg p-3 sm:col-span-2"
+            style={{
+              backgroundColor: "var(--color-bg-subtle)",
+              border: "1px solid var(--color-border)",
+            }}
+          >
+            <div className="flex items-center justify-between gap-2">
+              <span
+                className="text-xs"
+                style={{ color: "var(--color-text-secondary)" }}
+              >
+                Último evento
+              </span>
+              <Clock3 size={14} style={{ color: "var(--color-primary-500)" }} />
+            </div>
+            <div className="mt-1 flex flex-wrap items-center gap-2">
+              <Tag className="m-0">{stats.lastAction}</Tag>
+              <span
+                className="text-xs"
+                style={{ color: "var(--color-text-secondary)" }}
+              >
+                {stats.lastWhen}
+              </span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div
+        className="flex flex-wrap items-center justify-between gap-3 p-3 rounded-xl"
+        style={{
+          backgroundColor: "var(--color-bg-base)",
+          border: "1px solid var(--color-border)",
+        }}
+      >
         <DatePicker
           placeholder="Fecha inicio"
           value={fechaInicio}
@@ -132,34 +184,31 @@ export const SucursalAuditoria = ({ sucursalId }: SucursalAuditoriaProps) => {
             setFechaInicio(value);
           }}
         />
-        <Button
-          icon={<RotateCcw size={14} />}
-          onClick={fetch}
-          loading={loading}
-          size="small"
+        <span
+          className="text-xs"
+          style={{ color: "var(--color-text-secondary)" }}
         >
-          Refrescar
-        </Button>
+          Filtra la actividad desde una fecha específica.
+        </span>
       </div>
 
-      <Table
-        dataSource={items}
-        columns={columns}
-        rowKey="id"
+      <AuditoriaTable
+        data={items}
         loading={loading}
-        size="small"
-        scroll={{ x: 700 }}
+        onView={setSelected}
         pagination={{
           current: page,
-          pageSize: 10,
+          pageSize,
           total,
           onChange: setPage,
-          showTotal: (t, r) => `${r[0]}-${r[1]} de ${t}`,
+          showSizeChanger: false,
         }}
-        style={{
-          backgroundColor: "var(--color-bg-base)",
-          borderRadius: "var(--radius-card)",
-        }}
+      />
+
+      <AuditoriaViewModal
+        open={!!selected}
+        item={selected}
+        onClose={() => setSelected(null)}
       />
     </div>
   );

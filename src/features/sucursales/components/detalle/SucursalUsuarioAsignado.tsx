@@ -195,10 +195,11 @@ export const SucursalUsuarioAsignado = ({
         okText="Asignar"
         cancelText="Cancelar"
         okButtonProps={{ loading: assigningLoading }}
-        width={420}
+        width={760}
+        centered
         destroyOnClose
       >
-        <Form form={form} layout="vertical" style={{ marginTop: 16 }}>
+        <Form form={form} layout="vertical" size="large" style={{ marginTop: 16 }}>
           <Form.Item
             name="usuario_id"
             label="Seleccionar Usuario"

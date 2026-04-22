@@ -109,6 +109,7 @@ export const SucursalFormModal = ({
       <Form<FormValues>
         form={form}
         layout="vertical"
+        size="large"
         autoComplete="off"
         style={{ marginTop: 20 }}
         disabled={isSubmitting}
@@ -130,7 +131,7 @@ export const SucursalFormModal = ({
               label="Nombre"
               rules={[{ required: true, message: "El nombre es requerido" }]}
             >
-              <Input placeholder="Sucursal Central" />
+              <Input placeholder="Ej: Sucursal Central" />
             </Form.Item>
 
             <Form.Item
@@ -138,7 +139,7 @@ export const SucursalFormModal = ({
               label="Código"
               rules={[{ required: true, message: "El código es requerido" }]}
             >
-              <Input placeholder="SC-001" disabled={isEditMode} />
+              <Input placeholder="Ej: SC-001" disabled={isEditMode} />
             </Form.Item>
 
             <Form.Item
@@ -149,7 +150,7 @@ export const SucursalFormModal = ({
                 { type: "email", message: "Email inválido" },
               ]}
             >
-              <Input placeholder="sucursal@empresa.com" />
+              <Input placeholder="Ej: sucursal@empresa.com" />
             </Form.Item>
 
             <Form.Item
@@ -157,7 +158,7 @@ export const SucursalFormModal = ({
               label="Dirección"
               rules={[{ required: true, message: "La dirección es requerida" }]}
             >
-              <Input placeholder="Av. Principal 123" />
+              <Input placeholder="Ej: Av. Principal 123" />
             </Form.Item>
 
             <Form.Item
@@ -170,7 +171,7 @@ export const SucursalFormModal = ({
                 },
               ]}
             >
-              <Input placeholder="08:00" />
+              <Input placeholder="Ej: 08:00" />
             </Form.Item>
 
             <Form.Item
@@ -180,7 +181,7 @@ export const SucursalFormModal = ({
                 { required: true, message: "La hora de cierre es requerida" },
               ]}
             >
-              <Input placeholder="18:00" />
+              <Input placeholder="Ej: 18:00" />
             </Form.Item>
           </div>
         </div>
@@ -197,7 +198,7 @@ export const SucursalFormModal = ({
           </p>
 
           <Form.Item name="descripcion" label="Descripción">
-            <Input.TextArea rows={3} placeholder="Descripción opcional" />
+            <Input.TextArea rows={3} placeholder="Ej: Descripción opcional" />
           </Form.Item>
 
           <Form.Item name="logo" label="Logo">
