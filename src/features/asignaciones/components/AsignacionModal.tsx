@@ -54,7 +54,8 @@ export const AsignacionModal = ({
       cancelText="Cancelar"
       onOk={handleSubmit}
       onCancel={handleCancel}
-      width={500}
+      width={600}
+      centered
       okButtonProps={{ loading: submitting }}
       destroyOnClose
     >
@@ -79,6 +80,7 @@ export const AsignacionModal = ({
         <Form
           form={form}
           layout="vertical"
+          size="large"
           requiredMark={false}
           style={{ marginTop: 16 }}
         >

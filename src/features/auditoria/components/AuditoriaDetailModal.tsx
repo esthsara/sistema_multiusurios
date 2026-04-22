@@ -85,6 +85,7 @@ export const AuditoriaDetailModal = ({
       onCancel={onClose}
       footer={null}
       width={980}
+      centered
       destroyOnHidden
     >
       <Spin spinning={loading}>

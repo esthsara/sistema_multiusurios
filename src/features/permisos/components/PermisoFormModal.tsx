@@ -58,12 +58,14 @@ export const PermisoFormModal = ({
       okButtonProps={{ loading: submitting }}
       cancelButtonProps={{ disabled: submitting }}
       width={600}
+      centered
       destroyOnHidden
     >
       <Spin spinning={loading}>
         <Form
           form={form}
           layout="vertical"
+          size="large"
           requiredMark={false}
           className="mt-4"
         >
