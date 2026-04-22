@@ -11,10 +11,6 @@ import type {
 export const useSucursalDomicilios = (sucursalId: number) => {
   const [domicilios, setDomicilios] = useState<SucursalDomicilio[]>([]);
   const [loading, setLoading] = useState(false);
-  const [deleteTarget, setDeleteTarget] = useState<SucursalDomicilio | null>(
-    null,
-  );
-  const [deleting, setDeleting] = useState(false);
   const [markingPrincipalId, setMarkingPrincipalId] = useState<number | null>(
     null,
   );
@@ -67,22 +63,13 @@ export const useSucursalDomicilios = (sucursalId: number) => {
     }
   };
 
-  const handleDelete = async (domicilio: SucursalDomicilio) => {
-    setDeleteTarget(domicilio);
-  };
-
-  const confirmDelete = async () => {
-    if (!deleteTarget) return;
-    setDeleting(true);
+  const handleDelete = async (id: number) => {
     try {
-      await sucursalDomiciliosService.remove(deleteTarget.id);
+      await sucursalDomiciliosService.remove(id);
       toast.success("Domicilio eliminado");
-      setDeleteTarget(null);
       fetch();
     } catch {
       toast.error("Error al eliminar domicilio");
-    } finally {
-      setDeleting(false);
     }
   };
 
@@ -105,13 +92,9 @@ export const useSucursalDomicilios = (sucursalId: number) => {
     domicilios,
     loading,
     modal,
-    deleteTarget,
-    deleting,
     markingPrincipalId,
     handleSubmit,
     handleDelete,
-    confirmDelete,
     handleMarkPrincipal,
-    setDeleteTarget,
   };
 };
