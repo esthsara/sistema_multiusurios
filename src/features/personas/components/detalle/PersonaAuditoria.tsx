@@ -1,167 +1,172 @@
-// src/features/personas/components/detalle/PersonaAuditoria.tsx
-import { useState, useEffect, useCallback } from "react";
-import { Table, Tag, Badge, Button } from "antd";
-import { RotateCcw } from "lucide-react";
+import { useState, useEffect, useCallback, useMemo } from "react";
+import { Button, Tag } from "antd";
+import { Activity, Clock3, RotateCcw, UserCircle2 } from "lucide-react";
 import { toast } from "react-toastify";
-import type { TableColumnsType, TablePaginationConfig } from "antd";
-import { http } from "@/shared/services/http.service";
-import type { AuditoriaItem } from "../../types/persona-detalle.types";
 
-interface PersonaAuditoriaProps {
+import { http } from "@/shared/services/http.service";
+
+import { AuditoriaTable } from "./Auditoria/AuditoriaTable";
+import { AuditoriaViewModal } from "./Auditoria/AuditoriaViewModal";
+import type { AuditoriaItem } from "./Auditoria/auditoria.constants";
+
+interface Props {
   personaId: number;
 }
 
-const ACCION_COLOR: Record<string, string> = {
-  LOGIN_SUCCESS: "green",
-  LOGOUT: "orange",
-  CREATE: "blue",
-  UPDATE: "cyan",
-  DELETE: "red",
-};
-
-export const PersonaAuditoria = ({ personaId }: PersonaAuditoriaProps) => {
+export const PersonaAuditoria = ({ personaId }: Props) => {
   const [items, setItems] = useState<AuditoriaItem[]>([]);
-  const [total, setTotal] = useState(0);
-  const [page, setPage] = useState(1);
   const [loading, setLoading] = useState(false);
+  const [selected, setSelected] = useState<AuditoriaItem | null>(null);
 
-  const tablePagination: TablePaginationConfig = {
-    current: page,
-    pageSize: 10,
-    total,
-    onChange: setPage,
-    showSizeChanger: false,
-    showQuickJumper: false,
-    size: "small" as const,
-    position: ["bottomRight"],
-    showTotal: (t: number, range: [number, number]) =>
-      `${range[0]}-${range[1]} de ${t}`,
-  };
+  const stats = useMemo(() => {
+    const uniqueUsers = new Set(items.map((item) => item.usuario.id)).size;
+    const lastItem = items[0] ?? null;
+
+    return {
+      total: items.length,
+      users: uniqueUsers,
+      lastAction: lastItem?.accion_texto ?? "Sin registros",
+      lastWhen: lastItem?.created_at_humano ?? "—",
+    };
+  }, [items]);
 
   const fetch = useCallback(async () => {
     setLoading(true);
     try {
-      const res = await http.getPaginated<AuditoriaItem>("/auditoria", {
+      const res = await http.get<{ items: AuditoriaItem[] }>("/auditoria", {
         entidad_id: personaId,
-        page,
         per_page: 10,
       });
-      setItems(res.data);
-      setTotal(res.meta.total);
+
+      setItems(res.data.items);
     } catch {
       toast.error("Error al cargar auditoría");
     } finally {
       setLoading(false);
     }
-  }, [personaId, page]);
+  }, [personaId]);
 
   useEffect(() => {
     fetch();
   }, [fetch]);
 
-  const columns: TableColumnsType<AuditoriaItem> = [
-    {
-      title: "Fecha",
-      key: "fecha",
-      width: 130,
-      render: (_, r) => (
-        <span
-          className="text-xs"
-          style={{ color: "var(--color-text-secondary)" }}
-        >
-          {r.fecha}
-        </span>
-      ),
-    },
-    {
-      title: "Usuario",
-      key: "usuario",
-      width: 150,
-      render: (_, r) => (
-        <div>
-          <p
-            className="text-sm font-medium m-0"
-            style={{ color: "var(--color-text-primary)" }}
-          >
-            {r.usuario.nombre}
-          </p>
-          <p
-            className="text-xs m-0"
-            style={{ color: "var(--color-text-secondary)" }}
-          >
-            {r.usuario.email}
-          </p>
-        </div>
-      ),
-    },
-    {
-      title: "Acción",
-      key: "accion",
-      width: 140,
-      render: (_, r) => (
-        <Tag color={ACCION_COLOR[r.accion] ?? "default"}>{r.accion_texto}</Tag>
-      ),
-    },
-    {
-      title: "Entidad",
-      key: "entidad",
-      width: 100,
-      render: (_, r) => <Badge status="default" text={r.entidad_nombre} />,
-    },
-    {
-      title: "IP",
-      dataIndex: "ip",
-      key: "ip",
-      width: 110,
-      render: (ip) => (
-        <span
-          className="text-xs font-mono"
-          style={{ color: "var(--color-text-secondary)" }}
-        >
-          {ip}
-        </span>
-      ),
-    },
-  ];
-
   return (
-    <div>
-      <div className="flex justify-end mb-3">
-        <Button
-          icon={<RotateCcw size={14} />}
-          onClick={fetch}
-          loading={loading}
-          size="small"
-          className="rounded-lg shadow-sm"
-          style={{
-            backgroundColor: "var(--color-bg-base)",
-            borderColor: "var(--color-border)",
-          }}
-        >
-          Refrescar
-        </Button>
-      </div>
-
+    <div className="space-y-4">
       <div
+        className="p-4 rounded-xl"
         style={{
-          backgroundColor: "var(--color-bg-base)",
+          background:
+            "linear-gradient(135deg, rgba(59,130,246,0.10), rgba(168,85,247,0.08))",
           border: "1px solid var(--color-border)",
-          borderRadius: "var(--radius-card)",
-          overflow: "hidden",
-          boxShadow: "0 6px 20px rgba(2, 6, 23, 0.04)",
         }}
       >
-        <Table
-          dataSource={items}
-          columns={columns}
-          rowKey="id"
-          loading={loading}
-          size="small"
-          scroll={{ x: 700 }}
-          pagination={tablePagination}
-          style={{ backgroundColor: "transparent" }}
-        />
+        <div className="flex flex-wrap items-start justify-between gap-3">
+          <div>
+            <h3
+              className="text-base font-semibold m-0"
+              style={{ color: "var(--color-text-primary)" }}
+            >
+              Historial de auditoría
+            </h3>
+            <p
+              className="text-xs m-0 mt-1"
+              style={{ color: "var(--color-text-secondary)" }}
+            >
+              Seguimiento de acciones realizadas sobre esta persona.
+            </p>
+          </div>
+
+          <Button
+            icon={<RotateCcw size={14} />}
+            onClick={fetch}
+            loading={loading}
+            size="middle"
+          >
+            Refrescar
+          </Button>
+        </div>
+
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 mt-4">
+          <div
+            className="rounded-lg p-3"
+            style={{
+              backgroundColor: "var(--color-bg-subtle)",
+              border: "1px solid var(--color-border)",
+            }}
+          >
+            <div className="flex items-center justify-between">
+              <span
+                className="text-xs"
+                style={{ color: "var(--color-text-secondary)" }}
+              >
+                Eventos
+              </span>
+              <Activity
+                size={14}
+                style={{ color: "var(--color-primary-500)" }}
+              />
+            </div>
+            <p className="text-lg font-semibold m-0 mt-1">{stats.total}</p>
+          </div>
+
+          <div
+            className="rounded-lg p-3"
+            style={{
+              backgroundColor: "var(--color-bg-subtle)",
+              border: "1px solid var(--color-border)",
+            }}
+          >
+            <div className="flex items-center justify-between">
+              <span
+                className="text-xs"
+                style={{ color: "var(--color-text-secondary)" }}
+              >
+                Usuarios
+              </span>
+              <UserCircle2
+                size={14}
+                style={{ color: "var(--color-primary-500)" }}
+              />
+            </div>
+            <p className="text-lg font-semibold m-0 mt-1">{stats.users}</p>
+          </div>
+
+          <div
+            className="rounded-lg p-3 sm:col-span-2"
+            style={{
+              backgroundColor: "var(--color-bg-subtle)",
+              border: "1px solid var(--color-border)",
+            }}
+          >
+            <div className="flex items-center justify-between gap-2">
+              <span
+                className="text-xs"
+                style={{ color: "var(--color-text-secondary)" }}
+              >
+                Último evento
+              </span>
+              <Clock3 size={14} style={{ color: "var(--color-primary-500)" }} />
+            </div>
+            <div className="mt-1 flex flex-wrap items-center gap-2">
+              <Tag className="m-0">{stats.lastAction}</Tag>
+              <span
+                className="text-xs"
+                style={{ color: "var(--color-text-secondary)" }}
+              >
+                {stats.lastWhen}
+              </span>
+            </div>
+          </div>
+        </div>
       </div>
+
+      <AuditoriaTable data={items} loading={loading} onView={setSelected} />
+
+      <AuditoriaViewModal
+        open={!!selected}
+        item={selected}
+        onClose={() => setSelected(null)}
+      />
     </div>
   );
 };
