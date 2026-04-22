@@ -47,7 +47,8 @@ export const ConfirmModal = ({
       }}
       cancelButtonProps={{ disabled: loading }}
       closable={!loading}
-      mask={{ closable: !loading }}
+      maskClosable={!loading}
+      destroyOnClose
       width={420}
     >
       <div className="flex items-start gap-4 py-2">

@@ -1,3 +1,4 @@
+
 // src/shared/components/guards/PermissionGuard.tsx
 import { Navigate, Outlet } from "react-router-dom";
 import { useAuth } from "@/shared/hooks/useAuth";

@@ -15,7 +15,7 @@ export const useTableState = <F extends object = object>(
 ) => {
   const [state, setState] = useState<TableState<F>>({
     page: 1,
-    pageSize: 10,
+    pageSize: 6,
     search: "",
     sort: null,
     filters: initialFilters ?? ({} as F),
@@ -45,7 +45,7 @@ export const useTableState = <F extends object = object>(
   const reset = useCallback(() => {
     setState({
       page: 1,
-      pageSize: 10,
+      pageSize: 6,
       search: "",
       sort: null,
       filters: initialFilters ?? ({} as F),

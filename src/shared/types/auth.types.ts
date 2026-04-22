@@ -240,6 +240,6 @@ export type RegisterDto = RegisterFisicaDto | RegisterMoralDto;
 
 export interface ChangePasswordDto {
   current_password: string;
-  password: string;
-  password_confirmation: string;
+  new_password: string;
+  new_password_confirmation: string;
 }

@@ -89,6 +89,7 @@
   --color-bg-filter: #1e293bd3;
   --color-bg-card: #606e91;
   --color-bg-hero: #486594;
+  --color-bg-sidebar: #182033;
 
   /* Bordes y focus */
   --color-border: #6a7686;
@@ -928,4 +929,55 @@ body {
   .matriz-stats {
     grid-template-columns: repeat(2, minmax(84px, 1fr));
   }
+}
+/* ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+   DATATABLE SIMPLE
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ */
+/* CONTENEDOR GENERAL */
+.datatable-modern .ant-table {
+  background: transparent;
+}
+
+/* HEADER */
+.datatable-modern .ant-table-thead > tr > th {
+  background:"var(--color-primary-200)";
+  color: var(--color-text-primary);
+  font-weight: 600;
+  font-size: 13px;
+  border-bottom: 1px solid var(--color-border);
+}
+
+/* CELDAS */
+.datatable-modern .ant-table-tbody > tr > td {
+  border-bottom: 1px solid var(--color-border);
+  color: var(--color-text-primary);
+  transition: all 0.2s ease;
+}
+
+/* HOVER FILA */
+.datatable-modern .ant-table-tbody > tr:hover > td {
+  background: color-mix(in srgb, var(--color-primary-200) 20%, transparent);
+}
+
+/* FILA VACÍA */
+.datatable-modern .ant-empty-description {
+  color: var(--color-text-secondary);
+}
+
+/* PAGINACIÓN */
+.datatable-modern .ant-pagination {
+  padding: 10px;
+}
+
+.datatable-modern .ant-pagination-item {
+  border-radius: 50px;
+}
+
+.datatable-modern .ant-pagination-item-active {
+  background: var(--color-primary-400);
+  border-color: var(--color-primary-400);
+}
+
+.datatable-modern .ant-pagination-item-active a {
+  color: white;
 }

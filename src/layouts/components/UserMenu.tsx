@@ -1,6 +1,6 @@
 // src/layouts/components/UserMenu.tsx
 import { Avatar, Dropdown } from "antd";
-import { User, LogOut } from "lucide-react";
+import { LogOut, UserRound } from "lucide-react";
 import type { MenuProps } from "antd";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "@/shared/hooks/useAuth";
@@ -53,12 +53,11 @@ export const UserMenu = ({ collapsed }: UserMenuProps) => {
     },
     { type: "divider" },
     {
-      key: "perfil",
-      icon: <User size={14} />,
+      key: "profile",
+      icon: <UserRound size={14} />,
       label: "Mi Perfil",
-      onClick: () => navigate(APP_ROUTES.DASHBOARD.PERFIL),
+      onClick: () => navigate(APP_ROUTES.DASHBOARD.PROFILE),
     },
-    { type: "divider" },
     {
       key: "logout",
       icon: <LogOut size={14} />,
