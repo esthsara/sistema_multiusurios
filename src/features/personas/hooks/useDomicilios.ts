@@ -12,8 +12,6 @@ import type {
 export const useDomicilios = (personaId: number) => {
   const [domicilios, setDomicilios] = useState<Domicilio[]>([]);
   const [loading, setLoading] = useState(false);
-  const [deleteTarget, setDeleteTarget] = useState<Domicilio | null>(null);
-  const [deleting, setDeleting] = useState(false);
   const [markingPrincipalId, setMarkingPrincipalId] = useState<number | null>(
     null,
   );
@@ -67,22 +65,13 @@ export const useDomicilios = (personaId: number) => {
     }
   };
 
-  const handleDelete = async (domicilio: Domicilio) => {
-    setDeleteTarget(domicilio);
-  };
-
-  const confirmDelete = async () => {
-    if (!deleteTarget) return;
-    setDeleting(true);
+  const handleDelete = async (id: number) => {
     try {
-      await domiciliosService.remove(deleteTarget.id);
+      await domiciliosService.remove(id);
       toast.success("Domicilio eliminado");
-      setDeleteTarget(null);
       fetch();
     } catch {
       toast.error("Error al eliminar domicilio");
-    } finally {
-      setDeleting(false);
     }
   };
 
@@ -115,14 +104,10 @@ export const useDomicilios = (personaId: number) => {
     domicilios,
     loading,
     modal,
-    deleteTarget,
-    deleting,
     markingPrincipalId,
     handleSubmit,
     handleDelete,
-    confirmDelete,
     handleMarkPrincipal,
     handleRestore,
-    setDeleteTarget,
   };
 };

@@ -32,12 +32,20 @@ export const useContactos = (personaId: number) => {
 
   const handleSubmit = async (values: UpdateContactoDto) => {
     modal.setIsSubmitting(true);
+    const sanitizedValues: UpdateContactoDto = {
+      ...values,
+      valor: values.valor.trim(),
+    };
+
     try {
       if (modal.isEditMode && modal.selectedItem) {
-        await contactosService.update(modal.selectedItem.id, values);
+        await contactosService.update(modal.selectedItem.id, sanitizedValues);
         toast.success("Contacto actualizado");
       } else {
-        const dto: CreateContactoDto = { ...values, persona_id: personaId };
+        const dto: CreateContactoDto = {
+          ...sanitizedValues,
+          persona_id: personaId,
+        };
         await contactosService.create(dto);
         toast.success("Contacto creado");
       }
