@@ -19,13 +19,14 @@ export const RoleDetailModal = ({
       footer={null}
       onCancel={onClose}
       width={760}
+      centered
       destroyOnHidden
     >
       {!role ? (
         <Empty description="No hay información del rol" />
       ) : (
         <div className="pt-2">
-          <Descriptions bordered column={1} size="small" className="mb-4">
+          <Descriptions bordered column={2} size="middle" className="mb-4">
             <Descriptions.Item label="Nombre">{role.name}</Descriptions.Item>
             <Descriptions.Item label="Guard">
               {role.guard_name}

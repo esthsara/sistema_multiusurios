@@ -99,6 +99,7 @@ export const RolePermissionsModal = ({
       }
       onCancel={onClose}
       width={900}
+      centered
       destroyOnHidden
     >
       {!role ? (

@@ -51,6 +51,8 @@ export const RoleCopyModal = ({
       onCancel={handleCancel}
       okButtonProps={{ loading }}
       cancelButtonProps={{ disabled: loading }}
+      width={600}
+      centered
       destroyOnHidden
     >
       {/* 🔥 CONTEXTO MEJORADO */}
@@ -64,7 +66,7 @@ export const RoleCopyModal = ({
         }" incluyendo todos sus permisos y configuración actual.`}
       />
 
-      <Form form={form} layout="vertical" requiredMark={false}>
+      <Form form={form} layout="vertical" size="large" requiredMark={false}>
         <Form.Item
           name="newName"
           label="Nuevo nombre del rol"

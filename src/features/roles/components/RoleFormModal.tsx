@@ -329,6 +329,7 @@ export const RoleFormModal = ({
       onCancel={onCancel}
       footer={footer}
       width={760}
+      centered
       destroyOnHidden
     >
       <Spin spinning={loading}>
@@ -347,6 +348,7 @@ export const RoleFormModal = ({
         <Form
           form={form}
           layout="vertical"
+          size="large"
           requiredMark={false}
           className="mt-4"
         >

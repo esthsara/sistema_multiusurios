@@ -11,8 +11,10 @@ import {
   Form,
   Input,
   List,
+  Modal,
   Space,
   Tag,
+  Tooltip,
   Typography,
 } from "antd";
 import {
@@ -24,12 +26,17 @@ import {
   Fingerprint,
   IdCard,
   KeyRound,
+  Lock,
   LogIn,
   MapPin,
   Phone,
   RefreshCw,
   User,
   Users,
+  CheckCircle2,
+  XCircle,
+  CreditCard,
+  ClockIcon,
 } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
@@ -46,10 +53,8 @@ const { Title, Text, Paragraph } = Typography;
 const formatDateTime = (value: string | number | null | undefined) => {
   if (value === null || value === undefined || value === "")
     return "No disponible";
-
   const date = new Date(value);
   if (Number.isNaN(date.getTime())) return String(value);
-
   return new Intl.DateTimeFormat("es-ES", {
     dateStyle: "medium",
     timeStyle: "short",
@@ -58,13 +63,9 @@ const formatDateTime = (value: string | number | null | undefined) => {
 
 const formatDate = (value: string | null | undefined) => {
   if (!value) return "No disponible";
-
   const date = new Date(value);
   if (Number.isNaN(date.getTime())) return value;
-
-  return new Intl.DateTimeFormat("es-ES", {
-    dateStyle: "medium",
-  }).format(date);
+  return new Intl.DateTimeFormat("es-ES", { dateStyle: "medium" }).format(date);
 };
 
 const getInitials = (name: string) =>
@@ -72,30 +73,280 @@ const getInitials = (name: string) =>
     .split(" ")
     .filter(Boolean)
     .slice(0, 2)
-    .map((part) => part[0])
+    .map((p) => p[0])
     .join("")
     .toUpperCase() || "U";
 
-const infoItemStyle = {
-  background: "var(--color-bg-base-2)",
-  border: "1px solid var(--color-border)",
-  borderRadius: "var(--radius-card)",
-  padding: 16,
-  height: "100%",
-} as const;
-
-const cardBaseStyle = {
+// ─── Shared Styles ───────────────────────────────────────────────────────────
+const cardBase = {
   background: "var(--color-bg-base-2)",
   borderColor: "var(--color-border)",
   boxShadow: "var(--shadow-card)",
 } as const;
 
+const infoBox = {
+  background: "var(--color-bg-base-2)",
+  border: "1px solid var(--color-border)",
+  borderRadius: "var(--radius-card)",
+  padding: "12px 16px",
+} as const;
+
+// ─── Stat Card ────────────────────────────────────────────────────────────────
+const StatCard = ({
+  label,
+  value,
+  icon,
+}: {
+  label: string;
+  value: string | number;
+  icon: React.ReactNode;
+}) => (
+  <div
+    style={{
+      ...infoBox,
+      display: "flex",
+      alignItems: "center",
+      gap: 12,
+    }}
+  >
+    <div
+      style={{
+        width: 40,
+        height: 40,
+        borderRadius: 10,
+        background:
+          "var(--color-primary-50, rgba(var(--color-primary-rgb,99,102,241),0.08))",
+        display: "flex",
+        alignItems: "center",
+        justifyContent: "center",
+        color: "var(--color-primary-600)",
+        flexShrink: 0,
+      }}
+    >
+      {icon}
+    </div>
+    <div style={{ minWidth: 0 }}>
+      <Text
+        type="secondary"
+        style={{
+          fontSize: 11,
+          textTransform: "uppercase",
+          letterSpacing: "0.05em",
+        }}
+      >
+        {label}
+      </Text>
+      <div
+        style={{
+          color: "var(--color-text-primary)",
+          fontWeight: 700,
+          fontSize: 15,
+          overflow: "hidden",
+          textOverflow: "ellipsis",
+          whiteSpace: "nowrap",
+        }}
+      >
+        {value}
+      </div>
+    </div>
+  </div>
+);
+
+// ─── Permission Badge ─────────────────────────────────────────────────────────
+const PermBadge = ({ label }: { label: string }) => (
+  <Tooltip title={label}>
+    <span
+      style={{
+        display: "inline-flex",
+        alignItems: "center",
+        gap: 4,
+        padding: "3px 10px",
+        borderRadius: 6,
+        fontSize: 12,
+        fontWeight: 500,
+        background: "var(--color-bg-base-2)",
+        border: "1px solid var(--color-border)",
+        color: "var(--color-text-secondary)",
+        maxWidth: 220,
+        overflow: "hidden",
+        textOverflow: "ellipsis",
+        whiteSpace: "nowrap",
+        cursor: "default",
+      }}
+    >
+      <CheckCircle2
+        size={11}
+        style={{ color: "var(--color-success-500)", flexShrink: 0 }}
+      />
+      {label}
+    </span>
+  </Tooltip>
+);
+
+// ─── Branch Card ──────────────────────────────────────────────────────────────
+const BranchCard = ({
+  branch,
+}: {
+  branch: { id: string | number; nombre: string; clave?: string };
+}) => (
+  <div
+    style={{
+      ...infoBox,
+      display: "flex",
+      alignItems: "center",
+      gap: 12,
+    }}
+  >
+    <div
+      style={{
+        width: 36,
+        height: 36,
+        borderRadius: 8,
+        background: "var(--color-primary-50, rgba(99,102,241,0.08))",
+        display: "flex",
+        alignItems: "center",
+        justifyContent: "center",
+        color: "var(--color-primary-600)",
+        flexShrink: 0,
+      }}
+    >
+      <Building2 size={16} />
+    </div>
+    <div style={{ minWidth: 0 }}>
+      <Text
+        strong
+        style={{
+          color: "var(--color-text-primary)",
+          display: "block",
+          fontSize: 14,
+        }}
+      >
+        {branch.nombre}
+      </Text>
+      {branch.clave && (
+        <Text type="secondary" style={{ fontSize: 12 }}>
+          Clave: {branch.clave}
+        </Text>
+      )}
+    </div>
+  </div>
+);
+
+// ─── Change Password Modal ────────────────────────────────────────────────────
+const ChangePasswordModal = ({
+  open,
+  onClose,
+  onSubmit,
+  loading,
+}: {
+  open: boolean;
+  onClose: () => void;
+  onSubmit: (values: ChangePasswordDto) => Promise<void>;
+  loading: boolean;
+}) => {
+  const [form] = Form.useForm<ChangePasswordDto>();
+
+  const handleOk = async () => {
+    try {
+      const values = await form.validateFields();
+      await onSubmit(values);
+      form.resetFields();
+    } catch {
+      // validation errors handled by form
+    }
+  };
+
+  return (
+    <Modal
+      open={open}
+      onCancel={onClose}
+      onOk={handleOk}
+      confirmLoading={loading}
+      title={
+        <Space>
+          <Lock size={16} style={{ color: "var(--color-primary-600)" }} />
+          <span style={{ color: "var(--color-text-primary)" }}>
+            Cambiar contraseña
+          </span>
+        </Space>
+      }
+      okText={loading ? "Actualizando..." : "Actualizar contraseña"}
+      cancelText="Cancelar"
+      width={440}
+      destroyOnClose
+    >
+      <Alert
+        type="info"
+        showIcon
+        style={{ marginBottom: 18, marginTop: 8 }}
+        message="Al cambiar tu contraseña, la sesión actual se cerrará automáticamente."
+      />
+      <Form
+        form={form}
+        layout="vertical"
+        requiredMark={false}
+        autoComplete="off"
+      >
+        <Form.Item
+          name="current_password"
+          label="Contraseña actual"
+          rules={[{ required: true, message: "Ingresa tu contraseña actual" }]}
+        >
+          <Input.Password
+            size="large"
+            placeholder="••••••••"
+            prefix={<KeyRound size={16} />}
+          />
+        </Form.Item>
+        <Form.Item
+          name="new_password"
+          label="Nueva contraseña"
+          rules={[
+            { required: true, message: "Ingresa la nueva contraseña" },
+            { min: 8, message: "Debe tener al menos 8 caracteres" },
+          ]}
+        >
+          <Input.Password
+            size="large"
+            placeholder="Nueva contraseña"
+            prefix={<KeyRound size={16} />}
+          />
+        </Form.Item>
+        <Form.Item
+          name="new_password_confirmation"
+          label="Confirmar nueva contraseña"
+          dependencies={["new_password"]}
+          rules={[
+            { required: true, message: "Confirma la nueva contraseña" },
+            ({ getFieldValue }) => ({
+              validator(_, value) {
+                if (!value || getFieldValue("new_password") === value)
+                  return Promise.resolve();
+                return Promise.reject(
+                  new Error("Las contraseñas no coinciden"),
+                );
+              },
+            }),
+          ]}
+        >
+          <Input.Password
+            size="large"
+            placeholder="Repite la nueva contraseña"
+            prefix={<Shield size={16} />}
+          />
+        </Form.Item>
+      </Form>
+    </Modal>
+  );
+};
+
+// ─── Main Page ────────────────────────────────────────────────────────────────
 const ProfilePage = () => {
   const navigate = useNavigate();
   const { user, sucursalActiva, isAuthenticated } = useAuth();
   const { logout } = useAuthActions();
-  const [passwordForm] = Form.useForm<ChangePasswordDto>();
   const [isChangingPassword, setIsChangingPassword] = useState(false);
+  const [passwordModalOpen, setPasswordModalOpen] = useState(false);
 
   const displayName = safeText(user?.persona.nombreCompleto, "Usuario", 140);
   const email = safeText(user?.email, "Sin email", 140);
@@ -132,16 +383,11 @@ const ProfilePage = () => {
         }),
         new_password_confirmation: sanitizeInput(
           values.new_password_confirmation,
-          {
-            trim: false,
-            maxLength: 256,
-            stripTags: false,
-          },
+          { trim: false, maxLength: 256, stripTags: false },
         ),
       };
-
       await authService.changePassword(dto);
-      passwordForm.resetFields();
+      setPasswordModalOpen(false);
       toast.success("Contraseña actualizada. Debes iniciar sesión nuevamente.");
       await logout();
     } catch (error) {
@@ -149,11 +395,9 @@ const ProfilePage = () => {
         errors?: Record<string, string[]>;
         message?: string;
       };
-
       const firstError = apiError.errors
         ? Object.values(apiError.errors)[0]?.[0]
         : null;
-
       toast.error(
         safeText(
           firstError ?? apiError.message,
@@ -166,23 +410,11 @@ const ProfilePage = () => {
     }
   };
 
-  const photoLabel = user?.persona.fotoPatch
-    ? safeText(user.persona.fotoPatch, "Sin foto", 120)
-    : "Sin foto";
-
   return (
     <div className="min-h-screen px-4 py-6 md:px-6 md:py-8 lg:px-8">
-      <div className="mx-auto flex w-full max-w-7xl flex-col gap-[10px]">
-        <Card
-          className="shadow-none"
-          styles={{
-            body: {
-              background: "var(--color-bg-base-2)",
-              border: "1px solid var(--color-border)",
-              borderRadius: "var(--radius-card)",
-            },
-          }}
-        >
+      <div className="mx-auto flex w-full max-w-7xl flex-col gap-4">
+        {/* ── Header ─────────────────────────────────────────────────────── */}
+        <Card style={cardBase}>
           <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
             <div className="flex items-center gap-4">
               <Badge
@@ -199,7 +431,7 @@ const ProfilePage = () => {
                   style={{
                     backgroundColor: "var(--color-primary-600)",
                     color: "var(--color-text-inverse)",
-                    fontSize: 24,
+                    fontSize: 26,
                     fontWeight: 700,
                   }}
                 >
@@ -214,30 +446,20 @@ const ProfilePage = () => {
                 >
                   {displayName}
                 </Title>
-                <Space wrap size={[8, 8]} style={{ marginTop: 8 }}>
-                  <Tag color="blue" icon={<User size={12} />}>
+                <Space wrap size={[6, 6]} style={{ marginTop: 6 }}>
+                  <Tag color="blue" icon={<User size={11} />}>
                     {username}
                   </Tag>
                   <Tag
                     color={user?.activo ? "green" : "red"}
-                    icon={<BadgeCheck size={12} />}
+                    icon={<BadgeCheck size={11} />}
                   >
-                    {user?.activo ? "Usuario activo" : "Usuario inactivo"}
+                    {user?.activo ? "Activo" : "Inactivo"}
                   </Tag>
-                  <Tag color="geekblue" icon={<Shield size={12} />}>
+                  <Tag color="geekblue" icon={<Shield size={11} />}>
                     {primaryRole}
                   </Tag>
                 </Space>
-                <Paragraph
-                  style={{
-                    marginTop: 12,
-                    marginBottom: 0,
-                    color: "var(--color-text-secondary)",
-                  }}
-                >
-                  Vista completa del perfil con la información disponible en la
-                  sesión actual.
-                </Paragraph>
               </div>
             </div>
 
@@ -254,6 +476,12 @@ const ProfilePage = () => {
               >
                 Refrescar
               </Button>
+              <Button
+                icon={<Lock size={16} />}
+                onClick={() => setPasswordModalOpen(true)}
+              >
+                Cambiar contraseña
+              </Button>
               <Button danger onClick={logout}>
                 Cerrar sesión
               </Button>
@@ -261,22 +489,45 @@ const ProfilePage = () => {
           </div>
         </Card>
 
-        <div className="grid gap-[10px] xl:grid-cols-[1.6fr_1fr]">
-          <div className="space-y-[40px]">
+        {/* ── Stats Row ───────────────────────────────────────────────────── */}
+        <div className="grid grid-cols-2 gap-3 md:grid-cols-4">
+          <StatCard label="Correo" value={email} icon={<Mail size={18} />} />
+          <StatCard
+            label="Rol principal"
+            value={primaryRole}
+            icon={<Shield size={18} />}
+          />
+          <StatCard
+            label="Permisos"
+            value={permissionTags.length}
+            icon={<CheckCircle2 size={18} />}
+          />
+          <StatCard
+            label="Sucursales"
+            value={branchList.length}
+            icon={<Building2 size={18} />}
+          />
+        </div>
+
+        {/* ── Main Grid ───────────────────────────────────────────────────── */}
+        <div className="grid gap-4 xl:grid-cols-[1.6fr_1fr]">
+          {/* Left: Personal Data + Session */}
+          <div className="flex flex-col gap-4">
             <Card
               title={
                 <span style={{ color: "var(--color-text-primary)" }}>
                   Datos personales
                 </span>
               }
-              style={cardBaseStyle}
+              style={cardBase}
             >
               <Descriptions column={1} bordered size="middle">
                 <Descriptions.Item
                   label={
-                    <span>
-                      <IdCard size={14} /> Documento principal
-                    </span>
+                    <>
+                      <IdCard size={13} style={{ marginRight: 6 }} />
+                      Documento
+                    </>
                   }
                 >
                   {safeText(
@@ -287,66 +538,75 @@ const ProfilePage = () => {
                 </Descriptions.Item>
                 <Descriptions.Item
                   label={
-                    <span>
-                      <Mail size={14} /> Correo electrónico
-                    </span>
+                    <>
+                      <Mail size={13} style={{ marginRight: 6 }} />
+                      Correo electrónico
+                    </>
                   }
                 >
                   {email}
                 </Descriptions.Item>
                 <Descriptions.Item
                   label={
-                    <span>
-                      <User size={14} /> Usuario
-                    </span>
+                    <>
+                      <User size={13} style={{ marginRight: 6 }} />
+                      Usuario
+                    </>
                   }
                 >
                   {username}
                 </Descriptions.Item>
                 <Descriptions.Item
                   label={
-                    <span>
-                      <Building2 size={14} /> Tipo de persona
-                    </span>
+                    <>
+                      <Building2 size={13} style={{ marginRight: 6 }} />
+                      Tipo de persona
+                    </>
                   }
                 >
                   {personType}
                 </Descriptions.Item>
                 <Descriptions.Item
                   label={
-                    <span>
-                      <MapPin size={14} /> Estado de persona
-                    </span>
+                    <>
+                      <MapPin size={13} style={{ marginRight: 6 }} />
+                      Estado
+                    </>
                   }
                 >
                   {personStatus}
                 </Descriptions.Item>
                 <Descriptions.Item
                   label={
-                    <span>
-                      <Phone size={14} /> Fecha de nacimiento
-                    </span>
+                    <>
+                      <Phone size={13} style={{ marginRight: 6 }} />
+                      Fecha de nacimiento
+                    </>
                   }
                 >
                   {formatDate(user?.persona.fechaNacimiento)}
                 </Descriptions.Item>
                 <Descriptions.Item
                   label={
-                    <span>
-                      <Fingerprint size={14} /> Género
-                    </span>
+                    <>
+                      <Fingerprint size={13} style={{ marginRight: 6 }} />
+                      Género
+                    </>
                   }
                 >
                   {safeText(user?.persona.genero, "No disponible", 120)}
                 </Descriptions.Item>
                 <Descriptions.Item
                   label={
-                    <span>
-                      <KeyRound size={14} /> Foto de perfil
-                    </span>
+                    <>
+                      <CreditCard size={13} style={{ marginRight: 6 }} />
+                      Foto de perfil
+                    </>
                   }
                 >
-                  {photoLabel}
+                  {user?.persona.fotoPatch
+                    ? safeText(user.persona.fotoPatch, "Sin foto", 120)
+                    : "Sin foto"}
                 </Descriptions.Item>
               </Descriptions>
             </Card>
@@ -357,331 +617,223 @@ const ProfilePage = () => {
                   Seguridad y sesión
                 </span>
               }
-              style={cardBaseStyle}
+              style={cardBase}
+              extra={
+                <Button
+                  size="small"
+                  icon={<Lock size={13} />}
+                  onClick={() => setPasswordModalOpen(true)}
+                >
+                  Cambiar contraseña
+                </Button>
+              }
             >
               <Descriptions column={1} bordered size="middle">
                 <Descriptions.Item
                   label={
-                    <span>
-                      <KeyRound size={14} /> Estado de autenticación
-                    </span>
+                    <>
+                      <KeyRound size={13} style={{ marginRight: 6 }} />
+                      Autenticación
+                    </>
                   }
                 >
-                  {isAuthenticated ? "Autenticado" : "No autenticado"}
+                  <Space size={6}>
+                    {isAuthenticated ? (
+                      <>
+                        <CheckCircle2
+                          size={14}
+                          style={{ color: "var(--color-success-500)" }}
+                        />{" "}
+                        Autenticado
+                      </>
+                    ) : (
+                      <>
+                        <XCircle
+                          size={14}
+                          style={{ color: "var(--color-danger-500)" }}
+                        />{" "}
+                        No autenticado
+                      </>
+                    )}
+                  </Space>
                 </Descriptions.Item>
                 <Descriptions.Item
                   label={
-                    <span>
-                      <LogIn size={14} /> Inicio de sesión
-                    </span>
+                    <>
+                      <LogIn size={13} style={{ marginRight: 6 }} />
+                      Inicio de sesión
+                    </>
                   }
                 >
-                  {formatDateTime(loginTime)}
+                  <Space size={6}>
+                    <ClockIcon
+                      size={13}
+                      style={{ color: "var(--color-text-secondary)" }}
+                    />
+                    {formatDateTime(loginTime)}
+                  </Space>
                 </Descriptions.Item>
                 <Descriptions.Item
                   label={
-                    <span>
-                      <Shield size={14} /> ID de sesión
-                    </span>
+                    <>
+                      <Shield size={13} style={{ marginRight: 6 }} />
+                      ID de sesión
+                    </>
                   }
                 >
-                  {user?.sessionId ?? "No disponible"}
+                  <Text code style={{ fontSize: 12 }}>
+                    {user?.sessionId ?? "No disponible"}
+                  </Text>
                 </Descriptions.Item>
                 <Descriptions.Item
                   label={
-                    <span>
-                      <Building2 size={14} /> Sucursal activa
-                    </span>
+                    <>
+                      <Building2 size={13} style={{ marginRight: 6 }} />
+                      Sucursal activa
+                    </>
                   }
                 >
-                  {sucursalActiva
-                    ? `${sucursalActiva.nombre} (${sucursalActiva.clave})`
-                    : "No hay sucursal activa"}
+                  {sucursalActiva ? (
+                    <>
+                      <Tag color="green">{sucursalActiva.nombre}</Tag>
+                      <Text type="secondary" style={{ fontSize: 12 }}>
+                        ({sucursalActiva.clave})
+                      </Text>
+                    </>
+                  ) : (
+                    <Text type="secondary">Sin sucursal activa</Text>
+                  )}
                 </Descriptions.Item>
                 <Descriptions.Item
                   label={
-                    <span>
-                      <Users size={14} /> Sucursales asignadas
-                    </span>
+                    <>
+                      <Users size={13} style={{ marginRight: 6 }} />
+                      Sucursales asignadas
+                    </>
                   }
                 >
-                  {branchList.length}
+                  <Tag color="blue">{branchList.length}</Tag>
                 </Descriptions.Item>
               </Descriptions>
-
-              <Divider
-                style={{
-                  margin: "18px 0",
-                  borderColor: "var(--color-border)",
-                }}
-              />
-
-              <div style={infoItemStyle}>
-                <Title
-                  level={5}
-                  style={{ marginTop: 0, color: "var(--color-text-primary)" }}
-                >
-                  Cambiar contraseña
-                </Title>
-                <Paragraph
-                  style={{ marginTop: 8, color: "var(--color-text-secondary)" }}
-                >
-                  Por seguridad se solicita tu contraseña actual antes de
-                  registrar una nueva.
-                </Paragraph>
-
-                <Alert
-                  type="info"
-                  showIcon
-                  style={{ marginBottom: 14 }}
-                  message="Al cambiarla, tu sesión actual se cerrará automáticamente."
-                />
-
-                <Form
-                  form={passwordForm}
-                  layout="vertical"
-                  requiredMark={false}
-                  autoComplete="off"
-                  onFinish={handleChangePassword}
-                >
-                  <Form.Item
-                    name="current_password"
-                    label="Contraseña actual"
-                    rules={[
-                      {
-                        required: true,
-                        message: "Ingresa tu contraseña actual",
-                      },
-                    ]}
-                  >
-                    <Input.Password
-                      size="large"
-                      placeholder="••••••••"
-                      prefix={<KeyRound size={16} />}
-                    />
-                  </Form.Item>
-
-                  <Form.Item
-                    name="new_password"
-                    label="Nueva contraseña"
-                    rules={[
-                      {
-                        required: true,
-                        message: "Ingresa la nueva contraseña",
-                      },
-                      {
-                        min: 8,
-                        message: "Debe tener al menos 8 caracteres",
-                      },
-                    ]}
-                  >
-                    <Input.Password
-                      size="large"
-                      placeholder="Nueva contraseña"
-                      prefix={<KeyRound size={16} />}
-                    />
-                  </Form.Item>
-
-                  <Form.Item
-                    name="new_password_confirmation"
-                    label="Confirmar nueva contraseña"
-                    dependencies={["new_password"]}
-                    rules={[
-                      {
-                        required: true,
-                        message: "Confirma la nueva contraseña",
-                      },
-                      ({ getFieldValue }) => ({
-                        validator(_, value) {
-                          if (
-                            !value ||
-                            getFieldValue("new_password") === value
-                          ) {
-                            return Promise.resolve();
-                          }
-                          return Promise.reject(
-                            new Error("Las contraseñas no coinciden"),
-                          );
-                        },
-                      }),
-                    ]}
-                  >
-                    <Input.Password
-                      size="large"
-                      placeholder="Repite la nueva contraseña"
-                      prefix={<Shield size={16} />}
-                    />
-                  </Form.Item>
-
-                  <Button
-                    type="primary"
-                    htmlType="submit"
-                    loading={isChangingPassword}
-                    style={{ height: 42, fontWeight: 600 }}
-                  >
-                    {isChangingPassword
-                      ? "Actualizando..."
-                      : "Actualizar contraseña"}
-                  </Button>
-                </Form>
-              </div>
             </Card>
           </div>
 
-          <div className="space-y-[28px]">
+          {/* Right: Roles & Permissions */}
+          <div className="flex flex-col gap-4">
             <Card
               title={
                 <span style={{ color: "var(--color-text-primary)" }}>
-                  Resumen rápido
+                  Roles asignados
                 </span>
               }
-              style={cardBaseStyle}
+              style={cardBase}
             >
-              <div className="space-y-3">
-                <div style={infoItemStyle}>
-                  <Text type="secondary">Nombre completo</Text>
-                  <div
-                    style={{
-                      color: "var(--color-text-primary)",
-                      fontWeight: 600,
-                    }}
-                  >
-                    {displayName}
-                  </div>
+              {roleTags.length > 0 ? (
+                <div className="flex flex-col gap-2">
+                  {roleTags.map((role) => (
+                    <div
+                      key={`${role.id}-${role.name}`}
+                      style={{
+                        ...infoBox,
+                        display: "flex",
+                        alignItems: "center",
+                        gap: 10,
+                      }}
+                    >
+                      <div
+                        style={{
+                          width: 32,
+                          height: 32,
+                          borderRadius: 8,
+                          background:
+                            "var(--color-primary-50, rgba(99,102,241,0.08))",
+                          display: "flex",
+                          alignItems: "center",
+                          justifyContent: "center",
+                          color: "var(--color-primary-600)",
+                          flexShrink: 0,
+                        }}
+                      >
+                        <Shield size={15} />
+                      </div>
+                      <Text
+                        strong
+                        style={{
+                          color: "var(--color-text-primary)",
+                          fontSize: 14,
+                        }}
+                      >
+                        {role.name}
+                      </Text>
+                    </div>
+                  ))}
                 </div>
-                <div style={infoItemStyle}>
-                  <Text type="secondary">Correo</Text>
-                  <div
-                    style={{
-                      color: "var(--color-text-primary)",
-                      fontWeight: 600,
-                    }}
-                  >
-                    {email}
-                  </div>
-                </div>
-                <div style={infoItemStyle}>
-                  <Text type="secondary">Rol principal</Text>
-                  <div
-                    style={{
-                      color: "var(--color-text-primary)",
-                      fontWeight: 600,
-                    }}
-                  >
-                    {primaryRole}
-                  </div>
-                </div>
-                <div style={infoItemStyle}>
-                  <Text type="secondary">Permisos</Text>
-                  <div
-                    style={{
-                      color: "var(--color-text-primary)",
-                      fontWeight: 600,
-                    }}
-                  >
-                    {permissionTags.length}
-                  </div>
-                </div>
-              </div>
+              ) : (
+                <Empty
+                  image={Empty.PRESENTED_IMAGE_SIMPLE}
+                  description="Sin roles asignados"
+                />
+              )}
             </Card>
 
             <Card
               title={
-                <span style={{ color: "var(--color-text-primary) " }}>
-                  Roles y permisos
-                </span>
+                <Space>
+                  <span style={{ color: "var(--color-text-primary)" }}>
+                    Permisos
+                  </span>
+                  <Tag color="blue" style={{ fontWeight: 600 }}>
+                    {permissionTags.length}
+                  </Tag>
+                </Space>
               }
-              style={cardBaseStyle}
-              className="space-y-[28px]"
+              style={cardBase}
             >
-              <Space direction="vertical" size={10} style={{ width: "100%" }}>
-                <div>
-                  <Text type="secondary">Roles</Text>
-                  <div className="mt-2 flex flex-wrap gap-2">
-                    {roleTags.length > 0 ? (
-                      roleTags.map((role) => (
-                        <Tag
-                          key={`${role.id}-${role.name}`}
-                          color="geekblue"
-                          icon={<Shield size={12} />}
-                        >
-                          {role.name}
-                        </Tag>
-                      ))
-                    ) : (
-                      <Empty
-                        image={Empty.PRESENTED_IMAGE_SIMPLE}
-                        description="Sin roles asignados"
-                      />
-                    )}
-                  </div>
-                </div>
-
-                <Divider
+              {permissionTags.length > 0 ? (
+                <div
                   style={{
-                    margin: "30px 0",
-                    borderColor: "var(--color-border)",
+                    maxHeight: 300,
+                    overflowY: "auto",
+                    display: "flex",
+                    flexWrap: "wrap",
+                    gap: 8,
+                    padding: "4px 0",
                   }}
-                />
-
-                <div>
-                  <Text type="secondary">Permisos</Text>
-                  <List
-                    size="small"
-                    bordered={false}
-                    style={{ maxHeight: 280, overflowY: "auto" }}
-                    dataSource={permissionTags}
-                    locale={{
-                      emptyText: (
-                        <Empty
-                          image={Empty.PRESENTED_IMAGE_SIMPLE}
-                          description="Sin permisos asignados"
-                        />
-                      ),
-                    }}
-                    renderItem={(permission) => (
-                      <List.Item
-                        style={{
-                          paddingInline: 0,
-                          borderBottomColor: "var(--color-border)",
-                        }}
-                      >
-                        <Tag color="blue" style={{ marginInlineEnd: 0 }}>
-                          {permission}
-                        </Tag>
-                      </List.Item>
-                    )}
-                  />
+                >
+                  {permissionTags.map((permission) => (
+                    <PermBadge key={permission} label={permission} />
+                  ))}
                 </div>
-              </Space>
+              ) : (
+                <Empty
+                  image={Empty.PRESENTED_IMAGE_SIMPLE}
+                  description="Sin permisos asignados"
+                />
+              )}
             </Card>
           </div>
         </div>
 
+        {/* ── Branches ────────────────────────────────────────────────────── */}
         <Card
           title={
-            <span style={{ color: "var(--color-text-primary)" }}>
-              Sucursales asignadas
-            </span>
+            <Space>
+              <span style={{ color: "var(--color-text-primary)" }}>
+                Sucursales asignadas
+              </span>
+              {branchList.length > 0 && (
+                <Tag color="blue" style={{ fontWeight: 600 }}>
+                  {branchList.length}
+                </Tag>
+              )}
+            </Space>
           }
-          style={cardBaseStyle}
+          style={cardBase}
         >
           {branchList.length > 0 ? (
-            <div className="grid gap-[30px] md:grid-cols-2 xl:grid-cols-3">
+            <div className="grid gap-3 md:grid-cols-2 xl:grid-cols-3">
               {branchList.map((branch) => (
-                <div
-                  key={branch.id}
-                  style={{
-                    ...infoItemStyle,
-                    display: "flex",
-                    flexDirection: "column",
-                    gap: 8,
-                  }}
-                >
-                  <Text strong style={{ color: "var(--color-text-primary)" }}>
-                    {branch.nombre}
-                  </Text>
-                </div>
+                <BranchCard key={branch.id} branch={branch} />
               ))}
             </div>
           ) : (
@@ -689,6 +841,14 @@ const ProfilePage = () => {
           )}
         </Card>
       </div>
+
+      {/* ── Password Modal ───────────────────────────────────────────────── */}
+      <ChangePasswordModal
+        open={passwordModalOpen}
+        onClose={() => setPasswordModalOpen(false)}
+        onSubmit={handleChangePassword}
+        loading={isChangingPassword}
+      />
     </div>
   );
 };

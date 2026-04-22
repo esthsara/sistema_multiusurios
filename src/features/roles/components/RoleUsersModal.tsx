@@ -75,6 +75,7 @@ export const RoleUsersModal = ({
       footer={null}
       onCancel={onClose}
       width={820}
+      centered
       destroyOnHidden
     >
       <Table<RolUsuarioItem>

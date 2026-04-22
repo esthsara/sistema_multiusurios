@@ -147,19 +147,28 @@ const RolesPage = () => {
         </span>
       ),
     },
-    {/*
-      title: "Guard",
-      dataIndex: "guard_name",
-      key: "guard_name",
-      width: 140,
-      render: (guardName: string) => <Tag color="blue">{guardName}</Tag>,*/
+    {
+      title: "Nro Permisos",
+      key: "nroPermisos",
+      width: 130,
+      align: "center",
+      render: (_, r: any) => (
+        <span style={{ color: "var(--color-text-secondary)", fontWeight: 600 }}>
+          {r.permissions_count ?? r.permissions?.length ?? "—"}
+        </span>
+      ),
     },
     {
       title: "Nro Usuarios",
       dataIndex: "users_count",
       key: "users_count",
       width: 130,
-      render: (value?: number) => value ?? 0,
+      align: "center",
+      render: (value?: number) => (
+        <span style={{ color: "var(--color-text-secondary)", fontWeight: 600 }}>
+          {value ?? 0}
+        </span>
+      ),
     },
     {
       title: "Estado",
