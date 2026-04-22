@@ -1,33 +1,15 @@
 // src/features/personas/components/detalle/PersonaDomicilios.tsx
-import {
-  Button,
-  Modal,
-  Form,
-  Input,
-  Select,
-  Switch,
-  Table,
-  Tag,
-  Tooltip,
-} from "antd";
-import { Plus, Pencil, Trash2, Star } from "lucide-react";
-import type { TableColumnsType } from "antd";
+import { useState } from "react";
+import { Button } from "antd";
+import { Plus } from "lucide-react";
 import { ConfirmModal } from "@/shared/components/molecules/ConfirmModal";
 import { Can } from "@/shared/components/atoms/Can";
 import { useDomicilios } from "../../hooks/useDomicilios";
-import type {
-  Domicilio,
-  CreateDomicilioDto,
-  UpdateDomicilioDto,
-  TipoDomicilio,
-} from "../../types/persona-detalle.types";
+import type { Domicilio } from "./Domicilio/domicilio.constants";
 
-const TIPO_OPTIONS: { value: TipoDomicilio; label: string }[] = [
-  { value: "FISCAL", label: "Fiscal" },
-  { value: "PARTICULAR", label: "Particular" },
-  { value: "ENTREGA", label: "Entrega" },
-  { value: "OTRO", label: "Otro" },
-];
+import { DomicilioTable } from "./Domicilio/DomicilioTable";
+import { DomicilioFormModal } from "./Domicilio/DomicilioFormModal";
+import { DomicilioViewModal } from "./Domicilio/DomicilioViewModal";
 
 interface PersonaDomiciliosProps {
   personaId: number;
@@ -38,227 +20,73 @@ export const PersonaDomicilios = ({ personaId }: PersonaDomiciliosProps) => {
     domicilios,
     loading,
     modal,
-    deleteTarget,
-    deleting,
     markingPrincipalId,
     handleSubmit,
-    confirmDelete,
+    handleDelete,
     handleMarkPrincipal,
-    setDeleteTarget,
   } = useDomicilios(personaId);
 
-  const [form] = Form.useForm();
+  const [viewItem, setViewItem] = useState<Domicilio | null>(null);
+  const [deleteTarget, setDeleteTarget] = useState<Domicilio | null>(null);
+  const [deleting, setDeleting] = useState(false);
 
-  const openEdit = (item: Domicilio) => {
-    modal.openEdit(item);
-    form.setFieldsValue(item);
-  };
+  const confirmDelete = async () => {
+    if (!deleteTarget) return;
 
-  const onSubmit = async () => {
+    setDeleting(true);
     try {
-      const values = await form.validateFields();
-      await handleSubmit(values as CreateDomicilioDto | UpdateDomicilioDto);
-    } catch {
-      /* validación antd */
+      await handleDelete(deleteTarget.id);
+
+      if (viewItem?.id === deleteTarget.id) {
+        setViewItem(null);
+      }
+      setDeleteTarget(null);
+    } finally {
+      setDeleting(false);
     }
   };
 
-  const columns: TableColumnsType<Domicilio> = [
-    {
-      title: "Tipo",
-      key: "tipo",
-      width: 110,
-      render: (_, r) => <Tag>{r.tipo_texto}</Tag>,
-    },
-    { title: "País", dataIndex: "pais", width: 100 },
-    { title: "Ciudad", dataIndex: "ciudad", width: 120 },
-    { title: "Dirección", dataIndex: "direccion" },
-    { title: "C.P.", dataIndex: "codigo_postal", width: 80 },
-    {
-      title: "Principal",
-      key: "principal",
-      width: 170,
-      render: (_, r) =>
-        r.principal ? (
-          <Tag color="green">Principal</Tag>
-        ) : (
-          <Can permission="personas.editar">
-            <Tooltip title="Marcar como principal">
-              <Button
-                size="small"
-                type="text"
-                icon={<Star size={14} />}
-                className="rounded-lg"
-                style={{
-                  backgroundColor: "var(--color-bg-subtle)",
-                  border: "1px solid var(--color-border)",
-                }}
-                loading={markingPrincipalId === r.id}
-                onClick={() => handleMarkPrincipal(r)}
-              ></Button>
-            </Tooltip>
-          </Can>
-        ),
-    },
-    {
-      title: "Acciones",
-      key: "acciones",
-      fixed: "right",
-      width: 90,
-      render: (_, record) => (
-        <div className="flex gap-1">
-          <Can permission="personas.editar">
-            <Tooltip title="Editar">
-              <Button
-                type="text"
-                size="small"
-                icon={<Pencil size={14} />}
-                className="rounded-lg"
-                style={{
-                  backgroundColor: "var(--color-bg-subtle)",
-                  border: "1px solid var(--color-border)",
-                }}
-                onClick={() => openEdit(record)}
-              />
-            </Tooltip>
-          </Can>
-          <Can permission="personas.eliminar">
-            <Tooltip title="Eliminar">
-              <Button
-                type="text"
-                size="small"
-                danger
-                icon={<Trash2 size={14} />}
-                className="rounded-lg"
-                style={{
-                  backgroundColor: "var(--color-alert-danger-bg)",
-                  border: "1px solid var(--color-danger-200)",
-                }}
-                onClick={() => setDeleteTarget(record)}
-              />
-            </Tooltip>
-          </Can>
-        </div>
-      ),
-    },
-  ];
-
   return (
-    <div>
-      <div className="flex justify-between items-center mb-4">
-        <h3
-          className="font-semibold text-base m-0"
-          style={{ color: "var(--color-text-primary)" }}
-        >
-          Domicilios
-        </h3>
+    <div className="space-y-4">
+      <div className="flex justify-between items-center">
+        <h3 className="text-base font-semibold">Domicilios</h3>
         <Can permission="personas.crear">
-          <Button
-            type="primary"
-            size="small"
-            icon={<Plus size={14} />}
-            onClick={() => {
-              modal.openCreate();
-              form.resetFields();
-            }}
-            className="rounded-lg shadow-sm"
-          >
-            Agregar Domicilio
+          <Button icon={<Plus size={14} />} onClick={modal.openCreate}>
+            Nuevo
           </Button>
         </Can>
       </div>
 
-      <div
-        style={{
-          backgroundColor: "var(--color-bg-base)",
-          border: "1px solid var(--color-border)",
-          borderRadius: "var(--radius-card)",
-          overflow: "hidden",
-          boxShadow: "0 6px 20px rgba(2, 6, 23, 0.04)",
-        }}
-      >
-        <Table
-          dataSource={domicilios}
-          columns={columns}
-          rowKey="id"
-          loading={loading}
-          pagination={false}
-          size="small"
-          scroll={{ x: 600 }}
-          style={{ backgroundColor: "transparent" }}
-        />
-      </div>
+      <DomicilioTable
+        data={domicilios}
+        loading={loading}
+        markingPrincipalId={markingPrincipalId}
+        onMarkPrincipal={handleMarkPrincipal}
+        onView={setViewItem}
+        onEdit={modal.openEdit}
+        onDelete={setDeleteTarget}
+      />
 
-      <Modal
+      <DomicilioFormModal
         open={modal.isOpen}
-        title={modal.isEditMode ? "Editar Domicilio" : "Nuevo Domicilio"}
-        onOk={onSubmit}
+        isEdit={modal.isEditMode}
+        loading={modal.isSubmitting}
+        item={modal.selectedItem}
+        onSubmit={handleSubmit}
         onCancel={modal.close}
-        okText={modal.isEditMode ? "Actualizar" : "Crear"}
-        cancelText="Cancelar"
-        okButtonProps={{ loading: modal.isSubmitting }}
-        width={760}
-        centered
-        destroyOnClose
-      >
-        <Form
-          form={form}
-          layout="vertical"
-          size="large"
-          requiredMark={false}
-          className="mt-4"
-        >
-          <div className="grid grid-cols-2 gap-x-4">
-            <Form.Item
-              name="tipo"
-              label="Tipo"
-              rules={[{ required: true, message: "Selecciona el tipo" }]}
-            >
-              <Select options={TIPO_OPTIONS} />
-            </Form.Item>
-            <Form.Item
-              name="pais"
-              label="País"
-              rules={[{ required: true, message: "Ingresa el país" }]}
-            >
-              <Input placeholder="Ej: Bolivia" />
-            </Form.Item>
-          </div>
-          <div className="grid grid-cols-2 gap-x-4">
-            <Form.Item
-              name="ciudad"
-              label="Ciudad"
-              rules={[{ required: true, message: "Ingresa la ciudad" }]}
-            >
-              <Input placeholder="Ej: Santa Cruz" />
-            </Form.Item>
-            <Form.Item name="codigo_postal" label="Código Postal">
-              <Input placeholder="Ej: 12345" />
-            </Form.Item>
-          </div>
-          <Form.Item
-            name="direccion"
-            label="Dirección"
-            rules={[{ required: true, message: "Ingresa la dirección" }]}
-          >
-            <Input placeholder="Ej: Av. Principal #123" />
-          </Form.Item>
-          <Form.Item
-            name="principal"
-            label="¿Es principal?"
-            valuePropName="checked"
-          >
-            <Switch />
-          </Form.Item>
-        </Form>
-      </Modal>
+      />
+
+      <DomicilioViewModal
+        open={!!viewItem}
+        item={viewItem}
+        onClose={() => setViewItem(null)}
+      />
 
       <ConfirmModal
         open={!!deleteTarget}
-        title="¿Eliminar este domicilio?"
-        description="El domicilio será eliminado. Puedes restaurarlo más adelante."
+        title="Eliminar domicilio"
+        description="Esta acción es permanente"
         confirmText="Eliminar"
-        danger
         loading={deleting}
         onConfirm={confirmDelete}
         onCancel={() => setDeleteTarget(null)}
