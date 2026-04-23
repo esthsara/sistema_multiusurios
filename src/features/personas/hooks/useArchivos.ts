@@ -2,21 +2,22 @@
 import { useState, useEffect, useCallback } from "react";
 import { toast } from "react-toastify";
 import { archivosService } from "../services/archivos.service";
-import { useFormModal } from "@/shared/hooks/useFormModal";
-import type { Archivo } from "../types/persona-detalle.types";
+import type {
+  ArchivoResource,
+  TipoArchivo,
+} from "../components/detalle/Archivo/archivo.constants";
 
 export const useArchivos = (personaId: number) => {
-  const [archivos, setArchivos] = useState<Archivo[]>([]);
+  const [archivos, setArchivos] = useState<ArchivoResource[]>([]);
   const [loading, setLoading] = useState(false);
   const [uploading, setUploading] = useState(false);
   const [deleting, setDeleting] = useState<number | null>(null);
-  const modal = useFormModal<Archivo>();
 
   const fetch = useCallback(async () => {
     setLoading(true);
     try {
       const res = await archivosService.getByPersona(personaId);
-      setArchivos(res.data.items);
+      setArchivos(res.data.items ?? []);
     } catch {
       toast.error("Error al cargar archivos");
     } finally {
@@ -28,10 +29,21 @@ export const useArchivos = (personaId: number) => {
     fetch();
   }, [fetch]);
 
-  const handleUpload = async (file: File, tipo: string, nombre: string) => {
+  const handleUpload = async (
+    file: File,
+    tipo: TipoArchivo,
+    nombre?: string,
+    fechaExpiracion?: string,
+  ) => {
     setUploading(true);
     try {
-      await archivosService.upload(personaId, file, tipo, nombre);
+      await archivosService.upload({
+        personaId,
+        file,
+        tipo,
+        nombre,
+        fechaExpiracion,
+      });
       toast.success("Archivo subido");
       fetch();
     } catch {
@@ -66,11 +78,10 @@ export const useArchivos = (personaId: number) => {
 
   const handleDownload = async (id: number) => {
     try {
-      const res = await archivosService.download(id);
-      const url = window.URL.createObjectURL(new Blob([res.data]));
       const link = document.createElement("a");
-      link.href = url;
-      link.setAttribute("download", "archivo");
+      link.href = archivosService.getDownloadUrl(id);
+      link.target = "_blank";
+      link.rel = "noopener noreferrer";
       document.body.appendChild(link);
       link.click();
       link.parentNode?.removeChild(link);
@@ -84,7 +95,6 @@ export const useArchivos = (personaId: number) => {
     loading,
     uploading,
     deleting,
-    modal,
     handleUpload,
     handleDelete,
     handleRestore,

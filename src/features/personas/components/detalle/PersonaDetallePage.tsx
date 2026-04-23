@@ -1,11 +1,12 @@
 // src/features/personas/components/detalle/PersonaDetallePage.tsx
 import { useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
-import { Button, Tabs, Skeleton, Tag } from "antd";
+import { Button, Tabs, Skeleton } from "antd";
 import { ArrowLeft, Pencil } from "lucide-react";
 import { toast } from "react-toastify";
 import { PageHeader } from "@/shared/components/molecules/PageHeader";
 import { Can } from "@/shared/components/atoms/Can";
+import { AppTag } from "@/shared/components/atoms/AppTag";
 import { APP_ROUTES } from "@/shared/constants/routes.constants";
 import { personasService } from "../../services/personas.service";
 import { usePersonaDetalle } from "../../hooks/usePersonaDetalle";
@@ -139,12 +140,14 @@ const PersonaDetallePage = () => {
 
       {persona && (
         <div className="mb-4 flex gap-2">
-          <Tag color={persona.estado === "ACTIVO" ? "green" : "red"}>
+          <AppTag tone={persona.estado === "ACTIVO" ? "success" : "danger"}>
             {persona.estado_texto ?? persona.estado}
-          </Tag>
-          <Tag color={persona.tipo_persona === "FISICA" ? "blue" : "purple"}>
+          </AppTag>
+          <AppTag
+            tone={persona.tipo_persona === "FISICA" ? "primary" : "purple"}
+          >
             {persona.tipo_texto}
-          </Tag>
+          </AppTag>
         </div>
       )}
 

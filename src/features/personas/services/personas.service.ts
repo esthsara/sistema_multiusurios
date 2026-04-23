@@ -8,15 +8,67 @@ import type {
   UpdatePersonaDto,
 } from "../types/persona.types";
 
+/* ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+   NORMALIZADORES */
+
+const normalizePersonaListItem = (item: PersonaListItem): PersonaListItem => {
+  const nombreCompleto =
+    item.nombre_completo?.trim() ||
+    (item.nombre && item.apellido
+      ? `${item.nombre} ${item.apellido}`.trim()
+      : null) ||
+    item.razon_social ||
+    null;
+
+  const displayName =
+    item.display_name?.trim() ||
+    item.nombre ||
+    item.razon_social ||
+    "Sin nombre";
+
+  return {
+    ...item,
+    nombre_completo: nombreCompleto,
+    display_name: displayName,
+  };
+};
+
+const normalizePersonaList = (items: PersonaListItem[]): PersonaListItem[] =>
+  items.map(normalizePersonaListItem);
+
+/* ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+   API CALLS */
+
 export const personasService = {
-  getAll: (params?: RequestParams) =>
-    http.getPaginated<PersonaListItem>("/personas", params),
+  getAll: async (params?: RequestParams) => {
+    const res = await http.getPaginated<PersonaListItem>("/personas", params);
+    return {
+      ...res,
+      data: normalizePersonaList(res.data),
+    };
+  },
 
-  getFisicas: (params?: RequestParams) =>
-    http.getPaginated<PersonaListItem>("/personas/fisicas", params),
+  getFisicas: async (params?: RequestParams) => {
+    const res = await http.getPaginated<PersonaListItem>(
+      "/personas/fisicas",
+      params,
+    );
+    return {
+      ...res,
+      data: normalizePersonaList(res.data),
+    };
+  },
 
-  getMorales: (params?: RequestParams) =>
-    http.getPaginated<PersonaListItem>("/personas/morales", params),
+  getMorales: async (params?: RequestParams) => {
+    const res = await http.getPaginated<PersonaListItem>(
+      "/personas/morales",
+      params,
+    );
+    return {
+      ...res,
+      data: normalizePersonaList(res.data),
+    };
+  },
 
   getById: (id: number) => http.get<PersonaDetalle>(`/personas/${id}`),
 

@@ -1,47 +1,23 @@
-// src/features/personas/components/detalle/PersonaArchivos.tsx
 import { useState } from "react";
-import {
-  Button,
-  Modal,
-  Form,
-  Input,
-  Select,
-  Upload,
-  Table,
-  Tooltip,
-} from "antd";
-import { Plus, Download, Trash2, Eye } from "lucide-react";
-import type { TableColumnsType } from "antd";
-import { Can } from "@/shared/components/atoms/Can";
-import { ConfirmModal } from "@/shared/components/molecules/ConfirmModal";
+import { Button } from "antd";
+import { Plus } from "lucide-react";
+import { toast } from "react-toastify";
+
 import { useArchivos } from "../../hooks/useArchivos";
-import type { Archivo, TipoArchivo } from "../../types/persona-detalle.types";
+import { ConfirmModal } from "@/shared/components/molecules/ConfirmModal";
+import { archivosService } from "../../services/archivos.service";
 
-const TIPO_OPTIONS: { value: TipoArchivo; label: string }[] = [
-  { value: "CI", label: "CI" },
-  { value: "CONTRATO", label: "Contrato" },
-  { value: "CERTIFICADO", label: "Certificado" },
-  { value: "FOTO", label: "Foto" },
-  { value: "OTRO", label: "Otro" },
-];
+import { ArchivoTable } from "./Archivo/ArchivoTable";
+import { ArchivoViewImage } from "./Archivo/ArchivoViewImage";
+import { ArchivoFormModal } from "./Archivo/ArchivoFormModal";
+import {
+  getArchivoDisplayName,
+  isImageArchivo,
+  isPdfArchivo,
+  type ArchivoResource,
+} from "./Archivo/archivo.constants";
 
-interface PersonaArchivosProps {
-  personaId: number;
-}
-
-const getResolvedFileUrl = (rawUrl: string) => {
-  if (!rawUrl) return "";
-  if (/^https?:\/\//i.test(rawUrl)) return rawUrl;
-
-  const apiBase = (import.meta.env.VITE_API_URL as string | undefined) ?? "";
-  if (!apiBase) return rawUrl;
-
-  const normalizedApi = apiBase.replace(/\/$/, "");
-  const origin = normalizedApi.replace(/\/api(\/v\d+)?$/i, "");
-  return `${origin}${rawUrl.startsWith("/") ? rawUrl : `/${rawUrl}`}`;
-};
-
-export const PersonaArchivos = ({ personaId }: PersonaArchivosProps) => {
+export const PersonaArchivos = ({ personaId }: { personaId: number }) => {
   const {
     archivos,
     loading,
@@ -52,38 +28,44 @@ export const PersonaArchivos = ({ personaId }: PersonaArchivosProps) => {
     handleDownload,
   } = useArchivos(personaId);
 
-  const [modalOpen, setModalOpen] = useState(false);
-  const [deleteTarget, setDeleteTarget] = useState<Archivo | null>(null);
-  const [form] = Form.useForm();
-  const handleUploadFile = async () => {
-    try {
-      const values = await form.validateFields();
-      if (!values.archivo?.file) {
-        return;
-      }
-      await handleUpload(values.archivo.file, values.tipo, values.nombre);
-      setModalOpen(false);
-      form.resetFields();
-    } catch {
-      /* validación antd */
-    }
+  const [openForm, setOpenForm] = useState(false);
+  const [previewItem, setPreviewItem] = useState<ArchivoResource | null>(null);
+  const [deleteTarget, setDeleteTarget] = useState<ArchivoResource | null>(
+    null,
+  );
+
+  const onSubmit = async (values: {
+    file: File;
+    tipo: ArchivoResource["tipo"];
+    nombre?: string;
+    fechaExpiracion?: string;
+  }) => {
+    await handleUpload(
+      values.file,
+      values.tipo,
+      values.nombre,
+      values.fechaExpiracion,
+    );
+    setOpenForm(false);
   };
 
-  const handlePreview = async (archivo: Archivo) => {
+  const handlePreview = async (item: ArchivoResource) => {
     try {
-      const maybeImageOrPdf = /\.(jpg|jpeg|png|gif|webp|pdf)$/i.test(
-        archivo.url,
-      );
-
-      if (maybeImageOrPdf) {
-        const resolved = getResolvedFileUrl(archivo.url);
-        window.open(resolved, "_blank", "noopener,noreferrer");
+      if (isImageArchivo(item)) {
+        setPreviewItem(item);
         return;
       }
 
-      await handleDownload(archivo.id);
+      const publicUrl = await archivosService.getPublicUrl(item.id);
+
+      if (isPdfArchivo(item)) {
+        window.open(publicUrl, "_blank", "noopener,noreferrer");
+        return;
+      }
+
+      window.open(publicUrl, "_blank", "noopener,noreferrer");
     } catch {
-      /* error handling in hook */
+      toast.error("No se pudo previsualizar el archivo");
     }
   };
 
@@ -93,194 +75,46 @@ export const PersonaArchivos = ({ personaId }: PersonaArchivosProps) => {
     setDeleteTarget(null);
   };
 
-  const columns: TableColumnsType<Archivo> = [
-    {
-      title: "Previsualizar",
-      key: "preview",
-      width: 100,
-      render: (_, r) => (
-        <Tooltip title="Previsualizar">
-          <Button
-            type="text"
-            size="small"
-            icon={<Eye size={15} />}
-            className="rounded-lg"
-            style={{
-              backgroundColor: "var(--color-bg-subtle)",
-              border: "1px solid var(--color-border)",
-            }}
-            onClick={() => handlePreview(r)}
-          />
-        </Tooltip>
-      ),
-    },
-    { title: "Nombre", dataIndex: "nombre" },
-    {
-      title: "Tipo",
-      key: "tipo",
-      width: 100,
-      render: (_, r) => r.tipo_texto,
-    },
-    {
-      title: "Fecha subida",
-      key: "fecha",
-      width: 120,
-      render: (_, r) => (
-        <span
-          className="text-xs"
-          style={{ color: "var(--color-text-secondary)" }}
-        >
-          {r.created_at.slice(0, 10)}
-        </span>
-      ),
-    },
-    {
-      title: "Descargar",
-      key: "descargar",
-      width: 90,
-      render: (_, record) => (
-        <div className="flex gap-1">
-          <Tooltip title="Descargar">
-            <Button
-              type="text"
-              size="small"
-              icon={<Download size={14} />}
-              className="rounded-lg"
-              style={{
-                backgroundColor: "var(--color-bg-subtle)",
-                border: "1px solid var(--color-border)",
-              }}
-              onClick={() => handleDownload(record.id)}
-            />
-          </Tooltip>
-          <Can permission="personas.eliminar">
-            <Tooltip title="Eliminar">
-              <Button
-                type="text"
-                size="small"
-                danger
-                icon={<Trash2 size={14} />}
-                className="rounded-lg"
-                style={{
-                  backgroundColor: "var(--color-alert-danger-bg)",
-                  border: "1px solid var(--color-danger-200)",
-                }}
-                onClick={() => setDeleteTarget(record)}
-              />
-            </Tooltip>
-          </Can>
-        </div>
-      ),
-    },
-  ];
-
   return (
     <div>
-      <div className="flex justify-between items-center mb-4">
-        <h3
-          className="font-semibold text-base m-0"
-          style={{ color: "var(--color-text-primary)" }}
-        >
-          Archivos
-        </h3>
-        <Can permission="personas.crear">
-          <Button
-            type="primary"
-            size="small"
-            icon={<Plus size={14} />}
-            onClick={() => setModalOpen(true)}
-            className="rounded-lg shadow-sm"
-          >
-            Subir Archivo
-          </Button>
-        </Can>
+      {/* HEADER */}
+      <div className="flex justify-between mb-3">
+        <h3 className="font-semibold">Archivos</h3>
+
+        <Button icon={<Plus size={14} />} onClick={() => setOpenForm(true)}>
+          Subir
+        </Button>
       </div>
 
-      <div
-        style={{
-          backgroundColor: "var(--color-bg-base)",
-          border: "1px solid var(--color-border)",
-          borderRadius: "var(--radius-card)",
-          overflow: "hidden",
-          boxShadow: "0 6px 20px rgba(2, 6, 23, 0.04)",
-        }}
-      >
-        <Table
-          dataSource={archivos}
-          columns={columns}
-          rowKey="id"
-          loading={loading}
-          pagination={false}
-          size="small"
-          style={{ backgroundColor: "transparent" }}
-        />
-      </div>
+      {/* TABLE */}
+      <ArchivoTable
+        data={archivos}
+        loading={loading}
+        onView={handlePreview}
+        onDownload={(item) => handleDownload(item.id)}
+        onDelete={(item) => setDeleteTarget(item)}
+      />
 
-      <Modal
-        open={modalOpen}
-        title="Subir Archivo"
-        onOk={handleUploadFile}
-        onCancel={() => {
-          setModalOpen(false);
-          form.resetFields();
-        }}
-        okText="Subir"
-        cancelText="Cancelar"
-        okButtonProps={{ loading: uploading }}
-        width={760}
-        centered
-        destroyOnClose
-      >
-        <Form
-          form={form}
-          layout="vertical"
-          size="large"
-          requiredMark={false}
-          className="mt-4"
-        >
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-x-4">
-            <Form.Item
-              name="nombre"
-              label="Nombre del archivo"
-              rules={[{ required: true, message: "Ingresa un nombre" }]}
-            >
-              <Input placeholder="Ej: CI de Juan Pérez" />
-            </Form.Item>
-            <Form.Item
-              name="tipo"
-              label="Tipo de documento"
-              rules={[{ required: true, message: "Selecciona el tipo" }]}
-            >
-              <Select
-                options={TIPO_OPTIONS}
-                placeholder="Ej: Seleccionar tipo"
-              />
-            </Form.Item>
-          </div>
-          <Form.Item
-            name="archivo"
-            label="Archivo"
-            rules={[{ required: true, message: "Selecciona un archivo" }]}
-          >
-            <Upload beforeUpload={() => false} maxCount={1}>
-              <Button
-                size="large"
-                icon={<Plus size={14} />}
-                className="rounded-lg"
-              >
-                Seleccionar archivo
-              </Button>
-            </Upload>
-          </Form.Item>
-        </Form>
-      </Modal>
+      {/* MODAL UPLOAD */}
+      <ArchivoFormModal
+        open={openForm}
+        loading={uploading}
+        onCancel={() => setOpenForm(false)}
+        onSubmit={onSubmit}
+      />
+
+      {/* PREVIEW */}
+      <ArchivoViewImage
+        open={!!previewItem}
+        item={previewItem}
+        onClose={() => setPreviewItem(null)}
+      />
 
       <ConfirmModal
         open={!!deleteTarget}
-        title="¿Eliminar este archivo?"
-        description={`El archivo "${deleteTarget?.nombre}" será eliminado.`}
+        title="¿Eliminar archivo?"
+        description={`Se eliminará "${getArchivoDisplayName(deleteTarget ?? { nombre_original: null, nombre: null })}".`}
         confirmText="Eliminar"
-        danger
         loading={deleting === deleteTarget?.id}
         onConfirm={confirmDelete}
         onCancel={() => setDeleteTarget(null)}

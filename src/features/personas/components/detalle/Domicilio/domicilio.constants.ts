@@ -41,10 +41,10 @@ export const TIPO_OPTIONS = [
 
 
 export const TIPO_COLOR: Record<TipoDomicilio, string> = {
-  FISCAL: "var(--color-blue-500)",
-  PARTICULAR: "var(--color-green-500)",
-  ENTREGA: "var(--color-purple-500)",
-  OTRO: "var(--color-gray-500)",
+  FISCAL: "#1d4ed8",
+  PARTICULAR: "#166534",
+  ENTREGA: "#6d28d9",
+  OTRO: "#475569",
 };
 
 export const PLACEHOLDERS: Record<string, string> = {

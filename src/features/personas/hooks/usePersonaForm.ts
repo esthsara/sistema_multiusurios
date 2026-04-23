@@ -5,12 +5,16 @@ import { personasService } from "../services/personas.service";
 import { useFormModal } from "@/shared/hooks/useFormModal";
 import type {
   PersonaListItem,
+  PersonaDetalle,
   CreatePersonaDto,
   UpdatePersonaDto,
 } from "../types/persona.types";
 import type { TipoPersona } from "@/shared/types/auth.types";
 
-const normalizeText = (value: unknown) => {
+/* ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+   UTILIDADES */
+
+const normalizeText = (value: unknown): string | undefined => {
   if (typeof value !== "string") return undefined;
   const trimmed = value.trim();
   return trimmed.length ? trimmed : undefined;
@@ -47,13 +51,11 @@ const buildPersonaPayload = (
     : ({ ...payload, tipo_persona: "MORAL" } as CreatePersonaDto);
 };
 
-export const usePersonaForm = (onSuccess: () => void) => {
-  const modal = useFormModal<PersonaListItem>();
+/* ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+   HOOK */
 
-  /**
-   * tipoSeleccionado — controla qué formulario mostrar.
-   * Se selecciona en el TypeSelector antes de abrir el form.
-   */
+export const usePersonaForm = (onSuccess: () => void) => {
+  const modal = useFormModal<PersonaDetalle>();
   const [tipoSeleccionado, setTipoSeleccionado] = useState<TipoPersona | null>(
     null,
   );
@@ -67,9 +69,15 @@ export const usePersonaForm = (onSuccess: () => void) => {
     modal.openCreate();
   };
 
-  const handleEdit = (persona: PersonaListItem) => {
+  const handleEdit = async (persona: PersonaListItem) => {
     setTipoSeleccionado(persona.tipo_persona);
-    modal.openEdit(persona);
+
+    try {
+      const response = await personasService.getById(persona.id);
+      modal.openEdit(response.data);
+    } catch {
+      toast.error("No se pudo cargar la información de la persona");
+    }
   };
 
   const handleSubmit = async (values: CreatePersonaDto | UpdatePersonaDto) => {

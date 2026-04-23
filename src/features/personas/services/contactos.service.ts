@@ -4,7 +4,7 @@ import type {
   Contacto,
   CreateContactoDto,
   UpdateContactoDto,
-} from "../types/persona-detalle.types";
+} from "../components/detalle/Contacto/contacto.constants";
 
 export const contactosService = {
   getByPersona: (personaId: number) =>

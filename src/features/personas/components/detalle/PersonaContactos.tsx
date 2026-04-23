@@ -4,7 +4,7 @@ import { Plus } from "lucide-react";
 import { Can } from "@/shared/components/atoms/Can";
 import { ConfirmModal } from "@/shared/components/molecules/ConfirmModal";
 import { useContactos } from "../../hooks/useContactos";
-import type { Contacto } from "../../types/persona-detalle.types";
+import type { Contacto } from "../../components/detalle/Contacto/contacto.constants";
 
 import { ContactoTable } from "./Contacto/ContactoTable";
 import { ContactoFormModal } from "./Contacto/ContactoFormModal";
@@ -49,6 +49,7 @@ export const PersonaContactos = ({ personaId }: PersonaContactosProps) => {
             Nuevo
           </Button>
         </Can>
+        
       </div>
 
       {/* TABLA */}

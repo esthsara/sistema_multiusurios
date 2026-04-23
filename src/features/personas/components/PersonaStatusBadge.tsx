@@ -5,16 +5,18 @@ import type { EstadoPersona } from "@/shared/types/auth.types";
 interface PersonaStatusBadgeProps {
   estado: EstadoPersona;
 }
-/* Componente para mostrar el estado de una persona con un badge de Ant Design */
+
+const STATUS_CONFIG: Record<
+  EstadoPersona,
+  { status: "success" | "error" | "warning"; text: string }
+> = {
+  ACTIVO: { status: "success", text: "Activo" },
+  INACTIVO: { status: "error", text: "Inactivo" },
+  BLOQUEADO: { status: "warning", text: "Bloqueado" },
+};
 
 export const PersonaStatusBadge = ({ estado }: PersonaStatusBadgeProps) => {
-  const config = {
-    ACTIVO: { status: "success" as const, text: "Activo" },
-    INACTIVO: { status: "error" as const, text: "Inactivo" },
-    BLOQUEADO: { status: "warning" as const, text: "Bloqueado" },
-  };
-
-  const { status, text } = config[estado] ?? config.INACTIVO;
+  const { status, text } = STATUS_CONFIG[estado] ?? STATUS_CONFIG.INACTIVO;
 
   return <Badge status={status} text={text} />;
 };

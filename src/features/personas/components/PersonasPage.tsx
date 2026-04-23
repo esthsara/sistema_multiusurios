@@ -1,34 +1,48 @@
-// src/features/personas/components/PersonasPage.tsx
+// src/features/personas/screens/PersonasPage.tsx
 import { useState } from "react";
 import { Button, Avatar, Tooltip } from "antd";
 import { Plus, Pencil, Trash2, RotateCcw, PowerOff, Eye } from "lucide-react";
 import type { TableColumnsType } from "antd";
+
 import { PageHeader } from "@/shared/components/molecules/PageHeader";
 import { DataTable } from "@/shared/components/organisms/DataTable";
 import { ConfirmModal } from "@/shared/components/molecules/ConfirmModal";
 import { RowActions } from "@/shared/components/molecules/RowActions";
 import { Can } from "@/shared/components/atoms/Can";
+
 import { usePersonas } from "../hooks/usePersonas";
 import { usePersonaForm } from "../hooks/usePersonaForm";
-import { PersonaStatusBadge } from "./PersonaStatusBadge";
-import { PersonaTypeSelector } from "./PersonaTypeSelector";
-import { PersonaFormModal } from "./PersonaFormModal";
-import { PersonaFiltersBar } from "./PersonaFilters";
-import type { PersonaListItem } from "../types/persona.types";
+import { PersonaStatusBadge } from "../components/PersonaStatusBadge";
+import { PersonaTypeSelector } from "../components/PersonaTypeSelector";
+import { PersonaFormModal } from "../components/PersonaFormModal";
+import { PersonaFiltersBar } from "../components/PersonaFilters";
+
+import type { PersonaListItem, ConfirmState } from "../types/persona.types";
+import {
+  getPersonaInitials,
+  getAvatarStyle,
+  getConfirmConfig,
+  getConfirmIcon,
+  getDisplayName,
+} from "../utils/persona.utils";
+
 import { useNavigate } from "react-router-dom";
 import { APP_ROUTES } from "@/shared/constants/routes.constants";
 
 const PersonasPage = () => {
   const personas = usePersonas();
   const form = usePersonaForm(personas.fetchPersonas);
+  const navigate = useNavigate();
 
-  /* Estado para modales de confirmación */
-  const [confirmState, setConfirmState] = useState<{
-    open: boolean;
-    type: "toggle" | "delete" | null;
-    item: PersonaListItem | null;
-    loading: boolean;
-  }>({ open: false, type: null, item: null, loading: false });
+  /* ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+     ESTADO DE CONFIRM MODAL */
+
+  const [confirmState, setConfirmState] = useState<ConfirmState>({
+    open: false,
+    type: null,
+    item: null,
+    loading: false,
+  });
 
   const openConfirm = (type: "toggle" | "delete", item: PersonaListItem) =>
     setConfirmState({ open: true, type, item, loading: false });
@@ -37,76 +51,23 @@ const PersonasPage = () => {
     setConfirmState({ open: false, type: null, item: null, loading: false });
 
   const handleConfirm = async () => {
-    if (!confirmState.item) return;
+    if (!confirmState.item || !confirmState.type) return;
     setConfirmState((prev) => ({ ...prev, loading: true }));
 
-    if (confirmState.type === "toggle") {
-      await personas.toggleEstado(confirmState.item);
-    } else if (confirmState.type === "delete") {
-      await personas.remove(confirmState.item.id);
-    }
-    closeConfirm();
-  };
-
-  /*navegar al ver */
-  const navigate = useNavigate();
-
-  const getPersonaInitials = (persona: PersonaListItem) => {
-    if (persona.tipo_persona === "FISICA") {
-      const nombre = (persona.nombre ?? "").trim();
-      const apellido = (persona.apellido ?? "").trim();
-
-      if (nombre && apellido) {
-        return `${nombre.charAt(0)}${apellido.charAt(0)}`.toUpperCase();
+    try {
+      if (confirmState.type === "toggle") {
+        await personas.toggleEstado(confirmState.item);
+      } else {
+        await personas.remove(confirmState.item.id);
       }
-
-      if (nombre) {
-        const initials = nombre
-          .split(/\s+/)
-          .filter(Boolean)
-          .slice(0, 2)
-          .map((part) => part.charAt(0).toUpperCase())
-          .join("");
-        return initials || "P";
-      }
-
-      return "P";
+    } finally {
+      closeConfirm();
     }
-
-    const source = (persona.razon_social ?? persona.display_name ?? "").trim();
-    const initials = source
-      .split(/\s+/)
-      .filter(Boolean)
-      .slice(0, 2)
-      .map((part) => part.charAt(0).toUpperCase())
-      .join("");
-
-    return initials || "M";
   };
 
-  const getAvatarStyle = (persona: PersonaListItem) => {
-    if (persona.foto) {
-      return { backgroundColor: "var(--color-bg-overlay)" };
-    }
+  /* ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+     COLUMNAS DE LA TABLA */
 
-    if (persona.tipo_persona === "FISICA") {
-      return {
-        backgroundColor:
-          "color-mix(in srgb, var(--color-primary-600) 72%, var(--color-bg-base) 28%)",
-        color: "var(--color-text-inverse)",
-        fontWeight: 700,
-      };
-    }
-
-    return {
-      backgroundColor:
-        "color-mix(in srgb, var(--color-primary-400) 32%, var(--color-bg-overlay) 68%)",
-      color: "var(--color-primary-700)",
-      fontWeight: 700,
-    };
-  };
-
-  /* ── Columnas de la tabla ── */
   const columns: TableColumnsType<PersonaListItem> = [
     {
       title: "Foto",
@@ -135,9 +96,7 @@ const PersonasPage = () => {
             className="font-medium m-0"
             style={{ color: "var(--color-text-primary)" }}
           >
-            {(r.razon_social ??
-              `${r.nombre ?? ""} ${r.apellido ?? ""}`.trim()) ||
-              "Sin nombre"}
+            {getDisplayName(r)}
           </p>
           {r.usuario_asociado && (
             <p
@@ -248,33 +207,19 @@ const PersonasPage = () => {
     },
   ];
 
-  /* ── Textos del ConfirmModal ── */
-  const confirmConfig = {
-    toggle: {
-      title:
-        confirmState.item?.estado === "ACTIVO"
-          ? "¿Deseas desactivar esta persona?"
-          : "¿Deseas activar esta persona nuevamente?",
-      description:
-        confirmState.item?.estado === "ACTIVO"
-          ? "El usuario no podrá iniciar sesión ni acceder a nuevas funcionalidades."
-          : "La persona podrá iniciar sesión y utilizar las funcionalidades disponibles.",
-      confirmText:
-        confirmState.item?.estado === "ACTIVO" ? "Desactivar" : "Activar",
-      danger: confirmState.item?.estado === "ACTIVO",
-    },
-    delete: {
-      title: `¿Seguro que deseas eliminar a ${confirmState.item?.display_name}?`,
-      description:
-        "Esta acción puede revertirse restaurando la persona más adelante.",
-      confirmText: "Eliminar",
-      danger: true,
-    },
-  };
+  /* ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+     CONFIG DEL CONFIRM MODAL */
 
-  const currentConfirm = confirmState.type
-    ? confirmConfig[confirmState.type]
+  const currentConfirm = confirmState.type && confirmState.item
+    ? getConfirmConfig(
+        confirmState.type,
+        confirmState.item.estado,
+        getDisplayName(confirmState.item),
+      )
     : null;
+
+  /* ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+     RENDER */
 
   return (
     <div>
@@ -349,6 +294,7 @@ const PersonasPage = () => {
           loading={confirmState.loading}
           onConfirm={handleConfirm}
           onCancel={closeConfirm}
+          icon={getConfirmIcon(currentConfirm.iconType)}
         />
       )}
     </div>

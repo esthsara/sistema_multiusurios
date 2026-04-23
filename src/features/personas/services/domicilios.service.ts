@@ -4,7 +4,7 @@ import type {
   Domicilio,
   CreateDomicilioDto,
   UpdateDomicilioDto,
-} from "../types/persona-detalle.types";
+} from "../components/detalle/Domicilio/domicilio.constants";
 
 export const domiciliosService = {
   getByPersona: (personaId: number) =>

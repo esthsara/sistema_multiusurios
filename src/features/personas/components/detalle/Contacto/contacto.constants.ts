@@ -30,9 +30,9 @@ export const TIPO_OPTIONS = [
 ];
 
 export const TIPO_COLOR: Record<TipoContacto, string> = {
-  EMAIL: "var(--color-blue-500)",
-  TELEFONO: "var(--color-green-500)",
-  OTRO: "var(--color-gray-500)",
+  EMAIL: "#1d4ed8",
+  TELEFONO: "#166534",
+  OTRO: "#475569",
 };
 
 export const PLACEHOLDERS: Record<string, string> = {

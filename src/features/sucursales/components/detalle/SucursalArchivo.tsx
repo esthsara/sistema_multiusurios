@@ -217,36 +217,40 @@ export const SucursalArchivo = ({ sucursalId }: SucursalArchivoProps) => {
         okText="Subir"
         cancelText="Cancelar"
         okButtonProps={{ loading: uploading }}
-        width={420}
+        width={760}
+        centered
         destroyOnClose
       >
         <Form
           form={form}
           layout="vertical"
+          size="large"
           requiredMark={false}
           className="mt-4"
         >
-          <Form.Item
-            name="nombre"
-            label="Nombre del archivo"
-            rules={[{ required: true, message: "Ingresa un nombre" }]}
-          >
-            <Input placeholder="Ej: Contrato de sucursal" />
-          </Form.Item>
-          <Form.Item
-            name="tipo"
-            label="Tipo de documento"
-            rules={[{ required: true, message: "Selecciona el tipo" }]}
-          >
-            <Select options={TIPO_OPTIONS} />
-          </Form.Item>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-x-4">
+            <Form.Item
+              name="nombre"
+              label="Nombre del archivo"
+              rules={[{ required: true, message: "Ingresa un nombre" }]}
+            >
+              <Input placeholder="Ej: Contrato de sucursal" />
+            </Form.Item>
+            <Form.Item
+              name="tipo"
+              label="Tipo de documento"
+              rules={[{ required: true, message: "Selecciona el tipo" }]}
+            >
+              <Select options={TIPO_OPTIONS} placeholder="Ej: Seleccionar tipo" />
+            </Form.Item>
+          </div>
           <Form.Item
             name="archivo"
             label="Archivo"
             rules={[{ required: true, message: "Selecciona un archivo" }]}
           >
             <Upload beforeUpload={() => false} maxCount={1} accept="*/*">
-              <Button icon={<Plus size={14} />}>Seleccionar archivo</Button>
+              <Button size="large" icon={<Plus size={14} />}>Seleccionar archivo</Button>
             </Upload>
           </Form.Item>
         </Form>
