@@ -1,11 +1,12 @@
-import { Button, Tag, Tooltip } from "antd";
+import { Button, Tooltip } from "antd";
 import { Can } from "@/shared/components/atoms/Can";
 import type { TableColumnsType } from "antd";
 import { Eye, Pencil, Star, Trash2 } from "lucide-react";
 import { DataTableSimple } from "@/shared/components/organisms/DataTableSimple";
 import { RowActions } from "@/shared/components/molecules/RowActions";
+import { AppTag } from "@/shared/components/atoms/AppTag";
 
-import { TIPO_COLOR, type Domicilio } from "./domicilio.constants";
+import { type Domicilio } from "./domicilio.constants";
 
 interface Props {
   data: Domicilio[];
@@ -31,7 +32,21 @@ export const DomicilioTable = ({
       title: "Tipo",
       key: "tipo",
       width: 110,
-      render: (_, r) => <Tag color={TIPO_COLOR[r.tipo]}>{r.tipo_texto}</Tag>,
+      render: (_, r) => (
+        <AppTag
+          tone={
+            r.tipo === "FISCAL"
+              ? "primary"
+              : r.tipo === "PARTICULAR"
+                ? "success"
+                : r.tipo === "ENTREGA"
+                  ? "purple"
+                  : "neutral"
+          }
+        >
+          {r.tipo_texto}
+        </AppTag>
+      ),
     },
     { title: "País", dataIndex: "pais", width: 100 },
     { title: "Ciudad", dataIndex: "ciudad", width: 120 },
@@ -43,7 +58,7 @@ export const DomicilioTable = ({
       width: 170,
       render: (_, r) =>
         r.principal ? (
-          <Tag color="green">Principal</Tag>
+          <AppTag tone="success">Principal</AppTag>
         ) : (
           <Can permission="sucursales.editar">
             <Tooltip title="Marcar como principal">

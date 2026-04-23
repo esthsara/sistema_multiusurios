@@ -152,12 +152,19 @@ body {
 
 /* Filtros */
 .persona-filters .ant-input-affix-wrapper,
-.persona-filters .ant-select-selector,
+.persona-filters .ant-select .ant-select-selector,
 .persona-filters .ant-picker,
 .persona-filters .ant-btn {
   border-radius: var(--radius-md) !important;
   transition: all var(--transition-base) !important;
+  background: var(--color-bg-base) !important;
+  border: 1px solid var(--color-border) !important;
+  color: var(--color-text-primary) !important;
+  height: 32px; 
+  padding: 0 11px;
 }
+
+
 
 .persona-filters .ant-input-affix-wrapper,
 .persona-filters .ant-select .ant-select-selector,

@@ -1,6 +1,7 @@
 // src/shared/components/molecules/ConfirmModal.tsx
 import { Modal } from "antd";
 import { AlertTriangle } from "lucide-react";
+import type { ReactNode } from "react";
 
 interface ConfirmModalProps {
   open: boolean;
@@ -10,6 +11,7 @@ interface ConfirmModalProps {
   cancelText?: string;
   loading?: boolean;
   danger?: boolean;
+  icon?: ReactNode;
   onConfirm: () => void;
   onCancel: () => void;
 }
@@ -31,6 +33,7 @@ export const ConfirmModal = ({
   cancelText = "Cancelar",
   loading = false,
   danger = true,
+  icon,
   onConfirm,
   onCancel,
 }: ConfirmModalProps) => {
@@ -61,14 +64,16 @@ export const ConfirmModal = ({
               : "var(--color-alert-warning-bg)",
           }}
         >
-          <AlertTriangle
-            size={20}
-            style={{
-              color: danger
-                ? "var(--color-danger-500)"
-                : "var(--color-warning-500)",
-            }}
-          />
+          {icon ?? (
+            <AlertTriangle
+              size={20}
+              style={{
+                color: danger
+                  ? "var(--color-danger-500)"
+                  : "var(--color-warning-500)",
+              }}
+            />
+          )}
         </div>
         <div>
           <h3

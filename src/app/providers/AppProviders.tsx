@@ -8,6 +8,7 @@ import { lightTheme, darkTheme } from "@/config/theme.config";
 import { useTheme } from "@/shared/hooks/useTheme";
 import { useAuthStore } from "@/features/auth/store/auth.store";
 import { GlobalLoader } from "@/shared/components/molecules/GlobalLoader";
+import { SessionExpiredModal } from "@/shared/components/molecules/SessionExpiredModal";
 import { useUIStore } from "@/shared/store/ui.store";
 
 interface AppProvidersProps {
@@ -56,7 +57,13 @@ export const AppProviders = ({ children }: AppProvidersProps) => {
       theme={isDark ? darkTheme : lightTheme}
     >
       <GlobalLoader />
-      
+
+      {/* 
+        Modal de sesión expirada — montado aquí para ser independiente
+        del router y estar activo en toda la app desde el arranque.
+      */}
+      <SessionExpiredModal />
+
       {/* 
         Evitamos renderizar los children (router) hasta validar la sesión, 
         previniendo redireccionamientos prematuros ("flickers") hacia el login.

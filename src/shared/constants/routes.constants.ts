@@ -8,6 +8,7 @@
 export const APP_ROUTES = {
   ROOT: "/",
   LOGIN: "/login",
+  NO_BRANCH: "/sin-sucursal",
   DASHBOARD: {
     ROOT: "/dashboard",
     HOME: "/dashboard/home",

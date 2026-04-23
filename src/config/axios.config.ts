@@ -43,14 +43,19 @@ apiClient.interceptors.request.use(
       return Promise.reject(error);
     }
 
-    ///si tenemos token válido, lo agregamos al header Authorization
+    // Adjuntar token válido al header Authorization
     if (token) {
       config.headers.Authorization = `Bearer ${token}`;
     }
-    // Sucursal activa global (única fuente de verdad): Zustand/auth.user.sucursalActiva
-    const sucursalId = authStore.user?.sucursalActiva?.id;
-    if (sucursalId) {
-      config.headers["X-Sucursal-ID"] = String(sucursalId);
+
+    // Sucursal activa — única fuente de verdad: Zustand → auth.user.sucursalActiva
+    // Validación adicional: solo enviar si la sucursal activa pertenece al usuario.
+    // Esto previene que una sucursal manipulada externamente llegue al backend.
+    const sucursalActiva = authStore.user?.sucursalActiva;
+    const sucursalesPermitidas = authStore.user?.sucursales.map((s) => s.id) ?? [];
+
+    if (sucursalActiva && sucursalesPermitidas.includes(sucursalActiva.id)) {
+      config.headers["X-Sucursal-ID"] = String(sucursalActiva.id);
     } else {
       delete config.headers["X-Sucursal-ID"];
     }
@@ -129,8 +134,14 @@ apiClient.interceptors.response.use(
   (response: AxiosResponse) => response,
 
   async (error: AxiosError) => {
+    // Las peticiones canceladas por SESSION_EXPIRED son silenciosas.
+    // No mostrar error de red al usuario — el handleUnauthorized ya mostró el modal.
+    if (axios.isCancel(error)) {
+      return Promise.reject(error);
+    }
+
     const status = error.response?.status;
-    const requestUrl = error.config?.url || "";
+    const requestUrl = error.config?.url ?? "";
     const isAuthRequest = requestUrl.includes("/auth/");
     const isLoginRequest = requestUrl.includes("/auth/login");
 

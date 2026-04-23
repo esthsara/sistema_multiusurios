@@ -1,10 +1,10 @@
-import { Tag } from "antd";
 import type { TableColumnsType } from "antd";
 import { Eye, Pencil, Trash2 } from "lucide-react";
 import { DataTableSimple } from "@/shared/components/organisms/DataTableSimple";
 import { RowActions } from "@/shared/components/molecules/RowActions";
+import { AppTag } from "@/shared/components/atoms/AppTag";
 
-import { TIPO_COLOR, type Contacto } from "./contacto.constants";
+import { type Contacto } from "./contacto.constants";
 
 interface Props {
   data: Contacto[];
@@ -25,7 +25,19 @@ export const getContactoTable = ({
     {
       title: "Tipo",
       width: 120,
-      render: (_, r) => <Tag color={TIPO_COLOR[r.tipo]}>{r.tipo_texto}</Tag>,
+      render: (_, r) => (
+        <AppTag
+          tone={
+            r.tipo === "EMAIL"
+              ? "primary"
+              : r.tipo === "TELEFONO"
+                ? "success"
+                : "neutral"
+          }
+        >
+          {r.tipo_texto}
+        </AppTag>
+      ),
     },
     {
       title: "Valor",

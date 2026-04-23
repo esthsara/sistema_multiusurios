@@ -13,6 +13,9 @@ const DashboardLayout = lazy(() => import("@/layouts/DashboardLayout"));
 
 /* ── Páginas públicas ── */
 const LoginPage = lazy(() => import("@/features/auth/components/LoginPage"));
+const NoBranchPage = lazy(
+  () => import("@/features/auth/components/NoBranchPage"),
+);
 
 /* ── Páginas privadas ── */
 const HomePage = lazy(() => import("@/features/dashboard/components/HomePage"));
@@ -126,6 +129,13 @@ export const router = createBrowserRouter([
   {
     element: withSuspense(AuthLayout),
     children: [{ path: APP_ROUTES.LOGIN, element: withSuspense(LoginPage) }],
+  },
+
+  /* Ruta semi-pública: usuario autenticado pero sin sucursal asignada.
+   * Está fuera del AuthGuard para evitar bucle de redirección. */
+  {
+    path: APP_ROUTES.NO_BRANCH,
+    element: withSuspense(NoBranchPage),
   },
 
   /* ── Rutas Privadas — requieren autenticación ── */

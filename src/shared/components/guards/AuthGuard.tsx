@@ -7,38 +7,34 @@ import { useUIStore } from "@/shared/store/ui.store";
 
 /**
  * AuthGuard — Protege rutas que requieren autenticación.
- * useLocation: captura la ruta actual para redirigir al login y luego volver a la ruta original.
+ *
+ * Validaciones en orden:
+ * 1. Si está cargando → mostrar GlobalLoader (sin redirigir prematuramente)
+ * 2. Si no está autenticado → redirigir a /login (guardando la ruta original)
+ * 3. Si está autenticado pero sin sucursales → redirigir a /sin-sucursal
+ * 4. Si todo está bien → renderizar la ruta hija
  */
 export const AuthGuard = () => {
-  const { isAuthenticated, isLoading } = useAuth();
+  const { isAuthenticated, isLoading, user } = useAuth();
   const location = useLocation();
 
   useEffect(() => {
-    // Sincronizamos el estado local de auth con el GlobalLoader
     const { setGlobalLoading } = useUIStore.getState();
     if (isLoading) {
       setGlobalLoading(true, "Verificando accesos...");
     } else {
       setGlobalLoading(false);
     }
-    
-    // Limpiamos en caso de desmontaje
     return () => {
       setGlobalLoading(false);
     };
   }, [isLoading]);
 
-  if (isLoading) {
-    // Retornamos null para no flashear rutas hijas incorrectamente,
-    // el GlobalLoader montado en AppProviders cubrirá toda la pantalla.
-    return null;
-  }
+  // Esperando inicialización — el GlobalLoader cubre la pantalla
+  if (isLoading) return null;
 
+  // Sin autenticación → login (preservando la ruta intentada para redirigir luego)
   if (!isAuthenticated) {
-    /**
-     * 'state' preserva la ruta intentada.
-     * En el Login haremos: navigate(location.state?.from || '/dashboard')
-     */
     return (
       <Navigate
         to={APP_ROUTES.LOGIN}
@@ -46,6 +42,12 @@ export const AuthGuard = () => {
         replace
       />
     );
+  }
+
+  // Autenticado pero sin sucursal asignada → página informativa
+  // Evita que el usuario navegue la app con X-Sucursal-ID vacío
+  if (user && user.sucursales.length === 0) {
+    return <Navigate to={APP_ROUTES.NO_BRANCH} replace />;
   }
 
   return <Outlet />;

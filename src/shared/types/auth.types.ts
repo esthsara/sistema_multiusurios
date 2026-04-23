@@ -197,6 +197,18 @@ export interface AuthState {
   isAuthenticated: boolean;
   isLoading: boolean;
   isAuthInitialized: boolean;
+  /**
+   * Timestamp que se actualiza en cada switch de sucursal.
+   * Úsalo como parte del queryKey o en useEffect para invalidar
+   * automáticamente los datos de módulos al cambiar de sucursal.
+   *
+   * Ejemplo con React Query:
+   *   queryKey: ["personas", branchSwitchedAt]
+   *
+   * Ejemplo con useEffect:
+   *   useEffect(() => { fetchDatos(); }, [branchSwitchedAt]);
+   */
+  branchSwitchedAt: number | null;
 }
 
 /* ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━

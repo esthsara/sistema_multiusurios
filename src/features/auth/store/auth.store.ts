@@ -110,6 +110,7 @@ const initialState: AuthState = {
   isAuthenticated: false,
   isLoading: false,
   isAuthInitialized: false,
+  branchSwitchedAt: null,
 };
 
 /* ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
@@ -399,6 +400,10 @@ export const useAuthStore = create<AuthStore>()(
 
             get()._setUser(hydratedUser, get().accessToken);
             await get().syncSucursalesUsuario();
+
+            // Señal de invalidación: los módulos que usen branchSwitchedAt
+            // como queryKey o en useEffect se re-ejecutarán automáticamente.
+            set({ branchSwitchedAt: Date.now() }, false, "auth/branchSwitched");
           } finally {
             get()._setLoading(false);
           }
