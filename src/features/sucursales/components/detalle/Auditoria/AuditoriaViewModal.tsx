@@ -27,10 +27,12 @@ export const AuditoriaViewModal = ({ open, item, onClose }: Props) => {
         footer={null}
         centered
         width={screens.sm ? 500 : "92%"}
-        destroyOnClose
-        maskStyle={{
-          backdropFilter: "blur(4px)",
-          WebkitBackdropFilter: "blur(4px)",
+        destroyOnHidden
+        styles={{
+          mask: {
+            backdropFilter: "blur(6px)",
+            WebkitBackdropFilter: "blur(6px)",
+          },
         }}
       >
         <div className="space-y-4 pt-4">

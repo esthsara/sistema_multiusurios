@@ -51,10 +51,12 @@ export const ContactoViewModal = ({ open, item, onClose }: Props) => {
         footer={null}
         centered
         width={400}
-        destroyOnClose
-        maskStyle={{
-          backdropFilter: "blur(4px)",
-          WebkitBackdropFilter: "blur(4px)",
+        destroyOnHidden
+        styles={{
+          mask: {
+            backdropFilter: "blur(6px)",
+            WebkitBackdropFilter: "blur(6px)",
+          },
         }}
       >
         <div className="pt-4">
