@@ -1,11 +1,11 @@
-import { Tag, Badge } from "antd";
 import type { TableColumnsType } from "antd";
 import { Eye } from "lucide-react";
 
 import { DataTableSimple } from "@/shared/components/organisms/DataTableSimple";
 import { RowActions } from "@/shared/components/molecules/RowActions";
+import { AppTag } from "@/shared/components/atoms/AppTag";
 
-import { ACCION_COLOR, type AuditoriaItem } from "./auditoria.constants";
+import { ACCION_TONE, type AuditoriaItem } from "./auditoria.constants";
 
 interface Props {
   data: AuditoriaItem[];
@@ -21,9 +21,9 @@ export const AuditoriaTable = ({ data, loading, onView }: Props) => {
       render: (_, r) => (
         <div className="space-y-1 py-1">
           <div className="flex items-center justify-between gap-2">
-            <Tag color={ACCION_COLOR[r.accion] ?? "default"} className="m-0">
+            <AppTag tone={ACCION_TONE[r.accion] ?? "danger"} className="m-0">
               {r.accion_texto}
-            </Tag>
+            </AppTag>
             <span
               className="text-[11px]"
               style={{ color: "var(--color-text-secondary)" }}
@@ -93,14 +93,16 @@ export const AuditoriaTable = ({ data, loading, onView }: Props) => {
       width: 160,
       responsive: ["sm"],
       render: (_, r) => (
-        <Tag color={ACCION_COLOR[r.accion] ?? "default"}>{r.accion_texto}</Tag>
+        <AppTag tone={ACCION_TONE[r.accion] ?? "neutral"}>
+          {r.accion_texto}
+        </AppTag>
       ),
     },
     {
       title: "Entidad",
       width: 130,
       responsive: ["lg"],
-      render: (_, r) => <Badge status="default" text={r.entidad_nombre} />,
+      render: (_, r) => <AppTag tone="neutral">{r.entidad_nombre}</AppTag>,
     },
     {
       title: "IP",

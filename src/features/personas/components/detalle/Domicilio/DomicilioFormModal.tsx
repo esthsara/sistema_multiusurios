@@ -13,6 +13,7 @@ import {
   type Domicilio,
   type CreateDomicilioDto,
   type UpdateDomicilioDto,
+  type DomicilioFormValues,
 } from "./domicilio.constants";
 
 interface Props {
@@ -24,14 +25,7 @@ interface Props {
   onCancel: () => void;
 }
 
-interface DomicilioFormValues {
-  tipo: Domicilio["tipo"];
-  pais: string;
-  ciudad: string;
-  direccion: string;
-  codigo_postal?: string;
-  principal?: boolean;
-}
+
 
 export const DomicilioFormModal = ({
   open,
@@ -119,6 +113,7 @@ export const DomicilioFormModal = ({
         confirmLoading={loading}
         width={480}
         centered
+        forceRender
         destroyOnHidden
         styles={{
           mask: {

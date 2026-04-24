@@ -38,7 +38,7 @@ export const DomicilioTable = ({
             r.tipo === "FISCAL"
               ? "primary"
               : r.tipo === "PARTICULAR"
-                ? "success"
+                ? "cyan"
                 : r.tipo === "ENTREGA"
                   ? "purple"
                   : "neutral"
@@ -58,7 +58,7 @@ export const DomicilioTable = ({
       width: 170,
       render: (_, r) =>
         r.principal ? (
-          <AppTag tone="success">Principal</AppTag>
+          <AppTag tone="gold">Principal</AppTag>
         ) : (
           <Can permission="personas.editar">
             <Tooltip title="Marcar como principal">

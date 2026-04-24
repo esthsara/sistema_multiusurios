@@ -40,12 +40,6 @@ export const TIPO_OPTIONS = [
 ];
 
 
-export const TIPO_COLOR: Record<TipoDomicilio, string> = {
-  FISCAL: "#1d4ed8",
-  PARTICULAR: "#166534",
-  ENTREGA: "#6d28d9",
-  OTRO: "#475569",
-};
 
 export const PLACEHOLDERS: Record<string, string> = {
   FISCAL: "Calle Fiscal, Número 456",
@@ -53,3 +47,12 @@ export const PLACEHOLDERS: Record<string, string> = {
   ENTREGA: "Dirección de entrega específica",
   OTRO: "Ingresa el detalle del domicilio...",
 };
+
+export interface DomicilioFormValues {
+  tipo: Domicilio["tipo"];
+  pais: string;
+  ciudad: string;
+  direccion: string;
+  codigo_postal?: string;
+  principal?: boolean;
+}

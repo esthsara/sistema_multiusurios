@@ -65,14 +65,14 @@ export const PersonaTypeSelector = ({
                 border: "1px solid var(--color-border)",
                 backdropFilter: "blur(10px)",
               }}
-              bodyStyle={{ padding: "20px" }}
+              styles={{ body: { padding: "20px" } }}
             >
               <div className="flex flex-col items-center text-center gap-4">
                 {/* ICONO */}
                 <div
                   className="w-16 h-16 rounded-2xl flex items-center justify-center transition-all duration-300 group-hover:scale-110"
                   style={{
-                    background: "var(--color-primary-50)",
+                    background: "var(--color-alert-primary-bg)",
                   }}
                 >
                   <User
@@ -102,7 +102,7 @@ export const PersonaTypeSelector = ({
                   className="text-xs font-medium opacity-0 group-hover:opacity-100 transition"
                   style={{ color: "var(--color-primary-500)" }}
                 >
-                  Seleccionar →
+                  Seleccionar 
                 </div>
               </div>
             </Card>
@@ -117,7 +117,7 @@ export const PersonaTypeSelector = ({
                 border: "1px solid var(--color-border)",
                 backdropFilter: "blur(10px)",
               }}
-              bodyStyle={{ padding: "20px" }}
+              styles={{ body: { padding: "20px" } }}
             >
               <div className="flex flex-col items-center text-center gap-4">
                 {/* ICONO */}
@@ -154,7 +154,7 @@ export const PersonaTypeSelector = ({
                   className="text-xs font-medium opacity-0 group-hover:opacity-100 transition"
                   style={{ color: "var(--color-primary-500)" }}
                 >
-                  Seleccionar →
+                  Seleccionar 
                 </div>
               </div>
             </Card>

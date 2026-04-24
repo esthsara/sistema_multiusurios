@@ -1,7 +1,9 @@
-import { Modal, Button, Tag, ConfigProvider, Grid, theme } from "antd";
+import { Modal, Button, ConfigProvider, Grid, theme } from "antd";
 import { User, Globe, Calendar } from "lucide-react";
 
-import { ACCION_COLOR, type AuditoriaItem } from "./auditoria.constants";
+import { AppTag } from "@/shared/components/atoms/AppTag";
+
+import { ACCION_TONE, type AuditoriaItem } from "./auditoria.constants";
 
 interface Props {
   open: boolean;
@@ -67,9 +69,9 @@ export const AuditoriaViewModal = ({ open, item, onClose }: Props) => {
               Acción
             </span>
             <div className="mt-1">
-              <Tag color={ACCION_COLOR[item.accion] ?? "default"}>
+              <AppTag tone={ACCION_TONE[item.accion] ?? "neutral"}>
                 {item.accion_texto}
-              </Tag>
+              </AppTag>
             </div>
           </div>
 

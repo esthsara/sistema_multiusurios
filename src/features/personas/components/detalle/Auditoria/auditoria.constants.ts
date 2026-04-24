@@ -16,14 +16,27 @@ export interface AuditoriaItem {
   fecha: string;
 }
 
-
-
-export const ACCION_COLOR: Record<string, string> = {
-  LOGIN_SUCCESS: "green",
-  LOGOUT: "orange",
-  CREATE: "blue",
+export const ACCION_TONE: Record<
+  string,
+  | "neutral"
+  | "primary"
+  | "success"
+  | "warning"
+  | "danger"
+  | "purple"
+  | "cyan"
+  | "geekblue"
+  | "volcano"
+  | "lime"
+  | "magenta"
+  | "gold"
+  | "blue"
+> = {
+  LOGIN_SUCCESS: "success",
+  LOGOUT: "warning",
+  CREATE: "primary",
   UPDATE: "cyan",
-  DELETE: "red",
+  DELETE: "danger",
   SWITCH_BRANCH: "purple",
   USUARIO_ASIGNADO_SUCURSAL: "gold",
 };
