@@ -58,7 +58,7 @@ export const SessionExpiredModal = () => {
       open={open}
       // En modo aviso el usuario puede cerrarlo; en modo expirado, no
       closable={warnMode}
-      maskClosable={warnMode}
+      mask={{ closable: warnMode }}
       keyboard={warnMode}
       footer={null}
       centered
