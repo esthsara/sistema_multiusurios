@@ -95,11 +95,12 @@ export const ContactoFormModal = ({
         confirmLoading={loading}
         width={480}
         centered
-        destroyOnClose
-        // EFECTO BLUR SOLICITADO
-        maskStyle={{
-          backdropFilter: "blur(4px)",
-          WebkitBackdropFilter: "blur(4px)",
+        destroyOnHidden
+        styles={{
+          mask: {
+            backdropFilter: "blur(6px)",
+            WebkitBackdropFilter: "blur(6px)",
+          },
         }}
       >
         <Form

@@ -28,10 +28,12 @@ export const PersonaTypeSelector = ({
         footer={null}
         centered
         width={520}
-        destroyOnClose
-        maskStyle={{
-          backdropFilter: "blur(6px)",
-          WebkitBackdropFilter: "blur(6px)",
+        destroyOnHidden
+        styles={{
+          mask: {
+            backdropFilter: "blur(6px)",
+            WebkitBackdropFilter: "blur(6px)",
+          },
         }}
       >
         <div className="pt-2">

@@ -110,11 +110,13 @@ export const PersonaFormModal = ({
         cancelButtonProps={{ disabled: isSubmitting }}
         width={720}
         centered
-        destroyOnClose
+        destroyOnHidden
         title={null}
-        maskStyle={{
-          backdropFilter: "blur(6px)",
-          WebkitBackdropFilter: "blur(6px)",
+        styles={{
+          mask: {
+            backdropFilter: "blur(6px)",
+            WebkitBackdropFilter: "blur(6px)",
+          },
         }}
       >
         {/* HEADER PRO */}
