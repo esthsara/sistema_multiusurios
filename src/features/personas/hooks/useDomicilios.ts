@@ -7,7 +7,7 @@ import type {
   Domicilio,
   CreateDomicilioDto,
   UpdateDomicilioDto,
-} from "../types/persona-detalle.types";
+} from "../components/detalle/Domicilio/domicilio.constants";
 
 export const useDomicilios = (personaId: number) => {
   const [domicilios, setDomicilios] = useState<Domicilio[]>([]);

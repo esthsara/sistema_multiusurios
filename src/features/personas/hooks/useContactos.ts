@@ -7,7 +7,7 @@ import type {
   Contacto,
   CreateContactoDto,
   UpdateContactoDto,
-} from "../types/persona-detalle.types";
+} from "../components/detalle/Contacto/contacto.constants";
 
 export const useContactos = (personaId: number) => {
   const [contactos, setContactos] = useState<Contacto[]>([]);
