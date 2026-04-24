@@ -11,7 +11,11 @@ type AppTagTone =
   | "purple"
   | "cyan"
   | "geekblue"
-  | "volcano";
+  | "volcano"
+  | "lime"
+  | "magenta"
+  | "gold"
+  | "blue";
 
 interface AppTagProps extends Omit<TagProps, "color"> {
   tone?: AppTagTone;
@@ -22,58 +26,93 @@ const TONE_STYLES: Record<
   AppTagTone,
   { backgroundColor: string; color: string; borderColor: string }
 > = {
+  // NEUTRAL - gris suave
   neutral: {
-    backgroundColor: "var(--color-bg-subtle)",
-    color: "var(--color-text-secondary)",
-    borderColor: "var(--color-border)",
+    backgroundColor: "var(--tag-neutral-bg)",
+    color: "var(--tag-neutral-text)",
+    borderColor: "var(--tag-neutral-border)",
   },
 
+  // PRIMARY - azul principal (más visible)
   primary: {
-    backgroundColor: "rgba(59, 130, 246, 0.15)",
-    color: "rgb(96, 165, 250)",
-    borderColor: "rgba(59, 130, 246, 0.35)",
+    backgroundColor: "var(--color-alert-primary-bg)", // Aprovechamos tus variables existentes
+    color: "var(--color-primary-600)",
+    borderColor: "var(--color-primary-400)",
   },
 
+  // SUCCESS - verde vibrante
   success: {
-    backgroundColor: "rgba(34, 197, 94, 0.15)",
-    color: "rgb(74, 222, 128)",
-    borderColor: "rgba(34, 197, 94, 0.35)",
+    backgroundColor: "var(--color-alert-success-bg)",
+    color: "var(--color-success-500)",
+    borderColor: "var(--color-success-600)",
   },
 
+  // WARNING - naranja vibrante
   warning: {
-    backgroundColor: "rgba(234, 179, 8, 0.18)",
-    color: "rgb(253, 224, 71)",
-    borderColor: "rgba(234, 179, 8, 0.35)",
+    backgroundColor: "var(--color-alert-warning-bg)",
+    color: "var(--color-warning-500)",
+    borderColor: "var(--color-warning-600)",
   },
 
+  // DANGER - rojo vibrante
   danger: {
-    backgroundColor: "rgba(239, 68, 68, 0.15)",
-    color: "rgb(252, 165, 165)",
-    borderColor: "rgba(239, 68, 68, 0.35)",
+    backgroundColor: "var(--color-alert-danger-bg)",
+    color: "var(--color-danger-500)",
+    borderColor: "var(--color-danger-600)",
   },
 
+  // PURPLE - morado vibrante
   purple: {
-    backgroundColor: "rgba(168, 85, 247, 0.15)",
-    color: "rgb(196, 181, 253)",
-    borderColor: "rgba(168, 85, 247, 0.35)",
+    backgroundColor: "var(--tag-purple-bg)",
+    color: "var(--tag-purple-text)",
+    borderColor: "var(--tag-purple-border)",
   },
 
+  // CYAN - cian vibrante
   cyan: {
-    backgroundColor: "rgba(6, 182, 212, 0.15)",
-    color: "rgb(103, 232, 249)",
-    borderColor: "rgba(6, 182, 212, 0.35)",
+    backgroundColor: "var(--tag-cyan-bg)",
+    color: "var(--tag-cyan-text)",
+    borderColor: "var(--tag-cyan-border)",
   },
 
+  // GEEKBLUE - azul brillante
   geekblue: {
-    backgroundColor: "rgba(59, 130, 246, 0.18)",
-    color: "rgb(147, 197, 253)",
-    borderColor: "rgba(59, 130, 246, 0.4)",
+    backgroundColor: "var(--tag-geekblue-bg)",
+    color: "var(--tag-geekblue-text)",
+    borderColor: "var(--tag-geekblue-border)",
+  },
+  volcano: {
+    backgroundColor: "var(--tag-volcano-bg)",
+    color: "var(--tag-volcano-text)",
+    borderColor: "var(--tag-volcano-border)",
   },
 
-  volcano: {
-    backgroundColor: "rgba(249, 115, 22, 0.18)",
-    color: "rgb(253, 186, 116)",
-    borderColor: "rgba(249, 115, 22, 0.4)",
+  // LIME - verde limón vibrante
+  lime: {
+    backgroundColor: "var(--tag-lime-bg)",
+    color: "var(--tag-lime-text)",
+    borderColor: "var(--tag-lime-border)",
+  },
+
+  // MAGENTA - magenta/rosa vibrante
+  magenta: {
+    backgroundColor: "var(--tag-magenta-bg)",
+    color: "var(--tag-magenta-text)",
+    borderColor: "var(--tag-magenta-border)",
+  },
+
+  // GOLD - dorado vibrante
+  gold: {
+    backgroundColor: "var(--tag-gold-bg)",
+    color: "var(--tag-gold-text)",
+    borderColor: "var(--tag-gold-border)",
+  },
+
+  // BLUE - azul cielo vibrante
+  blue: {
+    backgroundColor: "var(--tag-blue-bg)",
+    color: "var(--tag-blue-text)",
+    borderColor: "var(--tag-blue-border)",
   },
 };
 
@@ -93,9 +132,13 @@ export const AppTag = ({
       style={{
         ...toneStyles,
         borderStyle: "solid",
-        borderWidth: 1,
+        borderWidth: "1px",
         fontWeight: 600,
         marginInlineEnd: 0,
+        borderRadius: "var(--radius-md)",
+        padding: "1px 10px",
+        fontSize: "12px",
+        transition: "all var(--transition-base)",
         ...style,
       }}
       {...props}

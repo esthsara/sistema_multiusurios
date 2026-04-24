@@ -71,6 +71,60 @@
 
   /* Transiciones */
   --transition-base: 150ms ease-in-out;
+
+  /* TAGS COLORS - MODO CLARO */
+  --tag-neutral-bg: color-mix(in srgb, #64748b 8%, var(--color-bg-base));
+  --tag-neutral-text: #475569;
+  --tag-neutral-border: color-mix(in srgb, #64748b 25%, transparent);
+
+  --tag-primary-bg: color-mix(in srgb, #3b6fcf 15%, var(--color-bg-base));
+  --tag-primary-text: #2c4fa3;
+  --tag-primary-border: #3b6fcf;
+
+  --tag-success-bg: color-mix(in srgb, #16a34a 15%, var(--color-bg-base));
+  --tag-success-text: #15803d;
+  --tag-success-border: #22c55e;
+
+  --tag-warning-bg: color-mix(in srgb, #ea580c 15%, var(--color-bg-base));
+  --tag-warning-text: #c2410c;
+  --tag-warning-border: #f97316;
+
+  --tag-danger-bg: color-mix(in srgb, #dc2626 15%, var(--color-bg-base));
+  --tag-danger-text: #991b1b;
+  --tag-danger-border: #ef4444;
+
+  --tag-purple-bg: color-mix(in srgb, #9333ea 15%, var(--color-bg-base));
+  --tag-purple-text: #6b21a8;
+  --tag-purple-border: #a855f7;
+
+  --tag-cyan-bg: color-mix(in srgb, #0891b2 15%, var(--color-bg-base));
+  --tag-cyan-text: #164e63;
+  --tag-cyan-border: #06b6d4;
+  
+  --tag-geekblue-bg: color-mix(in srgb, #1d4ed8 15%, var(--color-bg-base));
+  --tag-geekblue-text: #1e3a8a;
+  --tag-geekblue-border: #3b82f6;
+
+  --tag-volcano-bg: color-mix(in srgb, #ea580c 15%, var(--color-bg-base));
+  --tag-volcano-text: #7c2d12;
+  --tag-volcano-border: #f97316;
+
+--tag-lime-bg: color-mix(in srgb, #65a30d 15%, var(--color-bg-base));
+  --tag-lime-text: #365314;
+  --tag-lime-border: #84cc16;
+
+  --tag-magenta-bg: color-mix(in srgb, #be185d 15%, var(--color-bg-base));
+  --tag-magenta-text: #831843;
+  --tag-magenta-border: #ec4899;
+
+  --tag-gold-bg: color-mix(in srgb, #ca8a04 15%, var(--color-bg-base));
+  --tag-gold-text: #78350f;
+  --tag-gold-border: #eab308;
+
+  --tag-blue-bg: color-mix(in srgb, #0369a1 15%, var(--color-bg-base));
+  --tag-blue-text: #082f49;
+  --tag-blue-border: #0ea5e9;
+
 }
 
 .dark {
@@ -104,6 +158,60 @@
   /* Sombras */
   --shadow-card: 0 1px 3px 0 rgb(0 0 0 / 0.4);
   --shadow-modal: 0 20px 25px -5px rgb(0 0 0 / 0.5);
+
+
+  /* TAGS COLORS - MODO OSCURO */
+  --tag-neutral-bg: var(--color-bg-subtle);
+  --tag-neutral-text: var(--color-text-secondary);
+  --tag-neutral-border: var(--color-border);
+
+  --tag-primary-bg: color-mix(in srgb, var(--color-primary-600) 12%, var(--color-bg-base));
+  --tag-primary-text: var(--color-primary-600);
+  --tag-primary-border: color-mix(in srgb, var(--color-primary-600) 30%, transparent);
+
+  --tag-success-bg: color-mix(in srgb, var(--color-success-500) 12%, var(--color-bg-base));
+  --tag-success-text: var(--color-success-500);
+  --tag-success-border: color-mix(in srgb, var(--color-success-500) 30%, transparent);
+
+  --tag-warning-bg: color-mix(in srgb, var(--color-warning-500) 12%, var(--color-bg-base));
+  --tag-warning-text: var(--color-warning-500);
+  --tag-warning-border: color-mix(in srgb, var(--color-warning-500) 30%, transparent);
+
+  --tag-danger-bg: color-mix(in srgb, var(--color-danger-500) 12%, var(--color-bg-base));
+  --tag-danger-text: var(--color-danger-500);
+  --tag-danger-border: color-mix(in srgb, var(--color-danger-500) 30%, transparent);
+
+  --tag-purple-bg: color-mix(in srgb, #a855f7 12%, var(--color-bg-base));
+  --tag-purple-text: #d8b4fe;
+  --tag-purple-border: color-mix(in srgb, #a855f7 30%, transparent);
+
+  --tag-cyan-bg: color-mix(in srgb, #06b6d4 12%, var(--color-bg-base));
+  --tag-cyan-text: #67e8f9;
+  --tag-cyan-border: color-mix(in srgb, #06b6d4 30%, transparent);
+
+  --tag-geekblue-bg: color-mix(in srgb, #3b82f6 12%, var(--color-bg-base));
+  --tag-geekblue-text: #93c5fd;
+  --tag-geekblue-border: color-mix(in srgb, #3b82f6 35%, transparent);
+
+  --tag-volcano-bg: color-mix(in srgb, #f97316 12%, var(--color-bg-base));
+  --tag-volcano-text: #fdba74;
+  --tag-volcano-border: color-mix(in srgb, #f97316 35%, transparent);
+
+  --tag-lime-bg: color-mix(in srgb, #84cc16 12%, var(--color-bg-base));
+  --tag-lime-text: #d4fc79;
+  --tag-lime-border: color-mix(in srgb, #84cc16 30%, transparent);
+
+  --tag-magenta-bg: color-mix(in srgb, #ec4899 12%, var(--color-bg-base));
+  --tag-magenta-text: #f472b6;
+  --tag-magenta-border: color-mix(in srgb, #ec4899 30%, transparent);
+
+  --tag-gold-bg: color-mix(in srgb, #eab308 12%, var(--color-bg-base));
+  --tag-gold-text: #facc15;
+  --tag-gold-border: color-mix(in srgb, #eab308 30%, transparent);
+
+  --tag-blue-bg: color-mix(in srgb, #0ea5e9 12%, var(--color-bg-base));
+  --tag-blue-text: #7dd3fc;
+  --tag-blue-border: color-mix(in srgb, #0ea5e9 30%, transparent);
 }
 
 /* ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
