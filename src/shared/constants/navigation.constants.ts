@@ -17,7 +17,15 @@ import { APP_ROUTES } from "@/shared/constants/routes.constants";
 
 /**
  * NavItem — Un ítem del menú de navegación.
- * Aqui tenemos loq ue se muestra el sidebar y debemos controlar mediante permisos quien lo vera :,)
+ *
+ * permissions: lista de permisos requeridos (OR lógico).
+ *   - Array vacío [] → visible para cualquier usuario autenticado.
+ *   - Con valores → visible solo si el usuario tiene AL MENOS uno.
+ *
+ * El Sidebar aplica filterNavItems recursivamente:
+ *   - Si un grupo NO tiene hijos visibles, el grupo se oculta también.
+ *   - Los grupos padre tienen los permisos acumulados de sus hijos
+ *     como salvaguarda extra (aunque el filtro de hijos es suficiente).
  */
 export interface NavItem {
   key: string;
@@ -29,7 +37,15 @@ export interface NavItem {
 }
 
 /**
- * Para agregar un módulo agregar un objeto aquí.
+ * NAV_CONFIG — Configuración centralizada de la navegación.
+ *
+ * Reglas aplicadas:
+ *   - Dashboard y Perfil: sin permiso específico (solo autenticación).
+ *   - Cada módulo hoja tiene su permiso `.ver` correspondiente.
+ *   - Grupos padre tienen los permisos OR de sus hijos para que
+ *     el sidebar los oculte también si ningún hijo es accesible.
+ *   - La jerarquía (editar/eliminar → ver) se resuelve en auth.store,
+ *     por lo que usar `.ver` aquí es suficiente para todos los casos.
  */
 export const NAV_CONFIG: NavItem[] = [
   {
@@ -37,13 +53,14 @@ export const NAV_CONFIG: NavItem[] = [
     label: "Dashboard",
     icon: LayoutDashboard,
     path: APP_ROUTES.DASHBOARD.HOME,
-    permissions: [],
+    permissions: [], // Visible para todo usuario autenticado
   },
   {
     key: "gestion-personas",
     label: "Gestión de Personas",
     icon: Users,
-    permissions: [],
+    // OR de los permisos de sus hijos — el grupo se oculta si ningún hijo aplica
+    permissions: ["personas.ver", "usuarios.ver"],
     children: [
       {
         key: "personas",
@@ -57,7 +74,7 @@ export const NAV_CONFIG: NavItem[] = [
         label: "Usuarios",
         icon: Users,
         path: APP_ROUTES.DASHBOARD.USUARIOS.ROOT,
-        permissions: [],
+        permissions: ["usuarios.ver"],
       },
     ],
   },
@@ -65,23 +82,21 @@ export const NAV_CONFIG: NavItem[] = [
     key: "gestion-organizacional",
     label: "Gestión Organizacional",
     icon: Building2,
-    permissions: [],
+    permissions: ["sucursales.ver", "asignaciones.ver"],
     children: [
       {
         key: "sucursales",
         label: "Sucursales",
         icon: Building2,
         path: APP_ROUTES.DASHBOARD.SUCURSALES.ROOT,
-        permissions: [],
+        permissions: ["sucursales.ver"],
       },
       {
         key: "asignaciones",
         label: "Asignaciones Usuario-Sucursal",
         icon: GitMerge,
         path: APP_ROUTES.DASHBOARD.ASIGNACIONES,
-        permissions: [
-          /*"sucursales.ver", "usuarios.ver" aqui debo poner los permisos*/
-        ],
+        permissions: ["asignaciones.ver"],
       },
     ],
   },
@@ -89,34 +104,39 @@ export const NAV_CONFIG: NavItem[] = [
     key: "seguridad",
     label: "Seguridad y Accesos",
     icon: ShieldCheck,
-    permissions: [],
+    permissions: [
+      "roles.ver",
+      "permisos.ver",
+      "permisos.asignar",
+    ],
     children: [
       {
         key: "roles",
         label: "Roles",
         icon: ShieldCheck,
         path: APP_ROUTES.DASHBOARD.ROLES,
-        permissions: [],
+        permissions: ["roles.ver"],
       },
       {
         key: "permisos",
         label: "Permisos",
         icon: KeyRound,
         path: APP_ROUTES.DASHBOARD.PERMISOS,
-        permissions: [],
+        permissions: ["permisos.ver"],
       },
       {
         key: "matriz",
         label: "Matriz Rol-Permiso",
         icon: LayoutGrid,
         path: APP_ROUTES.DASHBOARD.MATRIZ,
-        permissions: [],
+        permissions: ["permisos.asignar"],
       },
       {
         key: "sesiones",
         label: "Sesiones",
         icon: MonitorCheck,
         path: APP_ROUTES.DASHBOARD.SESIONES,
+        // Sesiones solo requiere estar autenticado (todos los usuarios)
         permissions: [],
       },
     ],
@@ -126,6 +146,6 @@ export const NAV_CONFIG: NavItem[] = [
     label: "Auditoría",
     icon: ClipboardList,
     path: APP_ROUTES.DASHBOARD.AUDITORIA,
-    permissions: [],
+    permissions: ["auditoria.ver"],
   },
 ];

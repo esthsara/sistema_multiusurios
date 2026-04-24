@@ -5,13 +5,13 @@ import type { PermissionString, RoleName } from "@/shared/types/auth.types";
 /**
  * PermissionsApi — La interfaz pública del hook.
  *
- * ¿Por qué definir la interfaz explícitamente?
- * Documenta exactamente qué ofrece el hook.
- * Si alguien importa usePermissions, sabe exactamente
- * qué puede usar sin leer la implementación.
+ * Métodos genéricos: can, canAll, canAny, cannot, hasRole, isSuperAdmin
+ * Helpers semánticos: canView, canEdit, canDelete, canCreate
+ *   → usan hasPermission internamente, que aplica la jerarquía automática
+ *     (editar / eliminar implica ver).
  */
 interface PermissionsApi {
-  /** Tiene UN permiso específico */
+  /** Tiene UN permiso específico (aplica jerarquía automática) */
   can: (permission: PermissionString) => boolean;
   /** Tiene TODOS los permisos del array (AND lógico) */
   canAll: (permissions: PermissionString[]) => boolean;
@@ -23,6 +23,16 @@ interface PermissionsApi {
   hasRole: (role: RoleName | RoleName[]) => boolean;
   /** Es super-admin */
   isSuperAdmin: boolean;
+
+  // ── Helpers semánticos por módulo ──────────────────────────────────
+  /** Puede ver el módulo (o tiene editar/eliminar → jerarquía automática) */
+  canView: (module: string) => boolean;
+  /** Puede editar el módulo */
+  canEdit: (module: string) => boolean;
+  /** Puede eliminar en el módulo */
+  canDelete: (module: string) => boolean;
+  /** Puede crear en el módulo */
+  canCreate: (module: string) => boolean;
 }
 
 export const usePermissions = (): PermissionsApi => {
@@ -45,5 +55,14 @@ export const usePermissions = (): PermissionsApi => {
     cannot: (permission) => !hasPermission(permission),
     hasRole,
     isSuperAdmin,
+
+    // Helpers semánticos — delegan en hasPermission (con jerarquía)
+    canView: (module) => hasPermission(`${module}.ver` as PermissionString),
+    canEdit: (module) => hasPermission(`${module}.editar` as PermissionString),
+    canDelete: (module) =>
+      hasPermission(`${module}.eliminar` as PermissionString),
+    canCreate: (module) =>
+      hasPermission(`${module}.crear` as PermissionString),
   };
 };
+

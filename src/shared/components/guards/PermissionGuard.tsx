@@ -1,28 +1,51 @@
-
 // src/shared/components/guards/PermissionGuard.tsx
 import { Navigate, Outlet } from "react-router-dom";
-import { useAuth } from "@/shared/hooks/useAuth";
+import { useAuthStore } from "@/features/auth/store/auth.store";
 import { APP_ROUTES } from "@/shared/constants/routes.constants";
 import type { PermissionString } from "@/shared/types/auth.types";
 
 interface PermissionGuardProps {
   /**
-   * permission?: opcional — si no se pasa, solo verifica autenticación.
-   * Aqui solo deja entrar a usurios como unguardia que deja eentrar a usuarios autenticados, pero si se pasa un permiso, verifica que el usuario tenga ese permiso específico.
-   * Si el usuario no tiene el permiso requerido, se redirige a la ruta especificada en fallback.
-   * Si no se pasa un permiso, simplemente verifica que el usuario esté autenticado.
+   * Un permiso único ─── o ─── un array de permisos con su operador.
+   *
+   * Un permiso:
+   *   <PermissionGuard permission="personas.ver" />
+   *
+   * Varios con OR (al menos uno):
+   *   <PermissionGuard permissions={["personas.ver", "personas.editar"]} operator="OR" />
+   *
+   * Varios con AND (todos requeridos):
+   *   <PermissionGuard permissions={["roles.ver", "roles.editar"]} operator="AND" />
    */
   permission?: PermissionString;
-  fallback?: string; // Ruta a redirigir si no tiene permiso
+  permissions?: PermissionString[];
+  operator?: "OR" | "AND";
 }
 
 export const PermissionGuard = ({
   permission,
-  fallback = APP_ROUTES.DASHBOARD.HOME,
+  permissions,
+  operator = "OR",
 }: PermissionGuardProps) => {
-  const { hasPermission } = useAuth();
-  if (permission && !hasPermission(permission)) {
-    return <Navigate to={fallback} replace />;
+  const hasPermission = useAuthStore((s) => s.hasPermission);
+  const hasAnyPermission = useAuthStore((s) => s.hasAnyPermission);
+
+  // Normalizar: siempre trabajamos con un array
+  const required: PermissionString[] = permission
+    ? [permission]
+    : (permissions ?? []);
+
+  // Sin restricciones definidas → solo verifica autenticación (AuthGuard se encarga)
+  if (required.length === 0) return <Outlet />;
+
+  const granted =
+    operator === "AND"
+      ? required.every((p) => hasPermission(p))
+      : hasAnyPermission(required);
+
+  if (!granted) {
+    return <Navigate to={APP_ROUTES.UNAUTHORIZED} replace />;
   }
+
   return <Outlet />;
 };

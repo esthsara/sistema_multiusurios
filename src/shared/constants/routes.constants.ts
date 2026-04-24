@@ -9,6 +9,7 @@ export const APP_ROUTES = {
   ROOT: "/",
   LOGIN: "/login",
   NO_BRANCH: "/sin-sucursal",
+  UNAUTHORIZED: "/unauthorized",
   DASHBOARD: {
     ROOT: "/dashboard",
     HOME: "/dashboard/home",

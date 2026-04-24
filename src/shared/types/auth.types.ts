@@ -9,22 +9,37 @@ export type RoleName = string;
  * listamos permisos conocidos para tener autocompletado y evitar errores de typo y tambien los permitimos como string dinamico para que el sistema sea flexible y no dependa de una lista fija en el frontend.
  */
 type KnownPermission =
+  // ── Personas ─────────────────────────────
   | "personas.ver"
   | "personas.crear"
   | "personas.editar"
   | "personas.eliminar"
+  // ── Sucursales ────────────────────────────
   | "sucursales.ver"
   | "sucursales.crear"
   | "sucursales.editar"
   | "sucursales.eliminar"
+  // ── Usuarios ─────────────────────────────
   | "usuarios.ver"
   | "usuarios.crear"
   | "usuarios.editar"
   | "usuarios.eliminar"
+  // ── Roles ────────────────────────────────
   | "roles.ver"
   | "roles.crear"
   | "roles.editar"
   | "roles.eliminar"
+  // ── Permisos (gestión interna) ────────────
+  | "permisos.ver"
+  | "permisos.crear"
+  | "permisos.editar"
+  | "permisos.eliminar"
+  | "permisos.asignar"
+  // ── Asignaciones usuario-sucursal ─────────
+  | "asignaciones.ver"
+  | "asignaciones.crear"
+  | "asignaciones.eliminar"
+  // ── Auditoría ─────────────────────────────
   | "auditoria.ver";
 
 type DynamicPermission = string & {};
