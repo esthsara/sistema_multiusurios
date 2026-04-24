@@ -416,10 +416,28 @@ export const useAuthStore = create<AuthStore>()(
         const { user } = get();
         if (!user) return false;
 
+        // Super-admin siempre tiene acceso total
         const isSuper = user.roles.some((r) => isSuperAdminRole(r.name));
         if (isSuper) return true;
 
-        return user.permisos.includes(permission);
+        // Verificación directa
+        if (user.permisos.includes(permission)) return true;
+
+        /**
+         * Jerarquía automática: editar o eliminar implica ver.
+         * Si el usuario pide "módulo.ver" pero tiene "módulo.editar"
+         * o "módulo.eliminar", se le concede el acceso de lectura.
+         * "crear" es independiente y NO implica "ver".
+         */
+        if (permission.endsWith(".ver")) {
+          const modulo = permission.slice(0, -4); // quita ".ver"
+          return (
+            user.permisos.includes(`${modulo}.editar`) ||
+            user.permisos.includes(`${modulo}.eliminar`)
+          );
+        }
+
+        return false;
       },
 
       hasRole: (role) => {

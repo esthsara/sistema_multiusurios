@@ -1,11 +1,10 @@
 // src/config/router.config.tsx
 import { createBrowserRouter, Navigate } from "react-router-dom";
-import { lazy, Suspense } from "react";
+import { lazy, Suspense, useEffect } from "react";
 import { AuthGuard } from "@/shared/components/guards/AuthGuard";
 import { PermissionGuard } from "@/shared/components/guards/PermissionGuard";
 import { APP_ROUTES } from "@/shared/constants/routes.constants";
-
-/*Ponemos las rutas reales de donde se encuentran nuestras pages */
+import { useUIStore } from "@/shared/store/ui.store";
 
 /* ── Layouts ── */
 const AuthLayout = lazy(() => import("@/layouts/AuthLayout"));
@@ -18,35 +17,34 @@ const NoBranchPage = lazy(
 );
 
 /* ── Páginas privadas ── */
-const HomePage = lazy(() => import("@/features/dashboard/components/HomePage"));
+const HomePage = lazy(
+  () => import("@/features/dashboard/components/HomePage"),
+);
 const ProfilePage = lazy(
   () => import("@/features/auth/components/ProfilePage"),
 );
 const PersonasPage = lazy(
   () => import("@/features/personas/components/PersonasPage"),
 );
-/*ver persona */
 const PersonaDetallePage = lazy(
   () => import("@/features/personas/components/detalle/PersonaDetallePage"),
 );
-
 const SucursalesPage = lazy(
   () => import("@/features/sucursales/components/SucursalesPage"),
 );
 const SucursalDetallePage = lazy(
-  () => import("@/features/sucursales/components/detalle/SucursalDetallePage"),
+  () =>
+    import("@/features/sucursales/components/detalle/SucursalDetallePage"),
 );
-
 const UsuariosPage = lazy(
   () => import("@/features/usuarios/components/UsuariosPage"),
 );
-/*ver usuario */
 const UsuarioDetallePage = lazy(
   () => import("@/features/usuarios/components/detalle/UsuarioDetallePage"),
 );
-
-const RolesPage = lazy(() => import("@/features/roles/components/RolesPage"));
-
+const RolesPage = lazy(
+  () => import("@/features/roles/components/RolesPage"),
+);
 const PermisosPage = lazy(
   () => import("@/features/permisos/components/PermisosPage"),
 );
@@ -56,17 +54,19 @@ const MatrizPage = lazy(
 const AsignacionesPage = lazy(
   () => import("@/features/asignaciones/components/AsignacionesPage"),
 );
-
 const AuditoriaPage = lazy(
   () => import("@/features/auditoria/components/AuditoriaPage"),
 );
-const NotFoundPage = lazy(() => import("@/shared/components/NotFoundPage"));
-
-import { useEffect } from "react";
-import { useUIStore } from "@/shared/store/ui.store";
+const NotFoundPage = lazy(
+  () => import("@/shared/components/NotFoundPage"),
+);
+const UnauthorizedPage = lazy(
+  () => import("@/shared/components/UnauthorizedPage"),
+);
 
 /**
- * Este componente se muestra mientras se cargan las páginas de forma perezosa (lazy loading). Es una buena práctica mostrar algo al usuario para que sepa que la aplicación está trabajando en cargar el contenido.
+ * PageLoader — Se muestra mientras se cargan las páginas perezosas.
+ * Activa el loader global del store para mostrar feedback visual.
  */
 const PageLoader = () => {
   useEffect(() => {
@@ -74,49 +74,30 @@ const PageLoader = () => {
     setGlobalLoading(true, "Cargando vista...");
     return () => setGlobalLoading(false);
   }, []);
-
   return null;
 };
 
-/* Wrapper para envolver componentes con Suspense tiene carga perezosa es decir que no se cargan si no se necesitan  si no se carga se muestra hatsa mientras el pageloader*/
+/** Envuelve un componente en Suspense con el loader global. */
 const withSuspense = (Component: React.ComponentType) => (
   <Suspense fallback={<PageLoader />}>
     <Component />
   </Suspense>
 );
 
-/*Para aumentar rutas 
-* 1.Agregamos una ruta en routes.constants.ts
- * PRODUCTOS: {
- *   ROOT: "/dashboard/productos",
- *   NUEVO: "/dashboard/productos/nuevo",
- * }
-  2.Crear la página (lazy loading)
+/*
+ * ── Cómo añadir una ruta protegida ────────────────────────────────────────
  *
- * const ProductosPage = lazy(
- *   () => import("@/features/productos/components/ProductosPage")
- * );
+ * 1. Registrar la ruta en routes.constants.ts
+ * 2. Crear la página con lazy()
+ * 3. Añadir el bloque usando <PermissionGuard permission="modulo.ver" />
  *
-  * 3.Agregar la ruta al router.config.tsx
-  SIN permisos:
+ * Un permiso:
+ *   { element: <PermissionGuard permission="productos.ver" />,
+ *     children: [{ path: ..., element: withSuspense(ProductosPage) }] }
  *
- * {
- *   path: APP_ROUTES.DASHBOARD.PRODUCTOS.ROOT,
- *   element: withSuspense(ProductosPage),
- * }
-  CON MÚLTIPLES permisos:
- *
- * {
- *   element: (
- *     <PermissionGuard permissions={["productos.ver", "productos.editar"]} />
- *   ),
- *   children: [
- *     {
- *       path: APP_ROUTES.DASHBOARD.PRODUCTOS.ROOT,
- *       element: withSuspense(ProductosPage),
- *     },
- *   ],
- * }
+ * Varios permisos (OR — al menos uno):
+ *   { element: <PermissionGuard permissions={["productos.ver","productos.editar"]} operator="OR" />,
+ *     children: [...] }
  */
 export const router = createBrowserRouter([
   /* ── Redirect raíz ── */
@@ -125,22 +106,29 @@ export const router = createBrowserRouter([
     element: <Navigate to={APP_ROUTES.DASHBOARD.HOME} replace />,
   },
 
-  /* ── Rutas Públicas ── */
+  /* ── Rutas públicas ── */
   {
     element: withSuspense(AuthLayout),
-    children: [{ path: APP_ROUTES.LOGIN, element: withSuspense(LoginPage) }],
+    children: [
+      { path: APP_ROUTES.LOGIN, element: withSuspense(LoginPage) },
+    ],
   },
 
   /* Ruta semi-pública: usuario autenticado pero sin sucursal asignada.
-   * Está fuera del AuthGuard para evitar bucle de redirección. */
+   * Fuera del AuthGuard para evitar bucle de redirección. */
   {
     path: APP_ROUTES.NO_BRANCH,
     element: withSuspense(NoBranchPage),
   },
 
-  /* ── Rutas Privadas — requieren autenticación ── */
+  /* ── Página 403 ─── fuera del layout pero accesible tras login ── */
   {
-    /*aqui decimos que si o si necesitamos un login se va a ir a AuthGuard y si estamos logueados entramos */
+    path: APP_ROUTES.UNAUTHORIZED,
+    element: withSuspense(UnauthorizedPage),
+  },
+
+  /* ── Rutas privadas — requieren autenticación ── */
+  {
     element: <AuthGuard />,
     children: [
       {
@@ -150,6 +138,8 @@ export const router = createBrowserRouter([
             path: APP_ROUTES.DASHBOARD.ROOT,
             element: <Navigate to={APP_ROUTES.DASHBOARD.HOME} replace />,
           },
+
+          /* Dashboard y Perfil — sin permiso específico (solo login) */
           {
             path: APP_ROUTES.DASHBOARD.HOME,
             element: withSuspense(HomePage),
@@ -159,7 +149,7 @@ export const router = createBrowserRouter([
             element: withSuspense(ProfilePage),
           },
 
-          /* Personas — requiere permiso */
+          /* ── Personas ── */
           {
             element: <PermissionGuard permission="personas.ver" />,
             children: [
@@ -174,7 +164,7 @@ export const router = createBrowserRouter([
             ],
           },
 
-          /* Sucursales */
+          /* ── Sucursales ── */
           {
             element: <PermissionGuard permission="sucursales.ver" />,
             children: [
@@ -189,7 +179,7 @@ export const router = createBrowserRouter([
             ],
           },
 
-          /* Usuarios */
+          /* ── Usuarios ── */
           {
             element: <PermissionGuard permission="usuarios.ver" />,
             children: [
@@ -204,7 +194,7 @@ export const router = createBrowserRouter([
             ],
           },
 
-          /* Roles — solo admin */
+          /* ── Roles ── */
           {
             element: <PermissionGuard permission="roles.ver" />,
             children: [
@@ -214,8 +204,10 @@ export const router = createBrowserRouter([
               },
             ],
           },
+
+          /* ── Permisos ── usa su propio permiso, no hereda de roles ── */
           {
-            element: <PermissionGuard permission="roles.ver" />,
+            element: <PermissionGuard permission="permisos.ver" />,
             children: [
               {
                 path: APP_ROUTES.DASHBOARD.PERMISOS,
@@ -224,9 +216,9 @@ export const router = createBrowserRouter([
             ],
           },
 
-          /* Matriz Roles-Permisos */
+          /* ── Matriz Roles-Permisos ── requiere poder asignar ── */
           {
-            element: <PermissionGuard permission="roles.editar" />,
+            element: <PermissionGuard permission="permisos.asignar" />,
             children: [
               {
                 path: APP_ROUTES.DASHBOARD.MATRIZ,
@@ -235,9 +227,9 @@ export const router = createBrowserRouter([
             ],
           },
 
-          /* Asignaciones Usuario-Sucursal */
+          /* ── Asignaciones Usuario-Sucursal ── permiso propio ── */
           {
-            element: <PermissionGuard permission="sucursales.ver" />,
+            element: <PermissionGuard permission="asignaciones.ver" />,
             children: [
               {
                 path: APP_ROUTES.DASHBOARD.ASIGNACIONES,
@@ -246,7 +238,7 @@ export const router = createBrowserRouter([
             ],
           },
 
-          /* Auditoría — solo admin */
+          /* ── Auditoría ── */
           {
             element: <PermissionGuard permission="auditoria.ver" />,
             children: [
