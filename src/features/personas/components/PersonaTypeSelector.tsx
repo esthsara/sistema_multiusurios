@@ -1,4 +1,4 @@
-import { Modal, Card, ConfigProvider, theme } from "antd";
+import { Modal, Card } from "antd";
 import { User, Building2 } from "lucide-react";
 import type { TipoPersona } from "@/shared/types/auth.types";
 
@@ -14,14 +14,6 @@ export const PersonaTypeSelector = ({
   onCancel,
 }: PersonaTypeSelectorProps) => {
   return (
-    <ConfigProvider
-      theme={{
-        algorithm: theme.darkAlgorithm,
-        token: {
-          colorBgElevated: "var(--color-bg-base)",
-        },
-      }}
-    >
       <Modal
         open={open}
         onCancel={onCancel}
@@ -161,6 +153,5 @@ export const PersonaTypeSelector = ({
           </div>
         </div>
       </Modal>
-    </ConfigProvider>
   );
 };

@@ -1,7 +1,7 @@
 import { useEffect } from "react";
 import { Modal, Form, Input, Select, DatePicker } from "antd";
 import { User, Building2 } from "lucide-react";
-import dayjs from "dayjs";
+import dayjs, { type Dayjs } from "dayjs";
 import type { TipoPersona } from "@/shared/types/auth.types";
 import type {
   CreatePersonaDto,
@@ -11,6 +11,15 @@ import type {
 } from "../types/persona.types";
 
 type PersonaFormSelectedItem = PersonaListItem | PersonaDetalle;
+
+type PersonaFormValues = {
+  nombre?: string;
+  apellido?: string;
+  razon_social?: string;
+  identificacion_principal?: string;
+  fecha_nacimiento?: Dayjs | null;
+  genero?: "M" | "F" | "Otro";
+};
 
 type PersonaFormModalProps = {
   open: boolean;
@@ -33,53 +42,88 @@ export const PersonaFormModal = ({
   onSubmit,
   onCancel,
 }: PersonaFormModalProps) => {
-  const [form] = Form.useForm();
+  // TODOS los hooks deben estar aquí, en el nivel superior
+  const [form] = Form.useForm<PersonaFormValues>();
 
+  const isFisica = tipo === "FISICA";
+
+  const title = isEditMode
+    ? `Editar Persona ${isFisica ? "Física" : "Moral"}`
+    : `Nueva Persona ${isFisica ? "Física" : "Moral"}`;
+
+  const description = isFisica
+    ? "Completa la información personal del individuo"
+    : "Registra los datos legales de la entidad";
+
+  // useEffect DEBE estar aquí, nunca dentro de condicionales
   useEffect(() => {
-    if (!open) return;
+    if (!open || !tipo) return;
 
     if (isEditMode && selectedItem) {
       const hasFechaNacimiento =
         "fecha_nacimiento" in selectedItem && selectedItem.fecha_nacimiento;
 
-      form.setFieldsValue({
-        ...selectedItem,
-        fecha_nacimiento: hasFechaNacimiento
-          ? dayjs(selectedItem.fecha_nacimiento)
-          : null,
-      });
+      // Construir valores iniciales solo con campos relevantes según tipo
+      // Esto evita que el formulario tenga campos no deseados
+      const initialValues: PersonaFormValues = isFisica
+        ? {
+            nombre: selectedItem.nombre ?? undefined,
+            apellido: selectedItem.apellido ?? undefined,
+            identificacion_principal:
+              selectedItem.identificacion_principal ?? undefined,
+            fecha_nacimiento: hasFechaNacimiento
+              ? dayjs(selectedItem.fecha_nacimiento as string)
+              : null,
+            genero:
+              "genero" in selectedItem && selectedItem.genero
+                ? (selectedItem.genero as "M" | "F" | "Otro")
+                : undefined,
+          }
+        : {
+            razon_social: selectedItem.razon_social ?? undefined,
+            identificacion_principal:
+              selectedItem.identificacion_principal ?? undefined,
+          };
+
+      form.setFieldsValue(initialValues);
     } else {
       form.resetFields();
     }
-  }, [open, isEditMode, selectedItem, form]);
+  }, [open, isEditMode, selectedItem, isFisica, tipo, form]);
 
-  if (!tipo) return null;
+  // Validación DESPUÉS de todos los hooks
+  if (!open || !tipo) return null;
 
   const handleOk = async () => {
     try {
       const values = await form.validateFields();
-      const dto = {
-        ...values,
+
+      // Construir DTO solo con campos válidos según tipo_persona
+      // Esto previene error 422 por campos inesperados en validación
+      const baseDto = {
         tipo_persona: tipo,
         fecha_nacimiento: values.fecha_nacimiento
           ? values.fecha_nacimiento.format("YYYY-MM-DD")
           : undefined,
       };
-      onSubmit(dto);
+
+      const dto: CreatePersonaDto | UpdatePersonaDto = isFisica
+        ? {
+            ...baseDto,
+            nombre: values.nombre,
+            apellido: values.apellido,
+            identificacion_principal: values.identificacion_principal,
+            genero: values.genero,
+          }
+        : {
+            ...baseDto,
+            razon_social: values.razon_social,
+            identificacion_principal: values.identificacion_principal,
+          };
+
+      await onSubmit(dto);
     } catch {}
   };
-
-  const getIcon = () => {
-    return tipo === "FISICA" ? (
-      <User size={22} className="text-blue-400" />
-    ) : (
-      <Building2 size={22} className="text-purple-400" />
-    );
-  };
-
-  const title = isEditMode
-    ? `Editar Persona ${tipo === "FISICA" ? "Física" : "Moral"}`
-    : `Nueva Persona ${tipo === "FISICA" ? "Física" : "Moral"}`;
 
   return (
     <Modal
@@ -105,9 +149,8 @@ export const PersonaFormModal = ({
       {/* HEADER MINIMALISTA */}
       <div className="px-8 pt-8 pb-4 border-b border-[var(--color-border)]">
         <div className="flex items-start gap-5">
-
           <div className="mt-1">
-            {tipo === "FISICA" ? (
+            {isFisica ? (
               <User size={24} className="text-blue-400 " />
             ) : (
               <Building2 size={24} className="text-purple-400" />
@@ -119,9 +162,7 @@ export const PersonaFormModal = ({
               {title}
             </h3>
             <p className="mt-2 text-[13px] text-[var(--color-text-secondary)] opacity-70 leading-snug">
-              {tipo === "FISICA"
-                ? "Completa la información personal del individuo"
-                : "Registra los datos legales de la entidad"}
+              {description}
             </p>
           </div>
         </div>
@@ -138,7 +179,7 @@ export const PersonaFormModal = ({
       >
         <div className="space-y-5">
           {/* FISICA */}
-          {tipo === "FISICA" && (
+          {isFisica && (
             <>
               <div className="grid grid-cols-2 gap-5">
                 <Form.Item
@@ -186,11 +227,15 @@ export const PersonaFormModal = ({
                   name="genero"
                   label={<span className="font-medium">Género</span>}
                 >
-                  <Select placeholder="Seleccionar" className="rounded-lg">
-                    <Select.Option value="M">Masculino</Select.Option>
-                    <Select.Option value="F">Femenino</Select.Option>
-                    <Select.Option value="Otro">Otro</Select.Option>
-                  </Select>
+                  <Select
+                    placeholder="Seleccionar"
+                    className="rounded-lg"
+                    options={[
+                      { value: "M", label: "Masculino" },
+                      { value: "F", label: "Femenino" },
+                      { value: "Otro", label: "Otro" },
+                    ]}
+                  />
                 </Form.Item>
               </div>
             </>

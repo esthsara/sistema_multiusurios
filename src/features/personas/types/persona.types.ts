@@ -80,7 +80,7 @@ export interface PersonaQueryParams extends PersonaFilters {
   search?: string;
   sort_by?: string;
   sort_dir?: "asc" | "desc";
-  [key: string]: any;
+  [key: string]: string | number | boolean | undefined;
 }
 
 /* ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
@@ -92,3 +92,18 @@ export interface ConfirmState {
   item: PersonaListItem | null;
   loading: boolean;
 }
+
+
+/* ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+   CONFIRM MODAL CONFIG */
+
+export type IconType = "poweroff" | "rotateccw" | "trash2"
+
+export interface ConfirmConfig {
+  title: string
+  description: string
+  confirmText: string
+  danger: boolean
+  iconType: IconType
+}
+
