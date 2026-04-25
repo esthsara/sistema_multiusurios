@@ -1,3 +1,4 @@
+// src/features/usuarios/screens/UsuariosPage.tsx
 import { useState } from "react";
 import { Button, Avatar, Tooltip } from "antd";
 import {
@@ -10,29 +11,33 @@ import {
   Key,
 } from "lucide-react";
 import type { TableColumnsType } from "antd";
+
 import { PageHeader } from "@/shared/components/molecules/PageHeader";
 import { DataTable } from "@/shared/components/organisms/DataTable";
 import { ConfirmModal } from "@/shared/components/molecules/ConfirmModal";
 import { RowActions } from "@/shared/components/molecules/RowActions";
+import { Can } from "@/shared/components/atoms/Can";
 
 import { useNavigate } from "react-router-dom";
 import { APP_ROUTES } from "@/shared/constants/routes.constants";
+import { toast } from "react-toastify";
 
-import { Can } from "@/shared/components/atoms/Can";
 import { useUsuarios } from "../hooks/useUsuarios";
 import { useUsuarioForm } from "../hooks/useUsuarioForm";
 import { useRolesOptions } from "../hooks/useRolesOptions";
 import { useResetPassword } from "../hooks/useResetPassword";
 import { useSucursalesOptions } from "../hooks/useSucursalesOptions";
-import { UsuarioStatusBadge } from "./UsuarioStatusBadge";
-import { UsuarioFormModal } from "./UsuarioFormModal";
-import { UsuarioFiltersBar } from "./UsuarioFilters";
-import type { UsuarioListItem } from "../types/usuario.types";
-import { toast } from "react-toastify";
+import { UsuarioStatusBadge } from "../components/UsuarioStatusBadge";
+import { UsuarioFormModal } from "../components/UsuarioFormModal";
+import { UsuarioFiltersBar } from "../components/UsuarioFilters";
+
+import type { UsuarioListItem, ConfirmState } from "../types/usuario.types";
 import {
   getUsuarioDisplayName,
   getUsuarioInitials,
-} from "../utils/usuario.formatters";
+  getAvatarStyle,
+  getConfirmConfig,
+} from "../utils/usuario.utils";
 
 const UsuariosPage = () => {
   const navigate = useNavigate();
@@ -43,13 +48,15 @@ const UsuariosPage = () => {
   const resetPassword = useResetPassword();
   const { branchOptions } = useSucursalesOptions();
 
-  /* Estado para modales de confirmación */
-  const [confirmState, setConfirmState] = useState<{
-    open: boolean;
-    type: "toggle" | "delete" | "reset-password" | null;
-    item: UsuarioListItem | null;
-    loading: boolean;
-  }>({ open: false, type: null, item: null, loading: false });
+  /* ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+     ESTADO DE CONFIRM MODAL */
+
+  const [confirmState, setConfirmState] = useState<ConfirmState>({
+    open: false,
+    type: null,
+    item: null,
+    loading: false,
+  });
 
   const openConfirm = (
     type: "toggle" | "delete" | "reset-password",
@@ -60,53 +67,34 @@ const UsuariosPage = () => {
     setConfirmState({ open: false, type: null, item: null, loading: false });
 
   const handleConfirm = async () => {
-    if (!confirmState.item) return;
+    if (!confirmState.item || !confirmState.type) return;
     setConfirmState((prev) => ({ ...prev, loading: true }));
 
-    if (confirmState.type === "toggle") {
-      await usuarios.toggleEstado(confirmState.item);
-    } else if (confirmState.type === "delete") {
-      await usuarios.remove(confirmState.item.id);
-    } else if (confirmState.type === "reset-password") {
-      const result = await resetPassword.generateAndResetPassword(
-        confirmState.item.id,
-        "Reset de contraseña desde panel de administración",
-      );
-      if (result.success && result.temporaryPassword) {
-        // Mostrar contraseña temporal en un modal o copiar al portapapeles
-        await navigator.clipboard.writeText(result.temporaryPassword);
-        toast.info(
-          `Contraseña temporal copiada al portapapeles: ${result.temporaryPassword}`,
+    try {
+      if (confirmState.type === "toggle") {
+        await usuarios.toggleEstado(confirmState.item);
+      } else if (confirmState.type === "delete") {
+        await usuarios.remove(confirmState.item.id);
+      } else if (confirmState.type === "reset-password") {
+        const result = await resetPassword.generateAndResetPassword(
+          confirmState.item.id,
+          "Reset de contraseña desde panel de administración",
         );
+        if (result.success && result.temporaryPassword) {
+          await navigator.clipboard.writeText(result.temporaryPassword);
+          toast.info(
+            `Contraseña temporal copiada al portapapeles: ${result.temporaryPassword}`,
+          );
+        }
       }
+    } finally {
+      closeConfirm();
     }
-
-    closeConfirm();
   };
 
-  const getAvatarStyle = (usuario: UsuarioListItem) => {
-    if (usuario.persona.foto) {
-      return { backgroundColor: "var(--color-bg-overlay)" };
-    }
+  /* ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+     COLUMNAS DE LA TABLA */
 
-    if (usuario.persona.tipo_persona === "FISICA") {
-      return {
-        backgroundColor:
-          "color-mix(in srgb, var(--color-primary-600) 72%, var(--color-bg-base) 28%)",
-        color: "var(--color-text-inverse)",
-        fontWeight: 700,
-      };
-    }
-
-    return {
-      backgroundColor:
-        "color-mix(in srgb, var(--color-primary-400) 32%, var(--color-bg-overlay) 68%)",
-      color: "var(--color-primary-700)",
-      fontWeight: 700,
-    };
-  };
-
-  /* ── Columnas de la tabla ── */
   const columns: TableColumnsType<UsuarioListItem> = [
     {
       title: "Foto",
@@ -243,41 +231,18 @@ const UsuariosPage = () => {
     },
   ];
 
-  /* ── Textos del ConfirmModal ── */
-  const confirmConfig = {
-    toggle: {
-      title: confirmState.item?.activo
-        ? "¿Deseas desactivar este usuario?"
-        : "¿Deseas activar este usuario nuevamente?",
-      description: confirmState.item?.activo
-        ? "El usuario no podrá iniciar sesión ni acceder a nuevas funcionalidades."
-        : "El usuario podrá iniciar sesión y utilizar las funcionalidades disponibles.",
-      confirmText: confirmState.item?.activo ? "Desactivar" : "Activar",
-      danger: confirmState.item?.activo,
-    },
-    "reset-password": {
-      title: `¿Resetear contraseña de ${confirmState.item?.username}?`,
-      description:
-        "Se generará una contraseña temporal y se copiará automáticamente al portapapeles.",
-      confirmText: "Resetear",
-      danger: false,
-    },
-    delete: {
-      title: `¿Seguro que deseas eliminar a ${confirmState.item?.username}?`,
-      description:
-        "Se aplicará una baja lógica (soft delete). Podrás restaurar el usuario después.",
-      confirmText: "Eliminar",
-      danger: true,
-    },
-  };
+  /* ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+     CONFIG DEL CONFIRM MODAL */
 
   const currentConfirm = confirmState.type
-    ? confirmConfig[confirmState.type as keyof typeof confirmConfig]
+    ? getConfirmConfig(confirmState.type, confirmState.item)
     : null;
+
+  /* ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+     RENDER */
 
   return (
     <div>
-      {/* Header */}
       <PageHeader
         title="Usuarios"
         description="Panel de Gestión de Usuarios"
@@ -295,7 +260,6 @@ const UsuariosPage = () => {
         }
       />
 
-      {/* Filtros */}
       <UsuarioFiltersBar
         filters={usuarios.table.state.filters}
         search={usuarios.table.state.search}
@@ -306,7 +270,6 @@ const UsuariosPage = () => {
         onReset={usuarios.table.reset}
       />
 
-      {/* Tabla */}
       <DataTable<UsuarioListItem>
         data={usuarios.data}
         columns={columns}
@@ -322,17 +285,15 @@ const UsuariosPage = () => {
         onSortChange={usuarios.table.setSort}
       />
 
-      {/* Modal formulario */}
       <UsuarioFormModal
         open={form.modal.isOpen}
         selectedItem={form.modal.selectedItem}
         isEditMode={form.modal.isEditMode}
-        isSubmitting={form.isSubmitting}
+        isSubmitting={form.modal.isSubmitting}
         onSubmit={form.handleSubmit}
         onCancel={form.modal.close}
       />
 
-      {/* Modal confirmación */}
       {currentConfirm && (
         <ConfirmModal
           open={confirmState.open}
@@ -343,6 +304,7 @@ const UsuariosPage = () => {
           loading={confirmState.loading}
           onConfirm={handleConfirm}
           onCancel={closeConfirm}
+          icon={currentConfirm.icon}
         />
       )}
     </div>

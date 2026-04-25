@@ -1,18 +1,20 @@
+// src/features/usuarios/components/UsuarioStatusBadge.tsx
 import { Badge } from "antd";
 
 interface UsuarioStatusBadgeProps {
   activo: boolean;
 }
 
-export const UsuarioStatusBadge = ({ activo }: UsuarioStatusBadgeProps) => {
-  const config = {
-    true: { status: "success" as const, text: "Activo" },
-    false: { status: "error" as const, text: "Inactivo" },
-  };
+const STATUS_CONFIG: Record<
+  "true" | "false",
+  { status: "success" | "error"; text: string }
+> = {
+  true: { status: "success", text: "Activo" },
+  false: { status: "error", text: "Inactivo" },
+};
 
-  const { status, text } =
-    config[String(activo) as keyof typeof config] ?? config.false;
+export const UsuarioStatusBadge = ({ activo }: UsuarioStatusBadgeProps) => {
+  const { status, text } = STATUS_CONFIG[String(activo) as "true" | "false"];
 
   return <Badge status={status} text={text} />;
 };
-
