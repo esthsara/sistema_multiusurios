@@ -100,7 +100,7 @@ export const usePersonas = () => {
       nextData = applyDateFilter(nextData);
       nextData = applySorting(nextData);
 
-      if (import.meta.env.DEV) {
+      /*if (import.meta.env.DEV) {
         console.groupCollapsed("[usePersonas.fetchPersonas]");
         console.log("params:", params);
         console.log("response normalized:", res);
@@ -111,7 +111,7 @@ export const usePersonas = () => {
         );
         console.log("total:", searchTerm ? nextData.length : res.meta?.total);
         console.groupEnd();
-      }
+      }*/
 
       setData(nextData);
       setTotal(searchTerm ? nextData.length : res.meta.total);
