@@ -1,11 +1,40 @@
+// src/features/sucursales/hooks/useSucursalForm.ts
 import { toast } from "react-toastify";
 import { useFormModal } from "@/shared/hooks/useFormModal";
 import { sucursalesService } from "../services/sucursales.service";
 import type {
   SucursalListItem,
+  SucursalDetalle,
   CreateSucursalDto,
   UpdateSucursalDto,
 } from "../types/sucursal.types";
+
+/* ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+   NORMALIZACIÓN */
+
+const hydrateListItemFromDetail = (
+  detail: SucursalDetalle,
+): SucursalListItem => {
+  return {
+    id: detail.id,
+    nombre: detail.nombre,
+    codigo: detail.codigo,
+    activa: detail.activa,
+    email: detail.email,
+    direccion: detail.direccion,
+    descripcion: detail.descripcion,
+    horario: detail.horario_completo,
+    horario_apertura: detail.horario_apertura,
+    horario_cierre: detail.horario_cierre,
+    logo: detail.logo,
+    usuarios_count: detail.usuarios_count,
+    created_at: detail.created_at,
+    updated_at: detail.updated_at,
+  };
+};
+
+/* ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+   HOOK */
 
 export const useSucursalForm = (onSuccess: () => void) => {
   const modal = useFormModal<SucursalListItem>();
@@ -14,25 +43,7 @@ export const useSucursalForm = (onSuccess: () => void) => {
     modal.setIsSubmitting(true);
     try {
       const response = await sucursalesService.getById(sucursal.id);
-      const detail = response.data;
-
-      const hydratedItem: SucursalListItem = {
-        id: detail.id,
-        nombre: detail.nombre,
-        codigo: detail.codigo,
-        activa: detail.activa,
-        email: detail.email,
-        direccion: detail.direccion,
-        descripcion: detail.descripcion,
-        horario: detail.horario_completo,
-        horario_apertura: detail.horario_apertura,
-        horario_cierre: detail.horario_cierre,
-        logo: detail.logo,
-        usuarios_count: detail.usuarios_count,
-        created_at: detail.created_at,
-        updated_at: detail.updated_at,
-      };
-
+      const hydratedItem = hydrateListItemFromDetail(response.data);
       modal.openEdit(hydratedItem);
     } catch {
       toast.error("No se pudieron cargar los datos de la sucursal");

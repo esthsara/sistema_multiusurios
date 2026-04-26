@@ -1,3 +1,4 @@
+// src/features/sucursales/hooks/useSucursales.ts
 import { useState, useEffect, useCallback } from "react";
 import { toast } from "react-toastify";
 import { sucursalesService } from "../services/sucursales.service";
@@ -19,32 +20,61 @@ export const useSucursales = () => {
     fecha_hasta: "",
   });
 
+  /* ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+     BÚSQUEDA LOCAL (Fallback) */
+
+  const applyLocalSearch = (items: SucursalListItem[]): SucursalListItem[] => {
+    const searchTerm = table.state.search.trim().toLowerCase();
+    if (!searchTerm) return items;
+
+    return items.filter((item) => {
+      const nombre = item.nombre?.toLowerCase() ?? "";
+      const codigo = item.codigo?.toLowerCase() ?? "";
+      const email = item.email?.toLowerCase() ?? "";
+      const direccion = item.direccion?.toLowerCase() ?? "";
+
+      return (
+        nombre.includes(searchTerm) ||
+        codigo.includes(searchTerm) ||
+        email.includes(searchTerm) ||
+        direccion.includes(searchTerm)
+      );
+    });
+  };
+
+  /* ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+     ORDENAMIENTO LOCAL */
+
+  const applySorting = (items: SucursalListItem[]): SucursalListItem[] => {
+    if (table.state.sort?.field !== "nombre") return items;
+
+    return [...items].sort((a, b) => {
+      const aName = a.nombre.toLowerCase();
+      const bName = b.nombre.toLowerCase();
+
+      const compare = aName.localeCompare(bName, "es", { sensitivity: "base" });
+      return table.state.sort?.direction === "asc" ? compare : -compare;
+    });
+  };
+
+  /* ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+     FETCH SUCURSALES */
+
   const fetchSucursales = useCallback(async () => {
     setLoading(true);
     try {
       const params = table.toParams() as SucursalQueryParams;
       const searchTerm = table.state.search.trim().toLowerCase();
 
+      // No enviar search al backend
       if (searchTerm) delete params.search;
 
       const res = await sucursalesService.getAll(params);
       let nextData = Array.isArray(res.data) ? [...res.data] : [];
 
-      if (searchTerm) {
-        nextData = nextData.filter((item) => {
-          const nombre = item.nombre?.toLowerCase() ?? "";
-          const codigo = item.codigo?.toLowerCase() ?? "";
-          const email = item.email?.toLowerCase() ?? "";
-          const direccion = item.direccion?.toLowerCase() ?? "";
-
-          return (
-            nombre.includes(searchTerm) ||
-            codigo.includes(searchTerm) ||
-            email.includes(searchTerm) ||
-            direccion.includes(searchTerm)
-          );
-        });
-      }
+      // Aplicar filtros locales
+      nextData = applyLocalSearch(nextData);
+      nextData = applySorting(nextData);
 
       setData(nextData);
       setTotal(searchTerm ? nextData.length : res.meta.total);
@@ -58,6 +88,9 @@ export const useSucursales = () => {
   useEffect(() => {
     fetchSucursales();
   }, [fetchSucursales]);
+
+  /* ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+     ACCIONES */
 
   const toggleEstado = async (sucursal: SucursalListItem, motivo?: string) => {
     try {

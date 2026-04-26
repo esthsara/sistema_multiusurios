@@ -8,7 +8,7 @@ import { SucursalInfoGeneral } from "./SucursalInfoGeneral";
 import { SucursalContacto } from "./SucursalContacto";
 import { SucursalDomicilio } from "./SucursalDomicilio";
 import { SucursalArchivo } from "./SucursalArchivo";
-import { SucursalUsuarioAsignado } from "./AsignacionUser/SucursalUsuarioAsignado";
+import { SucursalUsuarioAsignado } from "./SucursalUsuarioAsignado";
 import { SucursalAuditoria } from "./SucursalAuditoria";
 
 const SucursalDetallePage = () => {

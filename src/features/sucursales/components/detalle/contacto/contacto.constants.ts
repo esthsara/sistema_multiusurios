@@ -5,6 +5,7 @@ import type {
 } from "../../../types/sucursal.types";
 
 /* ── Contacto ── */
+
 export type Contacto = SucursalContacto;
 
 export type CreateContactoDto = CreateSucursalContactoDto;

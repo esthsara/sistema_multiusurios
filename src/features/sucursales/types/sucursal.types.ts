@@ -25,6 +25,13 @@ export interface SucursalListItem {
   created_at_humano?: string;
 }
 
+export interface ConfirmState {
+  open: boolean;
+  type: "toggle" | "delete" | null;
+  item: SucursalListItem | null;
+  loading: boolean;
+}
+
 export interface SucursalDetalle {
   id: number;
   nombre: string;
@@ -101,6 +108,7 @@ export interface SucursalPersona {
   created_at?: string;
   updated_at?: string;
 }
+
 export interface SucursalUsuario {
   id: number;
   username: string;
@@ -124,7 +132,6 @@ export interface SucursalAdministrador {
     es_administrador: number;
     activo: number;
   };
-  //recien agregue esto
   current_branch_id?: number;
   created_at?: string;
   updated_at?: string;
@@ -146,6 +153,8 @@ export interface VerificarCodigoResponse {
 
 /* ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
    USUARIO EN SUCURSAL (asignaciones)
+   AsignarUsuarioDto se encuentra en:
+   @/features/asignaciones/types/asignacion.types
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ */
 
 export interface SucursalUsuarioAsignacion {
@@ -190,23 +199,12 @@ export interface ToggleSucursalStatusDto {
   motivo?: string;
 }
 
-/* ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-   ASIGNACIONES DTOs
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ */
-
-export interface AsignarUsuarioDto {
-  usuario_id: number;
-  sucursal_id: number;
-}
-
 export interface CreateSucursalContactoDto {
-  //sucursal_id: number;
   tipo: TipoContactoSucursal;
   valor: string;
 }
 
 export interface UpdateSucursalContactoDto {
-  //sucursal_id: number;
   tipo: TipoContactoSucursal;
   valor: string;
 }

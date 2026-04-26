@@ -1,33 +1,51 @@
+// src/features/sucursales/screens/SucursalesPage.tsx
 import { useEffect, useMemo, useRef, useState } from "react";
 import { Avatar, Button } from "antd";
-import type { TableColumnsType } from "antd";
 import { Eye, Pencil, Plus, PowerOff, RotateCcw, Trash2 } from "lucide-react";
+import type { TableColumnsType } from "antd";
+
 import apiClient from "@/config/axios.config";
 import { PageHeader } from "@/shared/components/molecules/PageHeader";
 import { DataTable } from "@/shared/components/organisms/DataTable";
 import { ConfirmModal } from "@/shared/components/molecules/ConfirmModal";
 import { RowActions } from "@/shared/components/molecules/RowActions";
 import { Can } from "@/shared/components/atoms/Can";
-import { APP_ROUTES } from "@/shared/constants/routes.constants";
+
 import { useNavigate } from "react-router-dom";
+import { APP_ROUTES } from "@/shared/constants/routes.constants";
+
 import { useSucursales } from "../hooks/useSucursales";
 import { useSucursalForm } from "../hooks/useSucursalForm";
-import { SucursalFiltersBar } from "./SucursalFilters";
-import { SucursalStatusBadge } from "./SucursalStatusBadge";
-import { SucursalFormModal } from "./SucursalFormModal";
-import type { SucursalListItem } from "../types/sucursal.types";
+import { SucursalFiltersBar } from "../components/SucursalFilters";
+import { SucursalStatusBadge } from "../components/SucursalStatusBadge";
+import { SucursalFormModal } from "../components/SucursalFormModal";
+
+import type { SucursalListItem, ConfirmState } from "../types/sucursal.types";
+import {
+  getSucursalInitials,
+  normalizeLogoUrl,
+  getConfirmConfig,
+  getHorarioDisplay,
+} from "../utils/sucursal.utils";
 
 const SucursalesPage = () => {
   const navigate = useNavigate();
   const sucursales = useSucursales();
   const form = useSucursalForm(sucursales.fetchSucursales);
 
-  const [confirmState, setConfirmState] = useState<{
-    open: boolean;
-    type: "toggle" | "delete" | null;
-    item: SucursalListItem | null;
-    loading: boolean;
-  }>({ open: false, type: null, item: null, loading: false });
+  /* ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+     ESTADO DE CONFIRM MODAL */
+
+  const [confirmState, setConfirmState] = useState<ConfirmState>({
+    open: false,
+    type: null,
+    item: null,
+    loading: false,
+  });
+
+  /* ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+     LOGO MANAGEMENT */
+
   const [logoSrcById, setLogoSrcById] = useState<Record<number, string>>({});
   const createdObjectUrlsRef = useRef<string[]>([]);
 
@@ -39,20 +57,8 @@ const SucursalesPage = () => {
     }
   }, []);
 
-  const normalizeLogoUrl = (logo: string) => {
-    try {
-      const parsed = new URL(logo);
-      if (parsed.origin !== apiOrigin) {
-        return `${apiOrigin}${parsed.pathname}`;
-      }
-      return parsed.toString();
-    } catch {
-      if (logo.startsWith("/")) {
-        return `${apiOrigin}${logo}`;
-      }
-      return `${apiOrigin}/${logo}`;
-    }
-  };
+  /* ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+     CONFIRM ACTIONS */
 
   const openConfirm = (type: "toggle" | "delete", item: SucursalListItem) =>
     setConfirmState({ open: true, type, item, loading: false });
@@ -65,21 +71,19 @@ const SucursalesPage = () => {
 
     setConfirmState((prev) => ({ ...prev, loading: true }));
 
-    if (confirmState.type === "toggle") {
-      await sucursales.toggleEstado(confirmState.item);
-    } else {
-      await sucursales.remove(confirmState.item);
+    try {
+      if (confirmState.type === "toggle") {
+        await sucursales.toggleEstado(confirmState.item);
+      } else {
+        await sucursales.remove(confirmState.item);
+      }
+    } finally {
+      closeConfirm();
     }
-
-    closeConfirm();
   };
 
-  const getSucursalInitials = (nombre: string) => {
-    const parts = nombre.trim().split(/\s+/).filter(Boolean).slice(0, 2);
-
-    if (parts.length === 0) return "SC";
-    return parts.map((part) => part.charAt(0).toUpperCase()).join("");
-  };
+  /* ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+     LOGO LOADING */
 
   useEffect(() => {
     let isMounted = true;
@@ -102,7 +106,7 @@ const SucursalesPage = () => {
           abortControllers.push(controller);
 
           const response = await apiClient.get<Blob>(
-            normalizeLogoUrl(sucursal.logo),
+            normalizeLogoUrl(sucursal.logo, apiOrigin),
             {
               responseType: "blob",
               signal: controller.signal,
@@ -113,7 +117,7 @@ const SucursalesPage = () => {
           createdObjectUrlsRef.current.push(objectUrl);
           nextLogoMap[sucursal.id] = objectUrl;
         } catch {
-          // Si falla (403/no existe), el avatar mostrará iniciales.
+          // Si falla (403/no existe), el avatar mostrará iniciales
         }
       }
 
@@ -129,7 +133,10 @@ const SucursalesPage = () => {
       abortControllers.forEach((controller) => controller.abort());
       clearObjectUrls();
     };
-  }, [sucursales.data]);
+  }, [sucursales.data, apiOrigin]);
+
+  /* ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+     COLUMNAS DE LA TABLA */
 
   const columns: TableColumnsType<SucursalListItem> = [
     {
@@ -185,8 +192,7 @@ const SucursalesPage = () => {
       width: 160,
       render: (_, r) => (
         <span style={{ color: "var(--color-text-secondary)" }}>
-          {r.horario ||
-            `${r.horario_apertura ?? ""} - ${r.horario_cierre ?? ""}`.trim()}
+          {getHorarioDisplay(r)}
         </span>
       ),
     },
@@ -261,29 +267,15 @@ const SucursalesPage = () => {
     },
   ];
 
-  const confirmConfig = {
-    toggle: {
-      title: confirmState.item?.activa
-        ? `¿Deseas desactivar ${confirmState.item?.nombre}?`
-        : `¿Deseas activar ${confirmState.item?.nombre}?`,
-      description: confirmState.item?.activa
-        ? "La sucursal quedará inactiva para nuevas operaciones y asignaciones."
-        : "La sucursal volverá a estar disponible para operar y asignarse.",
-      confirmText: confirmState.item?.activa ? "Desactivar" : "Activar",
-      danger: confirmState.item?.activa,
-    },
-    delete: {
-      title: `¿Enviar ${confirmState.item?.nombre} a papelera?`,
-      description:
-        "Se desactivará la sucursal usando toggle-status y dejará de mostrarse en la vista principal.",
-      confirmText: "Enviar a papelera",
-      danger: true,
-    },
-  };
+  /* ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+     CONFIG DEL CONFIRM MODAL */
 
   const currentConfirm = confirmState.type
-    ? confirmConfig[confirmState.type]
+    ? getConfirmConfig(confirmState.type, confirmState.item)
     : null;
+
+  /* ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+     RENDER */
 
   return (
     <div>
@@ -349,6 +341,7 @@ const SucursalesPage = () => {
           loading={confirmState.loading}
           onConfirm={handleConfirm}
           onCancel={closeConfirm}
+          icon={currentConfirm.icon}
         />
       )}
     </div>
