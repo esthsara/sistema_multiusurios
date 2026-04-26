@@ -15,10 +15,6 @@ export const useUsuarios = () => {
   const [total, setTotal] = useState(0);
   const [loading, setLoading] = useState(false);
 
-  /**
-   * ⚠️ Error corregido: table estaba FUERA del hook.
-   * Debe vivir DENTRO para que sea parte del estado del hook.
-   */
   const table = useTableState<UsuarioFilters>({
     sucursal_id: "",
     fecha_desde: "",
@@ -27,6 +23,45 @@ export const useUsuarios = () => {
     rol: "",
   });
 
+  /* ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+     BÚSQUEDA LOCAL (Fallback) */
+
+  const applyLocalSearch = (items: UsuarioListItem[]): UsuarioListItem[] => {
+    const searchTerm = table.state.search.trim().toLowerCase();
+    if (!searchTerm) return items;
+
+    return items.filter((item) => {
+      const fullName = getUsuarioDisplayName(item).toLowerCase();
+      const username = item.username?.toLowerCase() ?? "";
+      const email = item.email?.toLowerCase() ?? "";
+      const identificacion =
+        item.persona.identificacion_principal?.toLowerCase() ?? "";
+
+      return (
+        fullName.includes(searchTerm) ||
+        username.includes(searchTerm) ||
+        email.includes(searchTerm) ||
+        identificacion.includes(searchTerm)
+      );
+    });
+  };
+
+  /* ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+     FILTRO LOCAL POR FECHA */
+
+  const applyDateFilter = (items: UsuarioListItem[]): UsuarioListItem[] => {
+    const exactDate = table.state.filters.fecha_desde?.trim();
+    if (!exactDate) return items;
+
+    return items.filter((item) => {
+      const createdDate = item.created_at?.slice(0, 10) ?? "";
+      return createdDate === exactDate;
+    });
+  };
+
+  /* ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+     FETCH USUARIOS */
+
   const fetchUsuarios = useCallback(async () => {
     setLoading(true);
     try {
@@ -34,6 +69,7 @@ export const useUsuarios = () => {
       const searchTerm = table.state.search.trim().toLowerCase();
       const exactDate = table.state.filters.fecha_desde?.trim();
 
+      // Convertir estado a activo
       if (params.estado === "ACTIVO") {
         params.activo = true;
       } else if (params.estado === "INACTIVO") {
@@ -41,14 +77,14 @@ export const useUsuarios = () => {
       }
       delete params.estado;
 
-      // Fallback local para evitar depender del backend en estos 2 filtros
+      // No enviar al backend
       if (searchTerm) delete params.search;
       if (exactDate) {
         delete params.fecha_desde;
         delete params.fecha_hasta;
       }
 
-      // Compatibilidad de ordenamiento por nombre
+      // Compatibilidad de ordenamiento
       if (
         params.sort_by === "display_name" ||
         params.sort_by === "persona.nombre"
@@ -59,32 +95,9 @@ export const useUsuarios = () => {
       const res = await usuariosService.getAll(params);
       let nextData = Array.isArray(res.data) ? [...res.data] : [];
 
-      // Fallback local: búsqueda por nombre, username, email o identificación
-      if (searchTerm) {
-        nextData = nextData.filter((item) => {
-          const fullName = getUsuarioDisplayName(item).toLowerCase();
-
-          const username = item.username?.toLowerCase() ?? "";
-          const email = item.email?.toLowerCase() ?? "";
-          const identificacion =
-            item.persona.identificacion_principal?.toLowerCase() ?? "";
-
-          return (
-            fullName.includes(searchTerm) ||
-            username.includes(searchTerm) ||
-            email.includes(searchTerm) ||
-            identificacion.includes(searchTerm)
-          );
-        });
-      }
-
-      // Fallback local: filtro por fecha exacta (created_at)
-      if (exactDate) {
-        nextData = nextData.filter((item) => {
-          const createdDate = item.created_at?.slice(0, 10) ?? "";
-          return createdDate === exactDate;
-        });
-      }
+      // Aplicar filtros locales
+      nextData = applyLocalSearch(nextData);
+      nextData = applyDateFilter(nextData);
 
       setData(nextData);
       setTotal(searchTerm || exactDate ? nextData.length : res.meta.total);
@@ -98,6 +111,9 @@ export const useUsuarios = () => {
   useEffect(() => {
     fetchUsuarios();
   }, [fetchUsuarios]);
+
+  /* ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+     ACCIONES */
 
   const toggleEstado = async (usuario: UsuarioListItem, motivo?: string) => {
     try {

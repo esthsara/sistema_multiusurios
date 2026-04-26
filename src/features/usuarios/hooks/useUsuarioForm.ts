@@ -1,5 +1,4 @@
 // src/features/usuarios/hooks/useUsuarioForm.ts
-import { useState } from "react";
 import { toast } from "react-toastify";
 import { useFormModal } from "@/shared/hooks/useFormModal";
 import { usuariosService } from "../services/usuarios.service";
@@ -9,9 +8,9 @@ import type {
   UpdateUsuarioDto,
 } from "../types/usuario.types";
 
-/**
- * FormValues — tipo del 
- */
+/* ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+   TIPOS LOCALES */
+
 interface FormValues {
   persona_id?: number;
   email: string;
@@ -21,16 +20,18 @@ interface FormValues {
   activo?: boolean;
 }
 
+/* ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+   HOOK */
+
 export const useUsuarioForm = (onSuccess: () => void) => {
   const modal = useFormModal<UsuarioListItem>();
-  const [isSubmitting, setIsSubmitting] = useState(false);
 
   const handleEdit = (usuario: UsuarioListItem) => {
     modal.openEdit(usuario);
   };
 
   const handleSubmit = async (formData: FormValues) => {
-    setIsSubmitting(true);
+    modal.setIsSubmitting(true);
     try {
       if (modal.isEditMode && modal.selectedItem) {
         const dto: UpdateUsuarioDto = {
@@ -45,10 +46,6 @@ export const useUsuarioForm = (onSuccess: () => void) => {
         await usuariosService.update(modal.selectedItem.id, dto);
         toast.success("Usuario actualizado correctamente");
       } else {
-        /**
-         * En modo crear, persona_id es requerido.
-         * El formulario debe garantizarlo antes de llamar handleSubmit.
-         */
         const dto: CreateUsuarioDto = {
           persona_id: formData.persona_id!,
           email: formData.email,
@@ -66,13 +63,12 @@ export const useUsuarioForm = (onSuccess: () => void) => {
       const apiError = error as { message?: string };
       toast.error(apiError.message ?? "Error al guardar usuario");
     } finally {
-      setIsSubmitting(false);
+      modal.setIsSubmitting(false);
     }
   };
 
   return {
     modal,
-    isSubmitting,
     handleSubmit,
     handleEdit,
   };

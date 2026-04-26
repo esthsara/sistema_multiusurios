@@ -6,8 +6,7 @@ import type {
 } from "@/shared/types/auth.types";
 
 /* ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-   BACKEND TYPES
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ */
+   BACKEND TYPES */
 
 export interface UsuarioSucursalBackend {
   id: number;
@@ -109,8 +108,7 @@ export interface UsuarioDetalle extends UsuarioListItem {
 }
 
 /* ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-   DTOs
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ */
+   DTOs */
 
 export interface CreateUsuarioDto {
   persona_id: number;
@@ -135,9 +133,17 @@ export interface ToggleStatusDto {
   motivo?: string;
 }
 
+
+export interface FormValues {
+  persona_id?: number;
+  username: string;
+  email: string;
+  password?: string;
+  password_confirmation?: string;
+  activo: boolean;
+}
 /* ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-   FILTROS
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ */
+   FILTROS */
 
 export interface UsuarioFilters {
   estado?: EstadoPersona | "";
@@ -148,13 +154,6 @@ export interface UsuarioFilters {
   fecha_hasta?: string;
 }
 
-/**
- * UsuarioQueryParams — extiende filtros con params de paginación.
- *
- * ¿Por qué no usar any en el index signature?
- * Usamos un union type explícito para mantener seguridad de tipos
- * mientras permitimos campos dinámicos del backend.
- */
 export interface UsuarioQueryParams extends UsuarioFilters {
   page?: number;
   per_page?: number;
@@ -162,4 +161,14 @@ export interface UsuarioQueryParams extends UsuarioFilters {
   sort_by?: string;
   sort_dir?: "asc" | "desc";
   [key: string]: string | number | boolean | undefined;
+}
+
+/* ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+   ESTADOS DE UI */
+
+export interface ConfirmState {
+  open: boolean;
+  type: "toggle" | "delete" | "reset-password" | null;
+  item: UsuarioListItem | null;
+  loading: boolean;
 }

@@ -11,6 +11,10 @@ interface ResetPasswordPayload {
   usuario_id: number;
   new_password: string;
   password_confirmation: string;
+  new_password_confirmation?: string;
+  temporary?: boolean;
+  must_change_password?: boolean;
+  force_password_change?: boolean;
   motivo?: string;
 }
 
@@ -19,6 +23,22 @@ export const useResetPassword = () => {
   const [temporaryPassword, setTemporaryPassword] = useState<string | null>(
     null,
   );
+
+  const buildResetPayload = (payload: ResetPasswordPayload) => {
+    const confirmation =
+      payload.new_password_confirmation ?? payload.password_confirmation;
+
+    return {
+      new_password: payload.new_password,
+      // Compatibilidad: algunos backends esperan uno u otro nombre
+      password_confirmation: confirmation,
+      new_password_confirmation: confirmation,
+      temporary: payload.temporary,
+      must_change_password: payload.must_change_password,
+      force_password_change: payload.force_password_change,
+      motivo: payload.motivo,
+    };
+  };
 
   /**
    * resetPassword — Realiza el reset de contraseña
@@ -51,11 +71,10 @@ export const useResetPassword = () => {
       }
 
       // Llamar al servicio
-      await usuariosService.resetPassword(payload.usuario_id, {
-        new_password: payload.new_password,
-        password_confirmation: payload.password_confirmation,
-        motivo: payload.motivo,
-      });
+      await usuariosService.resetPassword(
+        payload.usuario_id,
+        buildResetPayload(payload),
+      );
 
       toast.success("Contraseña reseteada correctamente");
       setTemporaryPassword(null);
@@ -91,6 +110,10 @@ export const useResetPassword = () => {
         await usuariosService.resetPassword(usuarioId, {
           new_password: tempPass,
           password_confirmation: tempPass,
+          new_password_confirmation: tempPass,
+          temporary: true,
+          must_change_password: true,
+          force_password_change: true,
           motivo: motivo || "Contraseña temporal generada por administrador",
         });
 

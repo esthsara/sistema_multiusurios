@@ -28,16 +28,8 @@ export const usuariosService = {
       data,
     ),
 
-  /**
-   * remove — soft delete (no elimina, solo marca como eliminado).
-   * El API usa DELETE para soft delete, pero la lógica backend maneja
-   * la eliminación suave mediante deleted_at timestamp.
-   */
   remove: (id: number) => http.delete(`/users/${id}`),
 
-  /**
-   * restore — recupera un usuario eliminado (si lo soporta el backend)
-   */
   restore: (id: number) =>
     http.post<UsuarioDetalle, Record<string, never>>(
       `/users/${id}/restore`,
@@ -48,7 +40,11 @@ export const usuariosService = {
     id: number,
     data: {
       new_password: string;
-      password_confirmation: string;
+      password_confirmation?: string;
+      new_password_confirmation?: string;
+      temporary?: boolean;
+      must_change_password?: boolean;
+      force_password_change?: boolean;
       motivo?: string;
     },
   ) => http.post<UsuarioDetalle>(`/users/${id}/reset-password`, data),
