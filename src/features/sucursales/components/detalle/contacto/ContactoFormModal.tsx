@@ -6,6 +6,7 @@ import {
   type Contacto,
   type CreateContactoDto,
   type UpdateContactoDto,
+  type ContactoFormValues,
 } from "./contacto.constants";
 
 interface Props {
@@ -17,10 +18,7 @@ interface Props {
   onCancel: () => void;
 }
 
-interface ContactoFormValues {
-  tipo: Contacto["tipo"];
-  valor: string;
-}
+
 
 export const ContactoFormModal = ({
   open,
@@ -94,11 +92,12 @@ export const ContactoFormModal = ({
         confirmLoading={loading}
         width={480}
         centered
-        destroyOnClose
-        // EFECTO BLUR SOLICITADO
-        maskStyle={{
-          backdropFilter: "blur(4px)",
-          WebkitBackdropFilter: "blur(4px)",
+        destroyOnHidden
+        styles={{
+          mask: {
+            backdropFilter: "blur(6px)",
+            WebkitBackdropFilter: "blur(4px)",
+          },
         }}
       >
         <Form

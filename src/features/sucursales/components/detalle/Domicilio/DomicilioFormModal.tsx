@@ -80,6 +80,7 @@ export const DomicilioFormModal = ({
     >
       <Modal
         open={open}
+        forceRender
         title={
           <div className="pb-2">
             <h3

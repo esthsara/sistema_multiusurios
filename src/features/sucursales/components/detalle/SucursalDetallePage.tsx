@@ -8,7 +8,7 @@ import { SucursalInfoGeneral } from "./SucursalInfoGeneral";
 import { SucursalContacto } from "./SucursalContacto";
 import { SucursalDomicilio } from "./SucursalDomicilio";
 import { SucursalArchivo } from "./SucursalArchivo";
-import { SucursalUsuarioAsignado } from "./SucursalUsuarioAsignado";
+import { SucursalUsuarioAsignado } from "./AsignacionUser/SucursalUsuarioAsignado";
 import { SucursalAuditoria } from "./SucursalAuditoria";
 
 const SucursalDetallePage = () => {
@@ -18,7 +18,7 @@ const SucursalDetallePage = () => {
   if (!id) return <div>ID de sucursal no válido</div>;
 
   const sucursalId = Number(id);
-  const { sucursal, loading, quitarUsuario } = useSucursalDetalle(sucursalId);
+  const { sucursal, loading } = useSucursalDetalle(sucursalId);
 
   if (loading) return <Skeleton active />;
   if (!sucursal) return <div>Sucursal no encontrada</div>;
@@ -47,12 +47,7 @@ const SucursalDetallePage = () => {
     {
       key: "usuarios",
       label: "Usuarios Asignados",
-      children: (
-        <SucursalUsuarioAsignado
-          sucursal={sucursal}
-          onQuitarUsuario={quitarUsuario}
-        />
-      ),
+      children: <SucursalUsuarioAsignado sucursal={sucursal} />,
     },
     {
       key: "auditoria",

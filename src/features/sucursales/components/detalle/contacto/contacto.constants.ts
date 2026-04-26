@@ -1,5 +1,4 @@
 import type {
-  TipoContactoSucursal,
   SucursalContacto,
   CreateSucursalContactoDto,
   UpdateSucursalContactoDto,
@@ -18,14 +17,14 @@ export const TIPO_OPTIONS = [
   { value: "OTRO", label: "Otro" },
 ];
 
-export const TIPO_COLOR: Record<TipoContactoSucursal, string> = {
-  EMAIL: "#1d4ed8",
-  TELEFONO: "#166534",
-  OTRO: "#475569",
-};
 
 export const PLACEHOLDERS: Record<string, string> = {
   EMAIL: "ejemplo@correo.com",
   TELEFONO: "+591 70000000",
   OTRO: "Ingresa el detalle del contacto...",
 };
+
+export interface ContactoFormValues {
+  tipo: Contacto["tipo"];
+  valor: string;
+}

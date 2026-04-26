@@ -58,7 +58,7 @@ export const DomicilioTable = ({
       width: 170,
       render: (_, r) =>
         r.principal ? (
-          <AppTag tone="success">Principal</AppTag>
+          <AppTag tone="gold">Principal</AppTag>
         ) : (
           <Can permission="sucursales.editar">
             <Tooltip title="Marcar como principal">

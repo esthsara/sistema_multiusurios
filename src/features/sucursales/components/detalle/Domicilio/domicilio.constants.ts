@@ -21,13 +21,6 @@ export const TIPO_OPTIONS = [
   { value: "OTRO", label: "Otro" },
 ];
 
-export const TIPO_COLOR: Record<TipoDomicilio, string> = {
-  FISCAL: "#1d4ed8",
-  PARTICULAR: "#166534",
-  ENTREGA: "#6d28d9",
-  OTRO: "#475569",
-};
-
 export const PLACEHOLDERS: Record<string, string> = {
   FISCAL: "Calle Fiscal, Número 456",
   PARTICULAR: "Calle Principal, Número 123",
