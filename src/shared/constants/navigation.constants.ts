@@ -112,17 +112,10 @@ export const NAV_CONFIG: NavItem[] = [
     children: [
       {
         key: "roles",
-        label: "Roles",
+        label: "Roles y Permisos",
         icon: ShieldCheck,
         path: APP_ROUTES.DASHBOARD.ROLES,
         permissions: ["roles.ver"],
-      },
-      {
-        key: "permisos",
-        label: "Permisos",
-        icon: KeyRound,
-        path: APP_ROUTES.DASHBOARD.PERMISOS,
-        permissions: ["permisos.ver"],
       },
       {
         key: "matriz",

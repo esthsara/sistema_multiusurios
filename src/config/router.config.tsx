@@ -6,6 +6,7 @@ import { PermissionGuard } from "@/shared/components/guards/PermissionGuard";
 import { APP_ROUTES } from "@/shared/constants/routes.constants";
 import { useUIStore } from "@/shared/store/ui.store";
 
+
 /* ── Layouts ── */
 const AuthLayout = lazy(() => import("@/layouts/AuthLayout"));
 const DashboardLayout = lazy(() => import("@/layouts/DashboardLayout"));
@@ -201,17 +202,6 @@ export const router = createBrowserRouter([
               {
                 path: APP_ROUTES.DASHBOARD.ROLES,
                 element: withSuspense(RolesPage),
-              },
-            ],
-          },
-
-          /* ── Permisos ── usa su propio permiso, no hereda de roles ── */
-          {
-            element: <PermissionGuard permission="permisos.ver" />,
-            children: [
-              {
-                path: APP_ROUTES.DASHBOARD.PERMISOS,
-                element: withSuspense(PermisosPage),
               },
             ],
           },

@@ -30,7 +30,6 @@ export const APP_ROUTES = {
       DETALLE: (id: number | string) => `/dashboard/usuarios/${id}`,
     },
     ROLES: "/dashboard/roles",
-    PERMISOS: "/dashboard/permisos",
     MATRIZ: "/dashboard/matriz-rol-permiso",
     SESIONES: "/dashboard/sesiones",
     ASIGNACIONES: "/dashboard/asignaciones",
