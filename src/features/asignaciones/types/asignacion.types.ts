@@ -1,15 +1,10 @@
-// src/features/asignaciones/types/asignacion.types.ts
 import type { RequestParams } from "@/shared/types/api.types";
-
-/* ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-   TIPOS PRINCIPALES
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ */
 
 export interface AsignacionUsuarioSucursal {
   id: number;
   usuario_id: number;
   sucursal_id: number;
-  rol_id: number;
+  rol_id?: number | null;
   usuario?: {
     id: number;
     username: string;
@@ -33,27 +28,10 @@ export interface AsignacionUsuarioSucursal {
   updated_at?: string;
 }
 
-export interface AsignacionListItem extends AsignacionUsuarioSucursal {}
-
-/* ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-   DTOs
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ */
-
-export interface CreateAsignacionDto {
+export interface AsignarUsuarioDto {
   usuario_id: number;
   sucursal_id: number;
-  rol_id: number;
 }
-
-export interface UpdateAsignacionDto {
-  usuario_id?: number;
-  sucursal_id?: number;
-  rol_id?: number;
-}
-
-/* ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-   FILTROS
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ */
 
 export interface AsignacionFilters {
   sucursal_id?: number;

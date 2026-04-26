@@ -1,5 +1,4 @@
-// src/features/asignaciones/components/AsignacionesPage.tsx
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useState } from "react";
 import {
   Card,
   Input,
@@ -10,18 +9,21 @@ import {
   Badge,
   Popconfirm,
   Select,
-  Space,
 } from "antd";
-import { Plus, Trash2, Search, Crown } from "lucide-react";
+import { UserPlus, UserMinus, Search, Crown } from "lucide-react";
+import { toast } from "react-toastify";
+
+import { useAsignaciones } from "../hooks/useAsignaciones";
+import { Can } from "@/shared/components/atoms/Can";
 import { sucursalesService } from "@/features/sucursales/services/sucursales.service";
 import { usuariosService } from "@/features/usuarios/services/usuarios.service";
-import { asignacionesService } from "@/features/sucursales/services/asignaciones.service";
-import { Can } from "@/shared/components/atoms/Can";
-import { toast } from "react-toastify";
-import type { SucursalListItem, SucursalUsuario } from "@/features/sucursales/types/sucursal.types";
+import type { SucursalListItem } from "@/features/sucursales/types/sucursal.types";
 import type { UsuarioListItem } from "@/features/usuarios/types/usuario.types";
 
-// ─── Utility: Color único por usuario ────────────────────────────────────────
+/* ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+   CONSTANTES
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ */
+
 const COLORS = [
   "#FF6B6B",
   "#4ECDC4",
@@ -35,9 +37,8 @@ const COLORS = [
   "#95E1D3",
 ];
 
-const getUserColor = (userId: number): string => {
-  return COLORS[userId % COLORS.length];
-};
+
+const getUserColor = (userId: number): string => COLORS[userId % COLORS.length];
 
 const getUserInitials = (nombre: string, apellido?: string): string => {
   const first = nombre?.charAt(0)?.toUpperCase() || "?";
@@ -48,80 +49,82 @@ const getUserInitials = (nombre: string, apellido?: string): string => {
   return first + second;
 };
 
-// ─── Tipo para usuario con asignación ────────────────────────────────────────
-interface UsuarioConAsignacion extends UsuarioListItem {
-  asignado: boolean;
-  es_administrador: boolean;
-  loading?: boolean;
-}
+const isAdminUser = (usuario: UsuarioListItem): boolean =>
+  (usuario.roles ?? []).includes("admin");
+
+const matchesSearch = (usuario: UsuarioListItem, search: string): boolean => {
+  const q = search.toLowerCase();
+  return (
+    usuario.username.toLowerCase().includes(q) ||
+    usuario.email.toLowerCase().includes(q) ||
+    `${usuario.persona?.nombre ?? ""} ${usuario.persona?.apellido ?? ""}`
+      .toLowerCase()
+      .includes(q)
+  );
+};
+
+/* ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+   COMPONENTE PRINCIPAL
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ */
 
 export const AsignacionesPage = () => {
+  const { asignar, quitar } = useAsignaciones();
+
+  // Estado esencial
   const [sucursales, setSucursales] = useState<SucursalListItem[]>([]);
-  const [usuarios, setUsuarios] = useState<UsuarioConAsignacion[]>([]);
+  const [usuarios, setUsuarios] = useState<UsuarioListItem[]>([]);
+  const [asignadosIds, setAsignadosIds] = useState<Set<number>>(new Set());
   const [selectedSucursal, setSelectedSucursal] = useState<number | null>(null);
   const [loading, setLoading] = useState(true);
   const [searchAsignados, setSearchAsignados] = useState("");
   const [searchDisponibles, setSearchDisponibles] = useState("");
   const [loadingUsers, setLoadingUsers] = useState<Record<number, boolean>>({});
-  const [deleteConfirm, setDeleteConfirm] = useState<{
-    usuarioId: number;
-    usuarioUsername: string;
-  } | null>(null);
 
-  // Cargar sucursales al montar
-useEffect(() => {
-  const loadSucursales = async () => {
-    setLoading(true);
-    try {
-      const res = await sucursalesService.getAll({ per_page: 100 });
-      const lista = res.data ?? [];
-      setSucursales(lista);
-      if (lista.length > 0) setSelectedSucursal(lista[0].id);
-    } catch {
-      toast.error("Error al cargar sucursales");
-    } finally {
-      setLoading(false);
-    }
-  };
-  loadSucursales();
-}, []);
+  /* ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+     CARGA INICIAL - SUCURSALES
+  ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ */
 
-  // Cargar usuarios cuando cambia la sucursal seleccionada
+  useEffect(() => {
+    const loadSucursales = async () => {
+      setLoading(true);
+      try {
+        const res = await sucursalesService.getAll({ per_page: 100 });
+        const lista = res.data ?? [];
+        setSucursales(lista);
+        if (lista.length > 0) setSelectedSucursal(lista[0].id);
+      } catch {
+        toast.error("Error al cargar sucursales");
+      } finally {
+        setLoading(false);
+      }
+    };
+    loadSucursales();
+  }, []);
+
+  /* ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+     CARGA DE DATOS AL CAMBIAR SUCURSAL
+  ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ */
+
   useEffect(() => {
     if (!selectedSucursal) return;
 
     const loadData = async () => {
       setLoading(true);
       try {
-        // Cargar en paralelo:
-        // 1. Todos los usuarios del sistema
-        // 2. Detalle de la sucursal con usuarios asignados
         const [allUsersRes, sucursalRes] = await Promise.all([
           usuariosService.getAll({ per_page: 100 }),
-          sucursalesService.getById(selectedSucursal), // GET /sucursales/:id con usuarios
+          sucursalesService.getById(selectedSucursal),
         ]);
 
         const allUsers = allUsersRes.data ?? [];
-        // Obtener usuarios asignados desde sucursal.usuarios
         const asignados = sucursalRes.data.usuarios ?? [];
-        const asignadosIds = new Set(asignados.map((a: any) => a.id));
 
-        const usuariosConEstado: UsuarioConAsignacion[] = allUsers.map(
-          (u: any) => ({
-            id: u.id,
-            nombre: u.nombre,
-            apellido: u.apellido,
-            username: u.username,
-            email: u.email,
-            activo: u.activo,
-            es_administrador: u.es_administrador,
-            asignado: asignadosIds.has(u.id),
-          }),
-        );
-
-        setUsuarios(usuariosConEstado);
+        setUsuarios(allUsers);
+        setAsignadosIds(new Set(asignados.map((a) => a.id)));
+        setSearchAsignados("");
+        setSearchDisponibles("");
       } catch {
-        toast.error("Error al cargar usuarios");
+        toast.error("Error al cargar datos");
       } finally {
         setLoading(false);
       }
@@ -130,75 +133,168 @@ useEffect(() => {
     loadData();
   }, [selectedSucursal]);
 
-  // Filtrar usuarios asignados
-  const usuariosAsignados = useMemo(() => {
-    return usuarios
-      .filter((u) => u.asignado)
-      .filter((u) => {
-        const search = searchAsignados.toLowerCase();
-        return (
-          u.username.toLowerCase().includes(search) ||
-          u.email.toLowerCase().includes(search) ||
-          `${u.nombre} ${u.apellido || ""}`.toLowerCase().includes(search)
-        );
-      });
-  }, [usuarios, searchAsignados]);
+  /* ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+     FUNCIONES CALCULADAS (filtros en línea)
+  ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ */
 
-  // Filtrar usuarios disponibles
-  const usuariosDisponibles = useMemo(() => {
-    return usuarios
-      .filter((u) => !u.asignado)
-      .filter((u) => {
-        const search = searchDisponibles.toLowerCase();
-        return (
-          u.username.toLowerCase().includes(search) ||
-          u.email.toLowerCase().includes(search) ||
-          `${u.nombre} ${u.apellido || ""}`.toLowerCase().includes(search)
-        );
-      });
-  }, [usuarios, searchDisponibles]);
+  const usuariosAsignados = usuarios
+    .filter((u) => asignadosIds.has(u.id))
+    .filter((u) => matchesSearch(u, searchAsignados));
 
-  // Asignar usuario
+  const usuariosDisponibles = usuarios
+    .filter((u) => !asignadosIds.has(u.id))
+    .filter((u) => matchesSearch(u, searchDisponibles));
+
+  /* ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+     ACCIONES
+  ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ */
+
   const handleAsignar = async (usuarioId: number) => {
     if (!selectedSucursal) return;
+
     setLoadingUsers((prev) => ({ ...prev, [usuarioId]: true }));
     try {
-      // POST /asignaciones — asignar usuario a sucursal
-      await asignacionesService.asignar({
-        usuario_id: usuarioId,
-        sucursal_id: selectedSucursal,
-      });
-      toast.success("Usuario asignado correctamente");
-      // Actualizar estado local
-      setUsuarios((prev) =>
-        prev.map((u) => (u.id === usuarioId ? { ...u, asignado: true } : u)),
-      );
-    } catch {
-      toast.error("Error al asignar usuario");
+      const ok = await asignar(usuarioId, selectedSucursal);
+      if (ok) {
+        setAsignadosIds((prev) => new Set([...prev, usuarioId]));
+      }
     } finally {
       setLoadingUsers((prev) => ({ ...prev, [usuarioId]: false }));
     }
   };
 
-  // Desasignar usuario
   const handleDesasignar = async (usuarioId: number) => {
     if (!selectedSucursal) return;
+
+    // Validación: no permitir desasignar administradores
+    const usuario = usuarios.find((u) => u.id === usuarioId);
+    if (usuario && isAdminUser(usuario)) {
+      toast.error("No se puede desasignar administradores");
+      return;
+    }
+
     setLoadingUsers((prev) => ({ ...prev, [usuarioId]: true }));
     try {
-      // DELETE /asignaciones/:usuario_id/:sucursal_id — quitar usuario de sucursal
-      await asignacionesService.quitar(usuarioId, selectedSucursal);
-      toast.success("Usuario desasignado correctamente");
-      // Actualizar estado local
-      setUsuarios((prev) =>
-        prev.map((u) => (u.id === usuarioId ? { ...u, asignado: false } : u)),
-      );
-      setDeleteConfirm(null);
-    } catch {
-      toast.error("Error al desasignar usuario");
+      const ok = await quitar(selectedSucursal, usuarioId);
+      if (ok) {
+        setAsignadosIds((prev) => {
+          const next = new Set(prev);
+          next.delete(usuarioId);
+          return next;
+        });
+      }
     } finally {
       setLoadingUsers((prev) => ({ ...prev, [usuarioId]: false }));
     }
   };
+
+  /* ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+     RENDER - CARD DE USUARIO
+  ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ */
+
+  const UsuarioCard = ({
+    usuario,
+    accion,
+  }: {
+    usuario: UsuarioListItem;
+    accion: React.ReactNode;
+  }) => {
+    const esAdmin = isAdminUser(usuario);
+    return (
+      <div
+        style={{
+          padding: "12px",
+          backgroundColor: "var(--color-bg-secondary)",
+          borderRadius: "var(--radius-card)",
+          border: "1px solid var(--color-border)",
+          display: "flex",
+          alignItems: "center",
+          gap: "12px",
+          justifyContent: "space-between",
+        }}
+      >
+        <div
+          style={{
+            display: "flex",
+            alignItems: "center",
+            gap: "12px",
+            flex: 1,
+          }}
+        >
+          <Avatar
+            style={{
+              backgroundColor: getUserColor(usuario.id),
+              fontSize: "12px",
+              fontWeight: 600,
+            }}
+          >
+            {getUserInitials(
+              usuario.persona?.nombre ?? usuario.username,
+              usuario.persona?.apellido ?? "",
+            )}
+          </Avatar>
+
+          <div style={{ flex: 1, minWidth: 0 }}>
+            <div
+              style={{
+                display: "flex",
+                alignItems: "center",
+                gap: "6px",
+                marginBottom: "4px",
+              }}
+            >
+              <p
+                style={{
+                  margin: 0,
+                  fontSize: "14px",
+                  fontWeight: 500,
+                  color: "var(--color-text-primary)",
+                  overflow: "hidden",
+                  textOverflow: "ellipsis",
+                  whiteSpace: "nowrap",
+                }}
+              >
+                @{usuario.username}
+              </p>
+              {esAdmin && <Crown size={14} style={{ color: "#DAA520" }} />}
+            </div>
+            <p
+              style={{
+                margin: 0,
+                fontSize: "12px",
+                color: "var(--color-text-secondary)",
+                overflow: "hidden",
+                textOverflow: "ellipsis",
+                whiteSpace: "nowrap",
+              }}
+            >
+              {usuario.email}
+            </p>
+          </div>
+
+          <div style={{ display: "flex", alignItems: "center", gap: "4px" }}>
+            <Badge color={usuario.activo ? "#52c41a" : "#f5222d"} />
+            <span
+              style={{
+                fontSize: "12px",
+                color: usuario.activo
+                  ? "var(--color-text-secondary)"
+                  : "#f5222d",
+              }}
+            >
+              {usuario.activo ? "Activo" : "Inactivo"}
+            </span>
+          </div>
+        </div>
+
+        {accion}
+      </div>
+    );
+  };
+
+  /* ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+     RENDER PRINCIPAL
+  ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ */
 
   if (loading) {
     return (
@@ -220,10 +316,7 @@ useEffect(() => {
           Asignaciones de Usuarios
         </h1>
         <p
-          style={{
-            margin: "8px 0 0 0",
-            color: "var(--color-text-secondary)",
-          }}
+          style={{ margin: "8px 0 0 0", color: "var(--color-text-secondary)" }}
         >
           Gestiona qué usuarios trabajan en cada sucursal
         </p>
@@ -237,7 +330,7 @@ useEffect(() => {
           border: "1px solid var(--color-border)",
         }}
       >
-        <Space direction="vertical" style={{ width: "100%" }} size="middle">
+        <div style={{ display: "flex", flexDirection: "column", gap: "12px" }}>
           <div>
             <label
               style={{
@@ -267,7 +360,7 @@ useEffect(() => {
               <strong>Sucursal Activa:</strong> {sucursalSeleccionada.nombre}
             </div>
           )}
-        </Space>
+        </div>
       </Card>
 
       {/* Panel dividido */}
@@ -279,14 +372,11 @@ useEffect(() => {
           maxWidth: "1400px",
         }}
       >
-        {/* Columna Izquierda: Usuarios Asignados */}
+        {/* Columna: Asignados */}
         <Card
           style={{
             borderRadius: "var(--radius-card)",
             border: "1px solid var(--color-border)",
-            display: "flex",
-            flexDirection: "column",
-            height: "auto",
             minHeight: "400px",
           }}
         >
@@ -319,7 +409,6 @@ useEffect(() => {
             />
           </div>
 
-          {/* Lista con scroll — máximo 5 usuarios visibles */}
           <div
             style={{
               maxHeight: usuariosAsignados.length > 5 ? "340px" : "auto",
@@ -336,144 +425,45 @@ useEffect(() => {
               />
             ) : (
               usuariosAsignados.map((usuario) => (
-                <div
+                <UsuarioCard
                   key={usuario.id}
-                  style={{
-                    padding: "12px",
-                    backgroundColor: "var(--color-bg-secondary)",
-                    borderRadius: "var(--radius-card)",
-                    border: "1px solid var(--color-border)",
-                    display: "flex",
-                    alignItems: "center",
-                    gap: "12px",
-                    justifyContent: "space-between",
-                  }}
-                >
-                  <div
-                    style={{
-                      display: "flex",
-                      alignItems: "center",
-                      gap: "12px",
-                      flex: 1,
-                    }}
-                  >
-                    {/* Avatar */}
-                    <Avatar
-                      style={{
-                        backgroundColor: getUserColor(usuario.id),
-                        fontSize: "12px",
-                        fontWeight: 600,
-                      }}
-                    >
-                      {getUserInitials(usuario.nombre, usuario.apellido)}
-                    </Avatar>
-
-                    {/* Info */}
-                    <div style={{ flex: 1, minWidth: 0 }}>
-                      <div
-                        style={{
-                          display: "flex",
-                          alignItems: "center",
-                          gap: "6px",
-                          marginBottom: "4px",
-                        }}
+                  usuario={usuario}
+                  accion={
+                    <Can permission="asignaciones.eliminar">
+                      <Popconfirm
+                        title="¿Desasignar usuario?"
+                        description={`¿Quitar a ${usuario.username} de esta sucursal?`}
+                        okText="Desasignar"
+                        cancelText="Cancelar"
+                        onConfirm={() => handleDesasignar(usuario.id)}
                       >
-                        <p
-                          style={{
-                            margin: 0,
-                            fontSize: "14px",
-                            fontWeight: 500,
-                            color: "var(--color-text-primary)",
-                            overflow: "hidden",
-                            textOverflow: "ellipsis",
-                            whiteSpace: "nowrap",
-                          }}
-                        >
-                          @{usuario.username}
-                        </p>
-                        {usuario.es_administrador && (
-                          <Crown size={14} style={{ color: "#DAA520" }} />
-                        )}
-                      </div>
-                      <p
-                        style={{
-                          margin: 0,
-                          fontSize: "12px",
-                          color: "var(--color-text-secondary)",
-                          overflow: "hidden",
-                          textOverflow: "ellipsis",
-                          whiteSpace: "nowrap",
-                        }}
-                      >
-                        {usuario.email}
-                      </p>
-                    </div>
-
-                    {/* Badge de estado */}
-                    <div
-                      style={{
-                        display: "flex",
-                        alignItems: "center",
-                        gap: "4px",
-                      }}
-                    >
-                      <Badge
-                        color={usuario.activo ? "#52c41a" : "#f5222d"}
-                        style={{ width: "8px", height: "8px" }}
-                      />
-                      <span
-                        style={{
-                          fontSize: "12px",
-                          color: usuario.activo
-                            ? "var(--color-text-secondary)"
-                            : "#f5222d",
-                        }}
-                      >
-                        {usuario.activo ? "Activo" : "Inactivo"}
-                      </span>
-                    </div>
-                  </div>
-
-                  {/* Botón desasignar */}
-                  <Can permission="asignaciones.eliminar">
-                    <Popconfirm
-                      title="¿Desasignar usuario?"
-                      description={`¿Quitar a ${usuario.username} de esta sucursal?`}
-                      okText="Desasignar"
-                      cancelText="Cancelar"
-                      open={deleteConfirm?.usuarioId === usuario.id}
-                      onConfirm={() => handleDesasignar(usuario.id)}
-                      onCancel={() => setDeleteConfirm(null)}
-                    >
-                      <Button
-                        type="text"
-                        danger
-                        size="small"
-                        icon={<Trash2 size={16} />}
-                        loading={loadingUsers[usuario.id]}
-                        onClick={() =>
-                          setDeleteConfirm({
-                            usuarioId: usuario.id,
-                            usuarioUsername: usuario.username,
-                          })
-                        }
-                      />
-                    </Popconfirm>
-                  </Can>
-                </div>
+                        <Button
+                          type="text"
+                          danger
+                          size="small"
+                          icon={<UserMinus size={16} />}
+                          loading={loadingUsers[usuario.id]}
+                          disabled={isAdminUser(usuario)}
+                          title={
+                            isAdminUser(usuario)
+                              ? "No se puede desasignar administradores"
+                              : ""
+                          }
+                        />
+                      </Popconfirm>
+                    </Can>
+                  }
+                />
               ))
             )}
           </div>
         </Card>
 
-        {/* Columna Derecha: Usuarios Disponibles */}
+        {/* Columna: Disponibles */}
         <Card
           style={{
             borderRadius: "var(--radius-card)",
             border: "1px solid var(--color-border)",
-            display: "flex",
-            flexDirection: "column",
-            height: "auto",
             minHeight: "400px",
           }}
         >
@@ -506,7 +496,6 @@ useEffect(() => {
             />
           </div>
 
-          {/* Lista con scroll — máximo 5 usuarios visibles */}
           <div
             style={{
               maxHeight: usuariosDisponibles.length > 5 ? "340px" : "auto",
@@ -523,115 +512,21 @@ useEffect(() => {
               />
             ) : (
               usuariosDisponibles.map((usuario) => (
-                <div
+                <UsuarioCard
                   key={usuario.id}
-                  style={{
-                    padding: "12px",
-                    backgroundColor: "var(--color-bg-secondary)",
-                    borderRadius: "var(--radius-card)",
-                    border: "1px solid var(--color-border)",
-                    display: "flex",
-                    alignItems: "center",
-                    gap: "12px",
-                    justifyContent: "space-between",
-                  }}
-                >
-                  <div
-                    style={{
-                      display: "flex",
-                      alignItems: "center",
-                      gap: "12px",
-                      flex: 1,
-                    }}
-                  >
-                    {/* Avatar */}
-                    <Avatar
-                      style={{
-                        backgroundColor: getUserColor(usuario.id),
-                        fontSize: "12px",
-                        fontWeight: 600,
-                      }}
-                    >
-                      {getUserInitials(usuario.nombre, usuario.apellido)}
-                    </Avatar>
-
-                    {/* Info */}
-                    <div style={{ flex: 1, minWidth: 0 }}>
-                      <div
-                        style={{
-                          display: "flex",
-                          alignItems: "center",
-                          gap: "6px",
-                          marginBottom: "4px",
-                        }}
-                      >
-                        <p
-                          style={{
-                            margin: 0,
-                            fontSize: "14px",
-                            fontWeight: 500,
-                            color: "var(--color-text-primary)",
-                            overflow: "hidden",
-                            textOverflow: "ellipsis",
-                            whiteSpace: "nowrap",
-                          }}
-                        >
-                          @{usuario.username}
-                        </p>
-                        {usuario.es_administrador && (
-                          <Crown size={14} style={{ color: "#DAA520" }} />
-                        )}
-                      </div>
-                      <p
-                        style={{
-                          margin: 0,
-                          fontSize: "12px",
-                          color: "var(--color-text-secondary)",
-                          overflow: "hidden",
-                          textOverflow: "ellipsis",
-                          whiteSpace: "nowrap",
-                        }}
-                      >
-                        {usuario.email}
-                      </p>
-                    </div>
-
-                    {/* Badge de estado */}
-                    <div
-                      style={{
-                        display: "flex",
-                        alignItems: "center",
-                        gap: "4px",
-                      }}
-                    >
-                      <Badge
-                        color={usuario.activo ? "#52c41a" : "#f5222d"}
-                        style={{ width: "8px", height: "8px" }}
+                  usuario={usuario}
+                  accion={
+                    <Can permission="asignaciones.crear">
+                      <Button
+                        type="primary"
+                        size="small"
+                        icon={<UserPlus size={16} />}
+                        loading={loadingUsers[usuario.id]}
+                        onClick={() => handleAsignar(usuario.id)}
                       />
-                      <span
-                        style={{
-                          fontSize: "12px",
-                          color: usuario.activo
-                            ? "var(--color-text-secondary)"
-                            : "#f5222d",
-                        }}
-                      >
-                        {usuario.activo ? "Activo" : "Inactivo"}
-                      </span>
-                    </div>
-                  </div>
-
-                  {/* Botón asignar */}
-                  <Can permission="asignaciones.crear">
-                    <Button
-                      type="primary"
-                      size="small"
-                      icon={<Plus size={16} />}
-                      loading={loadingUsers[usuario.id]}
-                      onClick={() => handleAsignar(usuario.id)}
-                    />
-                  </Can>
-                </div>
+                    </Can>
+                  }
+                />
               ))
             )}
           </div>
