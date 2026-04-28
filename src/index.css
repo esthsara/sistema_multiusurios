@@ -1,78 +1,69 @@
 @import "tailwindcss";
 
-@theme {
-  /* ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-     PALETA BASE — Colores del sistema
-  ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ */
-
-  /* Primario — Azul corporativo */
-  --color-primary-50:  #eff6ff;
-  --color-primary-100: #dbeafe;
-  --color-primary-200: #bfdbfe;
-  --color-primary-300: #93c5fd;
-  --color-primary-400: #60a5fa;
-  --color-primary-500: #3b82f6;
-  --color-primary-600: #2563eb;
-  --color-primary-700: #1d4ed8;
-  --color-primary-800: #1e40af;
-  --color-primary-900: #1e3a8a;
+@theme{
+  /* Tonos de azules */
+/* PRIMARIO (más consistente y moderno) */
+--color-primary-50: #eef4ff;
+--color-primary-200: #c7d7f5;
+--color-primary-400: #6b9ce6;
+--color-primary-600: #3b6fcf;
+--color-primary-700: #2c4fa3;
 
   /* Éxito */
   --color-success-500: #22c55e;
-  --color-success-600: #16a34a;
+  --color-success-600: #5fd15b;
 
   /* Advertencia */
   --color-warning-500: #f59e0b;
-  --color-warning-600: #d97706;
+  --color-warning-600: #fab33a;
 
   /* Peligro */
-  --color-danger-500:  #ef4444;
-  --color-danger-600:  #dc2626;
+  --color-danger-500: #ef4444;
+  --color-danger-600: #d61a1a;
 
-  /* Neutrales */
-  --color-neutral-50:  #f8fafc;
-  --color-neutral-100: #f1f5f9;
-  --color-neutral-200: #e2e8f0;
-  --color-neutral-300: #cbd5e1;
-  --color-neutral-400: #94a3b8;
-  --color-neutral-500: #64748b;
-  --color-neutral-600: #475569;
-  --color-neutral-700: #334155;
-  --color-neutral-800: #1e293b;
-  --color-neutral-900: #0f172a;
+  /* Alertas y fondos sutiles de estado */
+  --color-alert-danger-bg: color-mix(in srgb, var(--color-danger-500) 10%, transparent);
+  --color-alert-warning-bg: color-mix(in srgb, var(--color-warning-500) 10%, transparent);
+  --color-alert-success-bg: color-mix(in srgb, var(--color-success-500) 10%, transparent);
+  --color-alert-primary-bg: color-mix(in srgb, var(--color-primary-600) 10%, transparent);
+  
+  /* Gradientes */
+  --gradient-primary: linear-gradient(135deg, color-mix(in srgb, var(--color-primary-600) 15%, transparent), color-mix(in srgb, var(--color-primary-700) 8%, transparent));
 
-  /* ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-     TOKENS SEMÁNTICOS — Light Mode (default)
-     Estos son los que usan los componentes.
-     NUNCA uses colores base directamente.
-  ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ */
-
-  /* Superficies */
-  --color-bg-base:      #ffffff;
-  --color-bg-subtle:    #f8fafc;
-  --color-bg-overlay:   #f1f5f9;
-  --color-bg-sidebar:   #0f172a;
+  /* Superficies para cambiar  */
+  --color-bg-base-loader: #ffffff;
+  --color-bg-base: #ffffff;
+  --color-bg-base-2: #f8fafc;
+  --color-bg-hero: #3b6fcf;
+  
+  --color-bg-overlay: #eef2f7;
+  --color-bg-subtle: #e2e8f0;
+  --color-bg-sidebar: #0f172a;
+  --color-bg-filter: #dfebf8;
+  --color-bg-card: #0f172a;
 
   /* Bordes */
-  --color-border:       #e2e8f0;
-  --color-border-focus: #3b82f6;
+  --color-border: #afbdcf;
+  --color-border-focus: #8199c0;
 
   /* Textos */
-  --color-text-primary:   #0f172a;
-  --color-text-secondary: #64748b;
-  --color-text-disabled:  #94a3b8;
-  --color-text-inverse:   #ffffff;
+  --color-text-primary: #1e293b;
+  --color-text-secondary: #475569;
+  --color-text-disabled: #94a3b8;
+  --color-text-inverse: #ffffff;
 
   /* Tipografía */
-  --font-sans:  'Inter', system-ui, -apple-system, sans-serif;
-  --font-mono:  'JetBrains Mono', 'Fira Code', monospace;
+  --font-sans: "Plus Jakarta Sans", "Inter", system-ui, sans-serif;
+  --font-mono: "JetBrains Mono", monospace;
 
   /* Radios */
-  --radius-sm:    0.25rem;
-  --radius-md:    0.5rem;
-  --radius-lg:    0.75rem;
-  --radius-xl:    1rem;
-  --radius-card:  0.75rem;
+
+  --radius-sm: 0.375rem;   /* antes 0.25 */
+  --radius-md: 0.75rem;    /* antes 0.5 */
+  --radius-lg: 1rem;       /* antes 0.75 */
+  --radius-xl: 1.25rem;    /* antes 1 */
+  --radius-card: 1rem;     /* importante */
+  --radius-full: 9999px;   /* para botones pill */
 
   /* Sombras */
   --shadow-card: 0 1px 3px 0 rgb(0 0 0 / 0.1), 0 1px 2px -1px rgb(0 0 0 / 0.1);
@@ -80,36 +71,157 @@
 
   /* Transiciones */
   --transition-base: 150ms ease-in-out;
+
+  /* TAGS COLORS - MODO CLARO */
+  --tag-neutral-bg: color-mix(in srgb, #64748b 8%, var(--color-bg-base));
+  --tag-neutral-text: #475569;
+  --tag-neutral-border: color-mix(in srgb, #64748b 25%, transparent);
+
+  --tag-primary-bg: color-mix(in srgb, #3b6fcf 15%, var(--color-bg-base));
+  --tag-primary-text: #2c4fa3;
+  --tag-primary-border: #3b6fcf;
+
+  --tag-success-bg: color-mix(in srgb, #16a34a 15%, var(--color-bg-base));
+  --tag-success-text: #15803d;
+  --tag-success-border: #22c55e;
+
+  --tag-warning-bg: color-mix(in srgb, #ea580c 15%, var(--color-bg-base));
+  --tag-warning-text: #c2410c;
+  --tag-warning-border: #f97316;
+
+  --tag-danger-bg: color-mix(in srgb, #dc2626 15%, var(--color-bg-base));
+  --tag-danger-text: #991b1b;
+  --tag-danger-border: #ef4444;
+
+  --tag-purple-bg: color-mix(in srgb, #9333ea 15%, var(--color-bg-base));
+  --tag-purple-text: #6b21a8;
+  --tag-purple-border: #a855f7;
+
+  --tag-cyan-bg: color-mix(in srgb, #0891b2 15%, var(--color-bg-base));
+  --tag-cyan-text: #164e63;
+  --tag-cyan-border: #06b6d4;
+  
+  --tag-geekblue-bg: color-mix(in srgb, #1d4ed8 15%, var(--color-bg-base));
+  --tag-geekblue-text: #1e3a8a;
+  --tag-geekblue-border: #3b82f6;
+
+  --tag-volcano-bg: color-mix(in srgb, #ea580c 15%, var(--color-bg-base));
+  --tag-volcano-text: #7c2d12;
+  --tag-volcano-border: #f97316;
+
+--tag-lime-bg: color-mix(in srgb, #65a30d 15%, var(--color-bg-base));
+  --tag-lime-text: #365314;
+  --tag-lime-border: #84cc16;
+
+  --tag-magenta-bg: color-mix(in srgb, #be185d 15%, var(--color-bg-base));
+  --tag-magenta-text: #831843;
+  --tag-magenta-border: #ec4899;
+
+  --tag-gold-bg: color-mix(in srgb, #ca8a04 15%, var(--color-bg-base));
+  --tag-gold-text: #78350f;
+  --tag-gold-border: #eab308;
+
+  --tag-blue-bg: color-mix(in srgb, #0369a1 15%, var(--color-bg-base));
+  --tag-blue-text: #082f49;
+  --tag-blue-border: #0ea5e9;
+
 }
 
-/* ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-   DARK MODE — Solo sobreescribe tokens semánticos
-   La paleta base NO cambia, solo su uso.
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ */
 .dark {
-  
-  --color-bg-base:      #0f172a;
-  --color-bg-subtle:    #1e293b;
-  --color-bg-overlay:   #334155;
-  --color-bg-sidebar:   #020617;
+  /* Primarios oscuros */
 
-  --color-border:       #334155;
+  --color-primary-50: #f4f5f8;
+  --color-primary-200: #c7ddf8;
+  --color-primary-400: #60a5fa;
+  --color-primary-600: #3b82f6;
+
+  /* Superficies oscuras */
+  --color-bg-base: #0f172a;
+  --color-bg-base-2: #1e293b;
+  --color-bg-overlay: #334155;
+  --color-bg-subtle: #1e293b;
+  --color-bg-filter: #1e293bd3;
+  --color-bg-card: #606e91;
+  --color-bg-hero: #486594;
+  --color-bg-sidebar: #182033;
+
+  /* Bordes y focus */
+  --color-border: #6a7686;
   --color-border-focus: #60a5fa;
 
-  --color-text-primary:   #f8fafc;
-  --color-text-secondary: #94a3b8;
-  --color-text-disabled:  #475569;
-  --color-text-inverse:   #0f172a;
+  /* Textos claros sobre fondo oscuro */
+  --color-text-primary: #f1f5f9;
+  --color-text-secondary: #cbd5f5;
+  --color-text-disabled: #64748b;
+  --color-text-inverse: #d2d7e4;
 
-  --shadow-card:  0 1px 3px 0 rgb(0 0 0 / 0.4);
+  /* Sombras */
+  --shadow-card: 0 1px 3px 0 rgb(0 0 0 / 0.4);
   --shadow-modal: 0 20px 25px -5px rgb(0 0 0 / 0.5);
+
+
+  /* TAGS COLORS - MODO OSCURO */
+  --tag-neutral-bg: var(--color-bg-subtle);
+  --tag-neutral-text: var(--color-text-secondary);
+  --tag-neutral-border: var(--color-border);
+
+  --tag-primary-bg: color-mix(in srgb, var(--color-primary-600) 12%, var(--color-bg-base));
+  --tag-primary-text: var(--color-primary-600);
+  --tag-primary-border: color-mix(in srgb, var(--color-primary-600) 30%, transparent);
+
+  --tag-success-bg: color-mix(in srgb, var(--color-success-500) 12%, var(--color-bg-base));
+  --tag-success-text: var(--color-success-500);
+  --tag-success-border: color-mix(in srgb, var(--color-success-500) 30%, transparent);
+
+  --tag-warning-bg: color-mix(in srgb, var(--color-warning-500) 12%, var(--color-bg-base));
+  --tag-warning-text: var(--color-warning-500);
+  --tag-warning-border: color-mix(in srgb, var(--color-warning-500) 30%, transparent);
+
+  --tag-danger-bg: color-mix(in srgb, var(--color-danger-500) 12%, var(--color-bg-base));
+  --tag-danger-text: var(--color-danger-500);
+  --tag-danger-border: color-mix(in srgb, var(--color-danger-500) 30%, transparent);
+
+  --tag-purple-bg: color-mix(in srgb, #a855f7 12%, var(--color-bg-base));
+  --tag-purple-text: #d8b4fe;
+  --tag-purple-border: color-mix(in srgb, #a855f7 30%, transparent);
+
+  --tag-cyan-bg: color-mix(in srgb, #06b6d4 12%, var(--color-bg-base));
+  --tag-cyan-text: #67e8f9;
+  --tag-cyan-border: color-mix(in srgb, #06b6d4 30%, transparent);
+
+  --tag-geekblue-bg: color-mix(in srgb, #3b82f6 12%, var(--color-bg-base));
+  --tag-geekblue-text: #93c5fd;
+  --tag-geekblue-border: color-mix(in srgb, #3b82f6 35%, transparent);
+
+  --tag-volcano-bg: color-mix(in srgb, #f97316 12%, var(--color-bg-base));
+  --tag-volcano-text: #fdba74;
+  --tag-volcano-border: color-mix(in srgb, #f97316 35%, transparent);
+
+  --tag-lime-bg: color-mix(in srgb, #84cc16 12%, var(--color-bg-base));
+  --tag-lime-text: #d4fc79;
+  --tag-lime-border: color-mix(in srgb, #84cc16 30%, transparent);
+
+  --tag-magenta-bg: color-mix(in srgb, #ec4899 12%, var(--color-bg-base));
+  --tag-magenta-text: #f472b6;
+  --tag-magenta-border: color-mix(in srgb, #ec4899 30%, transparent);
+
+  --tag-gold-bg: color-mix(in srgb, #eab308 12%, var(--color-bg-base));
+  --tag-gold-text: #facc15;
+  --tag-gold-border: color-mix(in srgb, #eab308 30%, transparent);
+
+  --tag-blue-bg: color-mix(in srgb, #0ea5e9 12%, var(--color-bg-base));
+  --tag-blue-text: #7dd3fc;
+  --tag-blue-border: color-mix(in srgb, #0ea5e9 30%, transparent);
 }
 
 /* ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-   ESTILOS BASE GLOBALES
+   ESTILOS BASE GLOBALES 
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ */
-*, *::before, *::after {
-  box-sizing: border-box; /* Evita que el padding y border afecten al tamaño total de los elementos*/
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box; /* Evita que el padding y border afecten al tamaño total de los elementos es decir que ocupe el 100% */
 }
 
 html {
@@ -119,17 +231,868 @@ html {
 /*el webkit-font-smoothing es una propiedad CSS que mejora la apariencia de las fuentes en navegadores basados en WebKit, como Chrome y Safari. Al habilitar esta propiedad, las fuentes se renderizan de manera más suave y clara, lo que mejora la legibilidad y la estética del texto en la página web.*/
 
 body {
-  background-color: var(--color-bg-base);
+  background-color: var(--color-bg-base-2);
   color: var(--color-text-primary);
-  transition: background-color var(--transition-base),
-              color var(--transition-base);
+  transition:
+    background-color var(--transition-base),
+    color var(--transition-base);
 }
 
 /* Scrollbar personalizado */
-::-webkit-scrollbar       { width: 6px; height: 6px; }
-::-webkit-scrollbar-track { background: var(--color-bg-subtle); }
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+::-webkit-scrollbar-track {
+  background: var(--color-bg-subtle);
+}
 ::-webkit-scrollbar-thumb {
   background: var(--color-border);
   border-radius: 999px;
 }
-::-webkit-scrollbar-thumb:hover { background: var(--color-text-disabled); }
+::-webkit-scrollbar-thumb:hover {
+  background: var(--color-text-disabled);
+}
+
+/* ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+   ANT DESIGN THEME HARMONIZATION
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ */
+
+/* Filtros */
+.persona-filters .ant-input-affix-wrapper,
+.persona-filters .ant-select .ant-select-selector,
+.persona-filters .ant-picker,
+.persona-filters .ant-btn {
+  border-radius: var(--radius-md) !important;
+  transition: all var(--transition-base) !important;
+  background: var(--color-bg-base) !important;
+  border: 1px solid var(--color-border) !important;
+  color: var(--color-text-primary) !important;
+  height: 32px; 
+  padding: 0 11px;
+}
+
+
+
+.persona-filters .ant-input-affix-wrapper,
+.persona-filters .ant-select .ant-select-selector,
+.persona-filters .ant-picker {
+  background: var(--color-bg-base) !important;
+  border-color: var(--color-border) !important;
+  color: var(--color-text-primary) !important;
+}
+
+.persona-filters .ant-input,
+.persona-filters .ant-input::placeholder,
+.persona-filters .ant-select-selection-placeholder,
+.persona-filters .ant-select-selection-item {
+  color: var(--color-text-secondary) !important;
+}
+
+.persona-filters .ant-btn {
+  background: var(--color-bg-base) !important;
+  border-color: var(--color-border) !important;
+  color: var(--color-text-primary) !important;
+}
+
+.persona-filters .ant-btn:hover,
+.persona-filters .ant-input-affix-wrapper:hover,
+.persona-filters .ant-picker:hover,
+.persona-filters .ant-select:hover .ant-select-selector {
+  border-color: var(--color-primary-600) !important;
+}
+
+.persona-filters .ant-input-affix-wrapper-focused,
+.persona-filters .ant-picker-focused,
+.persona-filters .ant-select-focused .ant-select-selector {
+  border-color: var(--color-border-focus) !important;
+  box-shadow: 0 0 0 2px
+    color-mix(in srgb, var(--color-border-focus) 15%, transparent) !important;
+}
+
+/* Select Dropdown — Global */
+.ant-select-dropdown {
+  background: var(--color-bg-base-2) !important;
+  border: 1px solid var(--color-border) !important;
+  transition:
+    background-color var(--transition-base),
+    border-color var(--transition-base);
+}
+
+.ant-select-item {
+  color: var(--color-text-primary) !important;
+  transition:
+    background-color var(--transition-base),
+    color var(--transition-base);
+}
+
+.ant-select-item-option-selected {
+  background: color-mix(
+    in srgb,
+    var(--color-primary-600) 20%,
+    transparent
+  ) !important;
+  color: var(--color-text-primary) !important;
+}
+
+.ant-select-item-option-active {
+  background: color-mix(
+    in srgb,
+    var(--color-primary-600) 12%,
+    transparent
+  ) !important;
+}
+
+/* ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+   TABLA DATATABLE — ESTILOS AISLADOS
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ */
+/* ═══════════════════════════════════════════════════════════════
+   DATA TABLE — Redesigned with Light/Dark Mode Support
+═══════════════════════════════════════════════════════════════ */
+
+.app-data-table .ant-table-wrapper {
+  background: var(--color-bg-base) !important;
+}
+
+.app-data-table .ant-table {
+  background: var(--color-bg-base) !important;
+  color: var(--color-text-primary) !important;
+  border-collapse: collapse;
+  transition:
+    background-color var(--transition-base),
+    color var(--transition-base);
+  font-size: 0.875rem;
+}
+
+/* ─────────────────────────────────────────────────────────────
+   TABLE CONTAINER
+───────────────────────────────────────────────────────────────── */
+
+.app-data-table .ant-table-container {
+  border: 1px solid var(--color-border) !important;
+  border-radius: var(--radius-lg) !important;
+  overflow: hidden;
+  transition: all var(--transition-base);
+  background: var(--color-bg-base) !important;
+  box-shadow: 0 2px 8px color-mix(in srgb, var(--color-primary-600) 8%, transparent);
+}
+
+/* ─────────────────────────────────────────────────────────────
+   HEADER — Columnas
+───────────────────────────────────────────────────────────────── */
+
+.app-data-table .ant-table-thead > tr > th {
+  background: color-mix(in srgb, var(--color-primary-600) 8%, var(--color-bg-hero)) !important;
+  color: var(--color-text-inverse) !important;
+  border-bottom: 1px solid var(--color-border) !important;
+  font-weight: 600;
+  font-size: 0.75rem;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  white-space: nowrap;
+  padding: 16px !important;
+  transition:
+    background-color var(--transition-base),
+    color var(--transition-base),
+    border-color var(--transition-base);
+}
+
+.app-data-table .ant-table-thead > tr > th:first-child {
+  width: 60px;
+  text-align: center;
+}
+
+/* ─────────────────────────────────────────────────────────────
+   BODY — Filas
+───────────────────────────────────────────────────────────────── */
+
+.app-data-table .ant-table-tbody > tr > td {
+  background: var(--color-bg-base) !important;
+  color: var(--color-text-primary) !important;
+  border-bottom: 1px solid var(--color-border) !important;
+  padding: 14px 16px !important;
+  transition:
+    background-color calc(var(--transition-base) / 2),
+    color var(--transition-base),
+    border-color var(--transition-base);
+  vertical-align: middle;
+}
+
+.app-data-table .ant-table-tbody > tr > td:first-child {
+  text-align: center;
+  padding: 12px !important;
+}
+
+/* ─────────────────────────────────────────────────────────────
+   ROW HOVER — Efecto al pasar el mouse
+───────────────────────────────────────────────────────────────── */
+
+.app-data-table .ant-table-tbody > tr:hover > td {
+  background: color-mix(in srgb, var(--color-primary-600) 12%, var(--color-bg-base)) !important;
+  transition: background-color calc(var(--transition-base) / 2);
+}
+
+.app-data-table .ant-table-tbody > tr:hover {
+  box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--color-primary-600) 20%, transparent);
+}
+
+/* ─────────────────────────────────────────────────────────────
+   SORTER — Iconos de ordenamiento
+───────────────────────────────────────────────────────────────── */
+
+.app-data-table .ant-table-column-sorter,
+.app-data-table .ant-table-column-sorter-up,
+.app-data-table .ant-table-column-sorter-down {
+  color: var(--color-primary-400) !important;
+  transition: color var(--transition-base) !important;
+}
+
+.app-data-table .ant-table-column-sorter-up.active,
+.app-data-table .ant-table-column-sorter-down.active {
+  color: var(--color-primary-600) !important;
+}
+
+/* ─────────────────────────────────────────────────────────────
+   PAGINATION
+───────────────────────────────────────────────────────────────── */
+
+.app-data-table .ant-pagination {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 4px;
+  margin-top: 16px;
+  padding: 0;
+}
+
+.app-data-table .ant-pagination-total-text {
+  color: var(--color-text-secondary) !important;
+  font-size: 0.875rem;
+  margin-right: auto;
+  order: -1;
+}
+
+.app-data-table .ant-table-measure-row {
+  display: none !important;
+  visibility: hidden !important;
+  height: 0 !important;
+}
+.app-data-table .ant-pagination-item,
+.app-data-table .ant-pagination-prev .ant-pagination-item-link,
+.app-data-table .ant-pagination-next .ant-pagination-item-link {
+  background: var(--color-bg-base) !important;
+  border: 1px solid var(--color-border) !important;
+  color: var(--color-text-primary) !important;
+  border-radius: 50px !important;
+  min-width: 20px;
+  height: 20px;
+  line-height: 34px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  transition:
+    background-color var(--transition-base),
+    color var(--transition-base),
+    border-color var(--transition-base),
+    box-shadow var(--transition-base);
+  font-weight: 500;
+}
+
+.app-data-table .ant-pagination-item a,
+.app-data-table .ant-pagination-options,
+.app-data-table .ant-select-selection-item,
+.app-data-table .ant-select-arrow,
+.app-data-table .ant-pagination-total-text {
+  color: var(--color-text-primary) !important;
+}
+
+/* Página activa */
+.app-data-table .ant-pagination-item-active {
+  border-color: var(--color-primary-600) !important;
+  background: color-mix(in srgb, var(--color-primary-600) 14%, var(--color-bg-base)) !important;
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--color-primary-600) 12%, transparent);
+}
+
+.app-data-table .ant-pagination-item-active a {
+  color: var(--color-primary-600) !important;
+  font-weight: 700;
+}
+
+/* Hover en paginación */
+.app-data-table .ant-pagination-item:hover,
+.app-data-table .ant-pagination-prev:hover .ant-pagination-item-link,
+.app-data-table .ant-pagination-next:hover .ant-pagination-item-link {
+  border-color: var(--color-primary-600) !important;
+  background: color-mix(in srgb, var(--color-primary-600) 8%, var(--color-bg-base)) !important;
+}
+
+.app-data-table .ant-pagination-item:hover a {
+  color: var(--color-primary-600) !important;
+}
+
+/* ─────────────────────────────────────────────────────────────
+   PAGE SIZE CHANGER
+───────────────────────────────────────────────────────────────── */
+
+.app-data-table .ant-pagination-options-size-changer {
+  background: transparent !important;
+  border-color: transparent !important;
+  color: var(--color-text-primary) !important;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.app-data-table .ant-pagination-options-size-changer .ant-select-selector {
+  background: var(--color-bg-base) !important;
+  border: 1px solid var(--color-border) !important;
+  border-radius: 8px !important;
+  color: var(--color-text-primary) !important;
+  min-width: 50px; 
+  height: 32px; 
+  line-height: 34px;
+  transition: all var(--transition-base);
+}
+
+.app-data-table .ant-pagination-options-size-changer .ant-select-selector:hover {
+  border-color: var(--color-primary-600) !important;
+}
+
+.app-data-table .ant-pagination-options-size-changer .ant-select-arrow,
+.app-data-table .ant-pagination-options-size-changer .ant-select-selection-item {
+  color: var(--color-text-primary) !important;
+}
+
+/* ─────────────────────────────────────────────────────────────
+   ROW ACTIONS
+───────────────────────────────────────────────────────────────── */
+
+.row-actions-wrap {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+}
+
+.row-action-btn,
+.row-actions-trigger {
+  border-radius: 8px !important;
+  min-width: 32px !important;
+  height: 32px !important;
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  transition: all var(--transition-base) !important;
+  color: var(--color-text-secondary) !important;
+  border: 1px solid transparent !important;
+  background: transparent !important;
+}
+
+.row-action-btn:hover,
+.row-actions-trigger:hover {
+  background: color-mix(in srgb, var(--color-primary-600) 14%, transparent) !important;
+  color: var(--color-primary-600) !important;
+  border-color: color-mix(in srgb, var(--color-primary-600) 25%, transparent) !important;
+}
+
+.row-action-btn.ant-btn-primary {
+  background: color-mix(in srgb, var(--color-primary-600) 12%, transparent) !important;
+  border-color: color-mix(in srgb, var(--color-primary-600) 25%, transparent) !important;
+  color: var(--color-primary-600) !important;
+}
+
+.row-action-btn.ant-btn-primary:hover {
+  background: color-mix(in srgb, var(--color-primary-600) 18%, transparent) !important;
+  border-color: var(--color-primary-600) !important;
+}
+
+.row-actions-dropdown-item {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  color: var(--color-text-primary) !important;
+}
+
+/* ─────────────────────────────────────────────────────────────
+   EMPTY STATE
+───────────────────────────────────────────────────────────────── */
+
+.app-data-table .ant-empty {
+  padding: 48px 16px !important;
+}
+
+.app-data-table .ant-empty-description {
+  color: var(--color-text-secondary) !important;
+  font-size: 0.875rem;
+}
+
+.app-data-table .ant-spin-nested-loading > div:first-child {
+  background: var(--color-bg-base) !important;
+}
+
+/* ─────────────────────────────────────────────────────────────
+   RESPONSIVE — Mobile
+───────────────────────────────────────────────────────────────── */
+
+@media (max-width: 768px) {
+  .app-data-table .ant-table {
+    font-size: 0.8125rem;
+  }
+
+  .app-data-table .ant-table-thead > tr > th {
+    padding: 12px 8px !important;
+    font-size: 0.7rem;
+    letter-spacing: 0.06em;
+  }
+
+  .app-data-table .ant-table-tbody > tr > td {
+    padding: 12px 8px !important;
+  }
+
+  .app-data-table .ant-pagination {
+    margin-top: 16px;
+    gap: 4px;
+  }
+
+  .app-data-table .ant-pagination-item,
+  .app-data-table .ant-pagination-prev .ant-pagination-item-link,
+  .app-data-table .ant-pagination-next .ant-pagination-item-link {
+    min-width: 32px;
+    height: 32px;
+    line-height: 30px;
+    font-size: 0.8125rem;
+  }
+
+  .app-data-table .ant-pagination-total-text {
+    font-size: 0.75rem;
+    margin-bottom: 8px;
+    order: -1;
+    flex-basis: 100%;
+  }
+
+  .row-action-btn,
+  .row-actions-trigger {
+    min-width: 28px !important;
+    height: 28px !important;
+  }
+}
+
+@media (max-width: 576px) {
+  .app-data-table .ant-table-thead > tr > th {
+    padding: 10px 4px !important;
+  }
+
+  .app-data-table .ant-table-tbody > tr > td {
+    padding: 10px 4px !important;
+  }
+
+  .app-data-table .ant-pagination-options-size-changer {
+    display: none;
+  }
+}
+
+/* ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+   MATRIZ DE PERMISOS
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ */
+
+.matriz-page {
+  padding: 24px;
+}
+
+.matriz-page__actions {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.matriz-changes-tag {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  border-radius: 999px;
+  font-weight: 600;
+}
+
+.matriz-toolbar {
+  display: grid;
+  grid-template-columns: minmax(260px, 1fr) auto;
+  gap: 12px;
+  align-items: center;
+  margin: 20px 0 16px;
+}
+
+.matriz-search .ant-input-affix-wrapper {
+  min-height: 40px;
+  border-radius: var(--radius-md);
+  background: var(--color-bg-base);
+  border-color: var(--color-border);
+}
+
+.matriz-search .ant-input,
+.matriz-search input {
+  color: var(--color-text-primary) !important;
+}
+
+.matriz-stats {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(84px, 1fr));
+  gap: 10px;
+}
+
+.matriz-stat-card {
+  min-width: 84px;
+  padding: 10px 12px;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  background: var(--color-bg-base);
+  box-shadow: var(--shadow-card);
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.matriz-stat-label {
+  font-size: 11px;
+  color: var(--color-text-secondary);
+  letter-spacing: 0.02em;
+}
+
+.matriz-stat-card strong {
+  font-size: 16px;
+  color: var(--color-text-primary);
+}
+
+.matriz-table-wrap {
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-card);
+  overflow: auto;
+  background: var(--color-bg-base);
+  box-shadow: var(--shadow-card);
+}
+
+.matriz-table {
+  width: 100%;
+  min-width: 980px;
+  border-collapse: separate;
+  border-spacing: 0;
+}
+
+.matriz-th,
+.matriz-td {
+  border-bottom: 1px solid var(--color-border);
+  border-right: 1px solid
+    color-mix(in srgb, var(--color-border) 70%, transparent);
+  padding: 12px 10px;
+  text-align: center;
+  vertical-align: middle;
+}
+
+.matriz-th {
+  position: sticky;
+  top: 0;
+  z-index: 3;
+  background: var(--color-bg-overlay);
+  color: var(--color-text-primary);
+}
+
+.matriz-th-sticky,
+.matriz-td-sticky {
+  position: sticky;
+  left: 0;
+  z-index: 2;
+  min-width: 310px;
+  text-align: left;
+  border-right: 2px solid var(--color-border);
+}
+
+.matriz-th-sticky {
+  z-index: 4;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+.matriz-td-sticky {
+  background: var(--color-bg-base);
+}
+
+.matriz-header-title {
+  font-size: 12px;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+.matriz-header-subtitle {
+  margin-top: 3px;
+  font-size: 11px;
+  color: var(--color-text-secondary);
+}
+
+.matriz-th-role {
+  min-width: 140px;
+}
+
+.matriz-role-title {
+  font-weight: 700;
+  color: var(--color-text-primary);
+  line-height: 1.2;
+  font-size: 13px;
+}
+
+.matriz-role-progress {
+  margin-top: 6px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  font-size: 11px;
+  color: var(--color-text-secondary);
+}
+
+.matriz-role-progress-bar {
+  width: 100%;
+  height: 6px;
+  border-radius: 999px;
+  background: color-mix(in srgb, var(--color-border) 70%, transparent);
+  overflow: hidden;
+}
+
+.matriz-role-progress-bar > span {
+  display: block;
+  height: 100%;
+  border-radius: inherit;
+  background: linear-gradient(
+    90deg,
+    var(--color-primary-600),
+    var(--color-primary-400)
+  );
+}
+
+.matriz-module-row .matriz-td,
+.matriz-module-row .matriz-td-sticky {
+  background: color-mix(in srgb, var(--color-bg-overlay) 45%, transparent);
+}
+
+.matriz-module-cell {
+  padding: 10px 12px;
+}
+
+.matriz-module-main {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  color: var(--color-text-primary);
+}
+
+.matriz-module-dot {
+  width: 9px;
+  height: 9px;
+  border-radius: 999px;
+  display: inline-block;
+  flex-shrink: 0;
+}
+
+.matriz-module-name {
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+}
+
+.matriz-module-count {
+  margin-inline-start: auto;
+  font-size: 11px;
+  border-radius: 999px;
+  background: color-mix(
+    in srgb,
+    var(--color-primary-600) 12%,
+    transparent
+  ) !important;
+  color: var(--color-text-primary) !important;
+}
+
+.matriz-module-meta {
+  margin-top: 6px;
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+  font-size: 11px;
+  color: var(--color-text-secondary);
+}
+
+.matriz-td .ant-checkbox-wrapper,
+.matriz-module-cell .ant-checkbox-wrapper {
+  color: var(--color-text-primary) !important;
+  font-size: 12px;
+}
+
+.matriz-checkbox .ant-checkbox-inner {
+  border-color: var(--color-border-focus);
+}
+
+.matriz-checkbox.ant-checkbox-wrapper:hover .ant-checkbox-inner,
+.matriz-checkbox .ant-checkbox-checked .ant-checkbox-inner,
+.matriz-checkbox .ant-checkbox-indeterminate .ant-checkbox-inner {
+  border-color: var(--color-primary-600) !important;
+  background-color: var(--color-primary-600) !important;
+}
+
+.matriz-perm-row:hover .matriz-td,
+.matriz-perm-row:hover .matriz-td-sticky {
+  background: color-mix(
+    in srgb,
+    var(--color-primary-600) 7%,
+    var(--color-bg-base)
+  );
+}
+
+.matriz-perm-name-cell {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 12px;
+}
+
+.matriz-perm-action {
+  display: inline-flex;
+  align-items: center;
+  padding: 2px 7px;
+  border-radius: 999px;
+  font-size: 10px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+}
+
+.matriz-perm-name {
+  color: var(--color-text-primary);
+  font-size: 12px;
+  line-height: 1.35;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.matriz-check-cell {
+  transition: background-color var(--transition-base);
+}
+
+.matriz-check-cell.is-added {
+  background: color-mix(in srgb, var(--color-success-500) 15%, transparent);
+}
+
+.matriz-check-cell.is-removed {
+  background: color-mix(in srgb, var(--color-danger-500) 15%, transparent);
+}
+
+.matriz-legend {
+  margin-top: 16px;
+  display: flex;
+  gap: 16px;
+  flex-wrap: wrap;
+  font-size: 12px;
+  color: var(--color-text-secondary);
+}
+
+.matriz-legend-item {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.matriz-legend-box {
+  display: inline-block;
+  width: 12px;
+  height: 12px;
+  border-radius: 2px;
+}
+
+.matriz-legend-box--add {
+  background: color-mix(in srgb, var(--color-success-500) 20%, transparent);
+  border: 1px solid var(--color-success-600);
+}
+
+.matriz-legend-box--remove {
+  background: color-mix(in srgb, var(--color-danger-500) 20%, transparent);
+  border: 1px solid var(--color-danger-600);
+}
+
+.matriz-table tr > *:last-child {
+  border-right: none;
+}
+
+.dark .matriz-search .ant-input-affix-wrapper,
+.dark .matriz-stat-card,
+.dark .matriz-table-wrap,
+.dark .matriz-td-sticky {
+  background: var(--color-bg-base-2);
+}
+
+.dark .matriz-perm-action {
+  background: color-mix(
+    in srgb,
+    var(--color-primary-600) 16%,
+    transparent
+  ) !important;
+}
+
+@media (max-width: 1200px) {
+  .matriz-toolbar {
+    grid-template-columns: 1fr;
+  }
+
+  .matriz-stats {
+    grid-template-columns: repeat(2, minmax(84px, 1fr));
+  }
+}
+/* ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+   DATATABLE SIMPLE
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ */
+/* CONTENEDOR GENERAL */
+.datatable-modern .ant-table {
+  background: transparent;
+}
+
+/* HEADER */
+.datatable-modern .ant-table-thead > tr > th {
+  background:"var(--color-primary-200)";
+  color: var(--color-text-primary);
+  font-weight: 600;
+  font-size: 13px;
+  border-bottom: 1px solid var(--color-border);
+}
+
+/* CELDAS */
+.datatable-modern .ant-table-tbody > tr > td {
+  border-bottom: 1px solid var(--color-border);
+  color: var(--color-text-primary);
+  transition: all 0.2s ease;
+}
+
+/* HOVER FILA */
+.datatable-modern .ant-table-tbody > tr:hover > td {
+  background: color-mix(in srgb, var(--color-primary-200) 20%, transparent);
+}
+
+/* FILA VACÍA */
+.datatable-modern .ant-empty-description {
+  color: var(--color-text-secondary);
+}
+
+/* PAGINACIÓN */
+.datatable-modern .ant-pagination {
+  padding: 10px;
+}
+
+.datatable-modern .ant-pagination-item {
+  border-radius: 50px;
+}
+
+.datatable-modern .ant-pagination-item-active {
+  background: var(--color-primary-400);
+  border-color: var(--color-primary-400);
+}
+
+.datatable-modern .ant-pagination-item-active a {
+  color: white;
+}
