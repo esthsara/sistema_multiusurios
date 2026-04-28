@@ -1,3 +1,4 @@
+// src/features/roles/services/roles.service.ts
 import { http } from "@/shared/services/http.service";
 import type { ApiError } from "@/shared/types/api.types";
 import type { RequestParams } from "@/shared/types/api.types";
@@ -8,6 +9,9 @@ import type {
   UpdateRolDto,
   SyncPermissionsDto,
   RolPermission,
+  AssignRoleDto,
+  RemoveRoleDto,
+  UsuarioConRoles,
 } from "../types/rol.types";
 
 const toPositiveNumber = (value: unknown): number | null => {
@@ -126,5 +130,34 @@ export const rolesService = {
     throw lastValidationError;
   },
 
+  /** Quitar permisos de un rol (desync) */
+  desyncPermissions: (id: number, data: SyncPermissionsDto) =>
+    http.post<RolDetalle, SyncPermissionsDto>(
+      `/roles/${id}/desync-permissions`,
+      data,
+    ),
+
   remove: (id: number) => http.delete(`/roles/${id}`),
+
+  /** ── Asignación de roles a usuario ── */
+
+  /**
+   * Asigna uno o varios roles a un usuario
+   * POST /users/{userId}/assign-role
+   */
+  assignRoleToUser: (userId: number, data: AssignRoleDto) =>
+    http.post<UsuarioConRoles, AssignRoleDto>(
+      `/users/${userId}/assign-role`,
+      data,
+    ),
+
+  /**
+   * Quita uno o varios roles de un usuario
+   * POST /users/{userId}/remove-role
+   */
+  removeRoleFromUser: (userId: number, data: RemoveRoleDto) =>
+    http.post<UsuarioConRoles, RemoveRoleDto>(
+      `/users/${userId}/remove-role`,
+      data,
+    ),
 };

@@ -1,48 +1,54 @@
+// src/features/roles/components/RoleFormModal.tsx
 import { useEffect, useMemo, useState } from "react";
 import {
+  Alert,
+  Badge,
   Button,
+  Card,
   Checkbox,
+  Collapse,
+  Divider,
+  Empty,
+  Flex,
   Form,
   Input,
   Modal,
-  Radio,
+  Space,
   Spin,
   Steps,
-  Collapse,
-  Space,
   Tag,
+  Tooltip,
   Typography,
-  Divider,
-  Card,
-  Flex,
-  Alert,
-  Badge,
-  Empty,
+  theme,
 } from "antd";
 import type { CollapseProps } from "antd";
 import {
-  ShieldCheck,
-  PlusCircle,
-  ChevronRight,
-  ChevronLeft,
-  Info,
-  Lock,
-  ShieldAlert,
-  Sparkles,
-  Clock,
-  Search,
   CheckSquare,
+  ChevronLeft,
+  ChevronRight,
+  Clock,
+  Info,
   MinusSquare,
-  Square,
+  PlusCircle,
+  Search,
+  ShieldAlert,
+  ShieldCheck,
+  Sparkles,
 } from "lucide-react";
+import { AppTag } from "@/shared/components/atoms/AppTag";
 import type { PermisoItem } from "@/features/permisos/types/permiso.types";
+import {
+  agruparCatalogoPermisosPorModulo,
+  contarSeleccionadosEnModulo,
+  getModuloStyles,
+  sanitizePermissionIds,
+} from "../utils/roles.utils";
 
 const { Text, Title } = Typography;
 
 interface RoleFormValues {
   name: string;
   permissionIds: number[];
-  assignNow: boolean;
 }
 
 interface RoleSubmitValues {
@@ -62,6 +68,19 @@ interface RoleFormModalProps {
   onSubmit: (values: RoleSubmitValues) => Promise<void> | void;
 }
 
+/** Mapea accion → tone para los tags de permisos */
+const accionToTone = (
+  accion: string,
+): "success" | "warning" | "danger" | "primary" | "neutral" => {
+  const a = accion.toLowerCase();
+  if (a.includes("ver") || a.includes("exportar")) return "success";
+  if (a.includes("crear") || a.includes("subir") || a.includes("asignar"))
+    return "primary";
+  if (a.includes("editar")) return "warning";
+  if (a.includes("eliminar")) return "danger";
+  return "neutral";
+};
+
 export const RoleFormModal = ({
   open,
   mode,
@@ -73,25 +92,15 @@ export const RoleFormModal = ({
   onCancel,
   onSubmit,
 }: RoleFormModalProps) => {
+  const { token } = theme.useToken();
   const [form] = Form.useForm<RoleFormValues>();
   const [currentStep, setCurrentStep] = useState(0);
   const [searchText, setSearchText] = useState("");
   const [activeKeys, setActiveKeys] = useState<string[]>([]);
 
   const selectedPermissionIds = Form.useWatch("permissionIds", form) ?? [];
-  const assignNow = Form.useWatch("assignNow", form);
 
-  const sanitizePermissionIds = (value: unknown): number[] => {
-    if (!Array.isArray(value)) return [];
-    return Array.from(
-      new Set(
-        value
-          .map((item) => Number(item))
-          .filter((id) => Number.isInteger(id) && id > 0),
-      ),
-    );
-  };
-
+  /* ── Reset al abrir/cerrar ── */
   useEffect(() => {
     if (!open) {
       setCurrentStep(0);
@@ -100,34 +109,26 @@ export const RoleFormModal = ({
       form.resetFields();
       return;
     }
-
     form.setFieldsValue({
       name: initialName ?? "",
       permissionIds: initialPermissionIds ?? [],
-      assignNow: true,
     });
-  }, [open, initialName, initialPermissionIds, form]);
+    // En modo edición, abrir todos los acordeones
+    if (mode === "edit") {
+      setActiveKeys(
+        agruparCatalogoPermisosPorModulo(permissions).map((g) => g.module),
+      );
+    }
+  }, [open, initialName, initialPermissionIds, form, mode, permissions]);
 
-  const permissionsByModule = useMemo(() => {
-    const map = new Map<string, PermisoItem[]>();
+  /* ── Permisos agrupados por módulo ── */
+  const permissionsByModule = useMemo(
+    () => agruparCatalogoPermisosPorModulo(permissions),
+    [permissions],
+  );
 
-    permissions.forEach((p) => {
-      const key = p.modulo?.trim() || "General";
-      const list = map.get(key) ?? [];
-      list.push(p);
-      map.set(key, list);
-    });
-
-    return Array.from(map.entries()).map(([module, items]) => ({
-      module,
-      items,
-    }));
-  }, [permissions]);
-
-  // Filtrar permisos por búsqueda
   const filteredPermissionsByModule = useMemo(() => {
     if (!searchText.trim()) return permissionsByModule;
-
     const lowerSearch = searchText.toLowerCase();
     return permissionsByModule
       .map((group) => ({
@@ -139,23 +140,24 @@ export const RoleFormModal = ({
             group.module.toLowerCase().includes(lowerSearch),
         ),
       }))
-      .filter((group) => group.items.length > 0);
+      .filter((g) => g.items.length > 0);
   }, [permissionsByModule, searchText]);
 
-  // Auto-abrir acordeones cuando hay búsqueda
+  /* Auto-expandir al buscar */
   useEffect(() => {
     if (searchText.trim()) {
       setActiveKeys(filteredPermissionsByModule.map((g) => g.module));
     }
   }, [searchText, filteredPermissionsByModule]);
 
+  /* ── Helpers de selección ── */
   const setPermissionIds = (value: number[]) => {
     form.setFieldsValue({ permissionIds: sanitizePermissionIds(value) });
     form.setFields([{ name: "permissionIds", errors: [] }]);
   };
 
   const togglePermission = (id: number) => {
-    const current = selectedPermissionIds;
+    const current: number[] = selectedPermissionIds;
     if (current.includes(id)) {
       setPermissionIds(current.filter((x) => x !== id));
     } else {
@@ -167,25 +169,20 @@ export const RoleFormModal = ({
     if (checked) {
       setPermissionIds([...new Set([...selectedPermissionIds, ...ids])]);
     } else {
-      setPermissionIds(selectedPermissionIds.filter((id) => !ids.includes(id)));
+      setPermissionIds(
+        (selectedPermissionIds as number[]).filter((id) => !ids.includes(id)),
+      );
     }
   };
 
-  const selectAllPermissions = () => {
-    const allIds = permissions.map((p) => p.id);
-    setPermissionIds(allIds);
-  };
+  const selectAll = () =>
+    setPermissionIds(permissions.map((p) => p.id));
+  const clearAll = () => setPermissionIds([]);
 
-  const clearAllPermissions = () => {
-    setPermissionIds([]);
-  };
-
+  /* ── Handlers de submit ── */
   const handleCreateWithoutPermissions = async () => {
     const values = await form.validateFields(["name"]);
-    await onSubmit({
-      name: values.name,
-      permissionIds: [],
-    });
+    await onSubmit({ name: values.name, permissionIds: [] });
   };
 
   const handleCreateFlow = async () => {
@@ -194,43 +191,27 @@ export const RoleFormModal = ({
       setCurrentStep(1);
       return;
     }
-
-    if (currentStep === 1) {
-      const values = await form.validateFields(["assignNow", "name"]);
-
-      if (!values.assignNow) {
-        await handleCreateWithoutPermissions();
+    // step 1 = opciones (sin permisos o configurar)
+    // step 2 = selección de permisos
+    if (currentStep === 2) {
+      const values = await form.validateFields(["name", "permissionIds"]);
+      const ids = sanitizePermissionIds(values.permissionIds);
+      if (ids.length === 0) {
+        form.setFields([
+          {
+            name: "permissionIds",
+            errors: ["Selecciona al menos un permiso"],
+          },
+        ]);
         return;
       }
-
-      setCurrentStep(2);
-      return;
+      await onSubmit({ name: values.name, permissionIds: ids });
     }
-
-    const values = await form.validateFields(["name", "permissionIds"]);
-
-    const ids = sanitizePermissionIds(values.permissionIds);
-
-    if (ids.length === 0) {
-      form.setFields([
-        { name: "permissionIds", errors: ["Selecciona al menos un permiso"] },
-      ]);
-      return;
-    }
-
-    await onSubmit({
-      name: values.name,
-      permissionIds: ids,
-    });
   };
 
-  const handleOk = async () => {
-    if (mode === "create") return handleCreateFlow();
-
+  const handleEditSubmit = async () => {
     const values = await form.validateFields();
-
     const ids = sanitizePermissionIds(values.permissionIds);
-
     await onSubmit({
       name: values.name,
       permissionIds:
@@ -238,124 +219,106 @@ export const RoleFormModal = ({
     });
   };
 
-  // Componente de selección masiva
-  const MassSelectionBar = () => (
-    <Flex justify="space-between" align="center" style={{ marginBottom: 16 }}>
+  const handleOk = () =>
+    mode === "create" ? handleCreateFlow() : handleEditSubmit();
+
+  /* ── Barra de herramientas de selección ── */
+  const SelectionBar = () => (
+    <Flex justify="space-between" align="center" style={{ marginBottom: 12 }}>
       <Space>
-        <ShieldAlert size={18} />
+        <ShieldAlert size={16} style={{ color: token.colorPrimary }} />
         <Text strong>Permisos seleccionados</Text>
         <Badge
           count={selectedPermissionIds.length}
           showZero
-          style={{ backgroundColor: "#52c41a" }}
+          style={{ backgroundColor: token.colorSuccess }}
         />
+        <Text type="secondary" style={{ fontSize: 12 }}>
+          de {permissions.length} disponibles
+        </Text>
       </Space>
       <Space>
         <Button
           size="small"
-          icon={<CheckSquare size={14} />}
-          onClick={selectAllPermissions}
+          icon={<CheckSquare size={13} />}
+          onClick={selectAll}
+          style={{ borderRadius: "var(--radius-md)" }}
         >
-          Seleccionar todos
+          Todos
         </Button>
         <Button
           size="small"
-          icon={<MinusSquare size={14} />}
-          onClick={clearAllPermissions}
+          icon={<MinusSquare size={13} />}
+          onClick={clearAll}
+          style={{ borderRadius: "var(--radius-md)" }}
         >
-          Limpiar todo
+          Ninguno
         </Button>
       </Space>
     </Flex>
   );
 
-  // Componente de búsqueda
-  const SearchBar = () => (
-    <Input
-      placeholder="Buscar permiso por nombre, acción o módulo..."
-      prefix={<Search size={16} />}
-      value={searchText}
-      onChange={(e) => setSearchText(e.target.value)}
-      allowClear
-      style={{ marginBottom: 16 }}
-      size="middle"
-    />
-  );
-
+  /* ── Acordeón de permisos ── */
   const collapseItems: CollapseProps["items"] = filteredPermissionsByModule.map(
     (group) => {
       const ids = group.items.map((i) => i.id);
-      const selectedCount = ids.filter((id) =>
-        selectedPermissionIds.includes(id),
-      ).length;
-      const isAllSelected = selectedCount === ids.length;
-      const isIndeterminate = selectedCount > 0 && selectedCount < ids.length;
+      const { allSelected, someSelected, selected } =
+        contarSeleccionadosEnModulo(ids, selectedPermissionIds);
+      const moduloStyles = getModuloStyles(group.module);
 
-      // Generar el header del acordeón
       const header = (
-        <Flex
-          justify="space-between"
-          align="center"
-          style={{ width: "100%" }}
-          onClick={(e) => e.stopPropagation()} // Prevenir que el checkbox cierre el acordeón
-        >
+        <Flex justify="space-between" align="center" style={{ width: "100%" }}>
           <Space>
             <Checkbox
-              checked={isAllSelected}
-              indeterminate={isIndeterminate}
+              checked={allSelected}
+              indeterminate={someSelected}
               onChange={(e) => toggleModule(ids, e.target.checked)}
               onClick={(e) => e.stopPropagation()}
             />
-            <Text strong>{group.module}</Text>
+
+            <Text strong style={{ textTransform: "capitalize" }}>
+              {group.module}
+            </Text>
           </Space>
-          <Tag color={isAllSelected ? "success" : "default"}>
-            {selectedCount}/{ids.length}
-          </Tag>
+
+          <Text type="secondary" style={{ fontSize: 12 }}>
+            {selected}/{ids.length}
+          </Text>
         </Flex>
       );
 
-      // Contenido del acordeón
       const content = (
-        <Flex wrap="wrap" gap="small" style={{ marginTop: 8 }}>
-          {group.items.map((p) => {
-            const checked = selectedPermissionIds.includes(p.id);
+        <div style={{ paddingTop: 8 }}>
+          <Flex wrap="wrap" gap={16} align="center">
+            {group.items.map((p) => {
+              const checked = (selectedPermissionIds as number[]).includes(
+                p.id,
+              );
 
-            return (
-              <Card
-                key={p.id}
-                size="small"
-                hoverable
-                style={{
-                  width: "calc(50% - 8px)",
-                  minWidth: "200px",
-                  cursor: "pointer",
-                  border: checked
-                    ? "2px solid var(--ant-color-primary)"
-                    : "1px solid var(--ant-color-border)",
-                  backgroundColor: checked
-                    ? "var(--ant-color-primary-bg)"
-                    : "white",
-                  transition: "all 0.2s ease",
-                }}
-                onClick={() => togglePermission(p.id)}
-              >
-                <Flex align="center" gap="small">
-                  <Checkbox
-                    checked={checked}
-                    onClick={(e) => e.stopPropagation()}
-                    onChange={(e) => {
-                      e.stopPropagation();
-                      togglePermission(p.id);
-                    }}
-                  />
-                  <Text style={{ flex: 1 }}>{p.accion || p.name}</Text>
-                </Flex>
-              </Card>
-            );
-          })}
-        </Flex>
+              return (
+                <Checkbox
+                  key={p.id}
+                  checked={checked}
+                  onChange={() => togglePermission(p.id)}
+                  style={{
+                    padding: "4px 8px",
+                    borderRadius: 6,
+                    border: checked
+                      ? `1px solid ${token.colorPrimary}`
+                      : "1px solid transparent",
+                    background: checked
+                      ? `color-mix(in srgb, ${token.colorPrimary} 10%, transparent)`
+                      : "transparent",
+                    transition: "all 0.2s",
+                  }}
+                >
+                  <span style={{ fontSize: 13 }}>{p.accion}</span>
+                </Checkbox>
+              );
+            })}
+          </Flex>
+        </div>
       );
-
       return {
         key: group.module,
         label: header,
@@ -365,25 +328,26 @@ export const RoleFormModal = ({
     },
   );
 
+  /* ── Opciones de creación (step 1) ── */
   const renderCreateOptions = () => (
     <Space direction="vertical" size="middle" style={{ width: "100%" }}>
       <Alert
-        message="Dos formas de crear un rol"
-        description="Puedes crear el rol inmediatamente sin permisos, o continuar para configurarlos ahora."
+        message="¿Cómo quieres crear este rol?"
+        description="Puedes crear el rol sin permisos ahora y asignarlos después, o configurarlos en este momento."
         type="info"
         showIcon
       />
-
-      <Card>
-        <Space direction="vertical" size="middle" style={{ width: "100%" }}>
+      <Card style={{ borderRadius: "var(--radius-md)" }}>
+        <Space direction="vertical" size={12} style={{ width: "100%" }}>
+          {/* Opción 1: Sin permisos */}
           <Flex justify="space-between" align="center">
             <Space>
-              <Clock size={20} />
+              <Clock size={20} style={{ color: token.colorTextSecondary }} />
               <div>
                 <Text strong>Crear sin permisos</Text>
                 <br />
-                <Text type="secondary" style={{ fontSize: "12px" }}>
-                  El rol se creará inmediatamente sin permisos
+                <Text type="secondary" style={{ fontSize: 12 }}>
+                  El rol se crea de inmediato. Puedes añadir permisos después.
                 </Text>
               </div>
             </Space>
@@ -391,31 +355,34 @@ export const RoleFormModal = ({
               type="default"
               onClick={handleCreateWithoutPermissions}
               loading={submitting}
+              style={{ borderRadius: "var(--radius-md)" }}
             >
               Crear ahora
             </Button>
           </Flex>
 
-          <Divider style={{ margin: "8px 0" }}>
-            <Tag>O</Tag>
+          <Divider style={{ margin: "4px 0" }}>
+            <AppTag tone="neutral">O</AppTag>
           </Divider>
 
+          {/* Opción 2: Con permisos */}
           <Flex justify="space-between" align="center">
             <Space>
-              <Sparkles size={20} />
+              <Sparkles size={20} style={{ color: token.colorPrimary }} />
               <div>
-                <Text strong>Configurar permisos</Text>
+                <Text strong>Configurar permisos ahora</Text>
                 <br />
-                <Text type="secondary" style={{ fontSize: "12px" }}>
-                  Continúa para asignar permisos específicos
+                <Text type="secondary" style={{ fontSize: 12 }}>
+                  Elige los permisos específicos que tendrá este rol.
                 </Text>
               </div>
             </Space>
             <Button
               type="primary"
               onClick={() => setCurrentStep(2)}
-              icon={<ChevronRight size={16} />}
+              icon={<ChevronRight size={15} />}
               iconPosition="end"
+              style={{ borderRadius: "var(--radius-md)" }}
             >
               Continuar
             </Button>
@@ -425,131 +392,147 @@ export const RoleFormModal = ({
     </Space>
   );
 
+  /* ── Panel de selección de permisos ── */
   const renderPermissions = () => (
     <>
-      <MassSelectionBar />
-      <SearchBar />
-
-      {filteredPermissionsByModule.length === 0 ? (
-        <Empty
-          description="No se encontraron permisos"
-          image={Empty.PRESENTED_IMAGE_SIMPLE}
-        />
-      ) : (
-        <Collapse
-          items={collapseItems}
-          activeKey={activeKeys}
-          onChange={(keys) => setActiveKeys(keys as string[])}
-          size="middle"
-          bordered
-          expandIconPosition="end"
-          style={{
-            maxHeight: "500px",
-            overflowY: "auto",
-            paddingRight: "4px",
-          }}
-        />
-      )}
+      <SelectionBar />
+      <Input
+        placeholder="Buscar permiso, módulo o acción..."
+        prefix={<Search size={15} />}
+        value={searchText}
+        onChange={(e) => setSearchText(e.target.value)}
+        allowClear
+        style={{
+          marginBottom: 12,
+          borderRadius: "var(--radius-md)",
+        }}
+      />
+      <Form.Item name="permissionIds" style={{ margin: 0 }}>
+        {filteredPermissionsByModule.length === 0 ? (
+          <Empty
+            description="No se encontraron permisos"
+            image={Empty.PRESENTED_IMAGE_SIMPLE}
+          />
+        ) : (
+          <Collapse
+            items={collapseItems}
+            activeKey={activeKeys}
+            onChange={(keys) => setActiveKeys(keys as string[])}
+            size="small"
+            bordered
+            expandIconPosition="end"
+            style={{
+              maxHeight: 440,
+              overflowY: "auto",
+              borderRadius: "var(--radius-md)",
+            }}
+          />
+        )}
+      </Form.Item>
     </>
   );
+
+  /* ── Footer dinámico ── */
+  const renderFooter = () => {
+    if (mode === "create" && currentStep === 1) return null; // Sin footer en opciones
+
+    return (
+      <Flex justify="space-between" align="center">
+        {/* Botón Anterior */}
+        {mode === "create" && currentStep === 2 && (
+          <Button
+            onClick={() => setCurrentStep(1)}
+            icon={<ChevronLeft size={15} />}
+          >
+            Anterior
+          </Button>
+        )}
+        <Flex gap={8} style={{ marginLeft: "auto" }}>
+          <Button onClick={onCancel}>Cancelar</Button>
+          {mode === "edit" && (
+            <Button type="primary" loading={submitting} onClick={handleOk}>
+              Guardar cambios
+            </Button>
+          )}
+          {mode === "create" && currentStep === 0 && (
+            <Button
+              type="primary"
+              loading={submitting}
+              onClick={handleOk}
+              icon={<ChevronRight size={15} />}
+              iconPosition="end"
+            >
+              Siguiente
+            </Button>
+          )}
+          {mode === "create" && currentStep === 2 && (
+            <Button type="primary" loading={submitting} onClick={handleOk}>
+              Crear rol
+            </Button>
+          )}
+        </Flex>
+      </Flex>
+    );
+  };
 
   return (
     <Modal
       open={open}
       onCancel={onCancel}
-      footer={
-        mode === "create" && currentStep === 1 ? null : (
-          <Flex justify="space-between" align="center">
-            {mode === "create" && currentStep > 0 && currentStep !== 2 && (
-              <Button
-                onClick={() => setCurrentStep((p) => p - 1)}
-                icon={<ChevronLeft size={16} />}
-              >
-                Anterior
-              </Button>
-            )}
-
-            <Flex gap="small" style={{ marginLeft: "auto" }}>
-              <Button onClick={onCancel}>Cancelar</Button>
-
-              {mode === "edit" && (
-                <Button type="primary" loading={submitting} onClick={handleOk}>
-                  Guardar cambios
-                </Button>
-              )}
-
-              {mode === "create" && currentStep !== 1 && (
-                <Button
-                  type="primary"
-                  loading={submitting}
-                  onClick={handleOk}
-                  icon={currentStep === 0 ? <ChevronRight size={16} /> : null}
-                  iconPosition="end"
-                >
-                  {currentStep === 0 ? "Siguiente" : "Crear rol"}
-                </Button>
-              )}
-            </Flex>
-          </Flex>
-        )
-      }
+      footer={renderFooter()}
       width={900}
       centered
       destroyOnClose
       title={
-        <Flex align="center" gap="middle">
+        <Flex align="center" gap={12}>
           {mode === "create" ? (
-            <PlusCircle
-              size={24}
-              style={{ color: "var(--ant-color-primary)" }}
-            />
+            <PlusCircle size={22} style={{ color: token.colorPrimary }} />
           ) : (
-            <ShieldCheck size={24} />
+            <ShieldCheck size={22} style={{ color: token.colorPrimary }} />
           )}
           <div>
             <Title level={4} style={{ margin: 0 }}>
               {mode === "create" ? "Nuevo Rol" : "Editar Rol"}
             </Title>
-            <Text type="secondary" style={{ fontSize: "12px" }}>
+            <Text type="secondary" style={{ fontSize: 12 }}>
               {mode === "create"
                 ? "Configura el nombre y los permisos del nuevo rol"
-                : "Modifica el nombre y los permisos del rol"}
+                : "Modifica el nombre o los permisos del rol"}
             </Text>
           </div>
         </Flex>
       }
       styles={{
-        mask: {
-          backdropFilter: "blur(6px)",
-        },
-        body: {
-          padding: 0,
-        },
+        mask: { backdropFilter: "blur(6px)" },
+        body: { padding: 0 },
       }}
     >
       <Spin spinning={loading}>
-        {/* STEPS */}
+        {/* Steps solo en creación */}
         {mode === "create" && currentStep !== 1 && (
-          <div style={{ padding: "24px 24px 0 24px" }}>
+          <div style={{ padding: "20px 24px 0" }}>
             <Steps
-              current={currentStep}
+              current={currentStep === 2 ? 1 : currentStep}
               size="small"
               items={[
-                { title: "Nombre", icon: <Info size={14} /> },
-                { title: "Permisos", icon: <ShieldAlert size={14} /> },
+                { title: "Nombre del rol", icon: <Info size={13} /> },
+                {
+                  title: "Permisos",
+                  icon: <ShieldAlert size={13} />,
+                },
               ]}
             />
           </div>
         )}
 
-        {/* FORM CONTENT */}
         <div style={{ padding: 24 }}>
           <Form form={form} layout="vertical" requiredMark={false}>
+            {/* Campo nombre siempre visible */}
             <Form.Item
               name="name"
               label="Nombre del rol"
               rules={[
-                { required: true, message: "El nombre del rol es requerido" },
+                { required: true, message: "El nombre es requerido" },
                 { min: 3, message: "Mínimo 3 caracteres" },
                 { max: 50, message: "Máximo 50 caracteres" },
               ]}
@@ -558,14 +541,20 @@ export const RoleFormModal = ({
                 placeholder="Ej: Administrador, Editor, Visualizador"
                 size="large"
                 autoFocus={currentStep === 0}
+                style={{ borderRadius: "var(--radius-md)" }}
               />
             </Form.Item>
 
+            {/* Opciones de creación */}
             {mode === "create" && currentStep === 1 && renderCreateOptions()}
 
-            {mode === "edit" && permissions.length > 0 && renderPermissions()}
-
-            {mode === "create" && currentStep === 2 && renderPermissions()}
+            {/* Selección de permisos */}
+            {mode === "edit" &&
+              permissions.length > 0 &&
+              renderPermissions()}
+            {mode === "create" &&
+              currentStep === 2 &&
+              renderPermissions()}
           </Form>
         </div>
       </Spin>

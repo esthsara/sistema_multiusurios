@@ -1,14 +1,19 @@
+// src/features/roles/components/RoleDetailModal.tsx
 import {
-  Descriptions,
   Empty,
   Modal,
   Tag,
   Typography,
   Flex,
   Divider,
+  Card,
+  Row,
+  Col,
+  theme,
 } from "antd";
 import { ShieldCheck, Users, Calendar, Key } from "lucide-react";
 import type { RolDetalle } from "../types/rol.types";
+import { agruparPermisosPorModulo } from "../utils/roles.utils";
 
 const { Title, Text } = Typography;
 
@@ -23,37 +28,34 @@ export const RoleDetailModal = ({
   role,
   onClose,
 }: RoleDetailModalProps) => {
+  const { token } = theme.useToken();
+
+  const groupedPermissions = agruparPermisosPorModulo(role?.permissions ?? []);
+
   return (
     <Modal
       open={open}
       footer={null}
       onCancel={onClose}
-      width={760}
+      width={820}
       centered
       destroyOnClose
       title={
-        <Flex align="center" gap="middle">
-          <ShieldCheck
-            size={24}
-            style={{ color: "var(--ant-color-primary)" }}
-          />
+        <Flex align="center" gap={12}>
+          <ShieldCheck size={24} style={{ color: token.colorPrimary }} />
           <div>
             <Title level={4} style={{ margin: 0 }}>
               Detalle del rol
             </Title>
-            <Text type="secondary" style={{ fontSize: "12px" }}>
+            <Text type="secondary" style={{ fontSize: 12 }}>
               Información general y permisos asignados
             </Text>
           </div>
         </Flex>
       }
       styles={{
-        mask: {
-          backdropFilter: "blur(6px)",
-        },
-        body: {
-          padding: 0,
-        },
+        mask: { backdropFilter: "blur(6px)" },
+        body: { padding: 0 },
       }}
     >
       {!role ? (
@@ -63,49 +65,79 @@ export const RoleDetailModal = ({
         />
       ) : (
         <div>
-          {/* Contenido principal */}
-          <div style={{ padding: 24 }}>
-            <Descriptions
-              bordered
-              column={{ xs: 1, sm: 2 }}
-              size="middle"
-              labelStyle={{
-                fontWeight: 500,
-                backgroundColor: "var(--ant-color-bg-layout)",
-              }}
-              contentStyle={{
-                backgroundColor: "var(--ant-color-bg-container)",
-              }}
-            >
-              <Descriptions.Item label="Nombre">
-                <Text strong>{role.name}</Text>
-              </Descriptions.Item>
-              <Descriptions.Item label="Usuarios asignados">
-                <Flex align="center" gap={6}>
-                  <Users size={14} />
-                  <Text>{role.users_count ?? 0}</Text>
-                </Flex>
-              </Descriptions.Item>
-              <Descriptions.Item label="Creado">
-                <Flex align="center" gap={6}>
-                  <Calendar size={14} />
+          {/* ───────── HEADER INFO ───────── */}
+          <div style={{ padding: "20px 24px 0" }}>
+            <Row gutter={[12, 12]}>
+              {/* Nombre */}
+              <Col xs={24}>
+                <Card
+                  size="small"
+                  style={{
+                    borderRadius: 10,
+                    background: token.colorFillTertiary,
+                  }}
+                >
+                  <Text type="secondary">Nombre del rol</Text>
+                  <Title
+                    level={5}
+                    style={{
+                      margin: 0,
+                      wordBreak: "break-word",
+                    }}
+                  >
+                    {role.name}
+                  </Title>
+                </Card>
+              </Col>
+
+              {/* Usuarios */}
+              <Col xs={24} sm={8}>
+                <Card size="small" style={{ borderRadius: 10 }}>
+                  <Flex align="center" gap={8}>
+                    <Users size={16} />
+                    <Text type="secondary">Usuarios</Text>
+                  </Flex>
+                  <Title level={4} style={{ margin: 0 }}>
+                    {role.users_count ?? 0}
+                  </Title>
+                </Card>
+              </Col>
+
+              {/* Creado */}
+              <Col xs={24} sm={8}>
+                <Card size="small" style={{ borderRadius: 10 }}>
+                  <Flex align="center" gap={8}>
+                    <Calendar size={16} />
+                    <Text type="secondary">Creado</Text>
+                  </Flex>
                   <Text>{role.created_at ?? "—"}</Text>
-                </Flex>
-              </Descriptions.Item>
-              <Descriptions.Item label="Actualizado" span={2}>
-                {role.updated_at ?? "—"}
-              </Descriptions.Item>
-            </Descriptions>
+                </Card>
+              </Col>
 
-            <Divider style={{ margin: "24px 0 16px" }} />
+              {/* Actualizado */}
+              <Col xs={24} sm={8}>
+                <Card size="small" style={{ borderRadius: 10 }}>
+                  <Flex align="center" gap={8}>
+                    <Calendar size={16} />
+                    <Text type="secondary">Actualizado</Text>
+                  </Flex>
+                  <Text>{role.updated_at ?? "—"}</Text>
+                </Card>
+              </Col>
+            </Row>
+          </div>
 
+          <Divider style={{ margin: "20px 0 12px" }} />
+
+          {/* ───────── PERMISOS ───────── */}
+          <div style={{ padding: "0 24px 24px" }}>
             <Flex
               justify="space-between"
               align="center"
               style={{ marginBottom: 12 }}
             >
-              <Flex align="center" gap={6}>
-                <Key size={18} style={{ color: "var(--ant-color-primary)" }} />
+              <Flex align="center" gap={8}>
+                <Key size={18} style={{ color: token.colorPrimary }} />
                 <Text strong>Permisos del rol</Text>
               </Flex>
               <Tag color="blue">{role.permissions.length} permisos</Tag>
@@ -113,35 +145,60 @@ export const RoleDetailModal = ({
 
             <div
               style={{
-                maxHeight: 280,
+                maxHeight: 320,
                 overflowY: "auto",
                 padding: 16,
                 borderRadius: 12,
-                border: "1px solid var(--ant-color-border)",
-                backgroundColor: "var(--ant-color-bg-container-secondary)",
-                transition: "all 0.2s",
+                border: `1px solid ${token.colorBorder}`,
+                background: token.colorBgContainer,
               }}
             >
-              {role.permissions.length === 0 ? (
+              {groupedPermissions.length === 0 ? (
                 <Empty
                   description="Sin permisos asignados"
                   image={Empty.PRESENTED_IMAGE_SIMPLE}
-                  style={{ margin: "16px 0" }}
                 />
               ) : (
-                <Flex wrap="wrap" gap="small">
-                  {role.permissions.map((permission) => (
-                    <Tag
-                      key={permission.id}
-                      color="processing"
+                <Flex direction="column" gap={12}>
+                  {groupedPermissions.map((group) => (
+                    <Card
+                      key={group.module}
+                      size="small"
                       style={{
-                        margin: 0,
-                        fontSize: "13px",
-                        padding: "2px 10px",
+                        borderRadius: 10,
+                        background: token.colorFillQuaternary,
                       }}
                     >
-                      {permission.name}
-                    </Tag>
+                      {/* MÓDULO */}
+                      <Text
+                        strong
+                        style={{
+                          display: "block",
+                          marginBottom: 8,
+                          textTransform: "capitalize",
+                        }}
+                      >
+                        {group.module}
+                      </Text>
+
+                      {/* PERMISOS */}
+                      <Flex wrap="wrap" gap={6}>
+                        {group.permissions.map((p) => (
+                          <Tag
+                            key={p.id}
+                            color="processing"
+                            style={{
+                              margin: 0,
+                              borderRadius: 6,
+                              fontSize: 12,
+                              padding: "3px 10px",
+                            }}
+                          >
+                            {p.name}
+                          </Tag>
+                        ))}
+                      </Flex>
+                    </Card>
                   ))}
                 </Flex>
               )}
@@ -152,3 +209,5 @@ export const RoleDetailModal = ({
     </Modal>
   );
 };
+
+export default RoleDetailModal;

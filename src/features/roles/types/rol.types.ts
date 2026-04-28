@@ -66,3 +66,35 @@ export interface RolFilters {
   fecha_desde?: string;
   fecha_hasta?: string;
 }
+
+/** ── Asignación de Roles a Usuarios ── */
+
+/** Shape de un rol simple en la respuesta de usuarios */
+export interface RolDetalleSimple {
+  id: number;
+  name: string;
+  guard_name: string;
+}
+
+/** Respuesta del backend al asignar/quitar roles a usuario */
+export interface UsuarioConRoles {
+  id: number;
+  username: string;
+  email: string;
+  activo: boolean;
+  roles: string[];
+  roles_detalle: RolDetalleSimple[];
+  permisos: string[];
+  created_at: string;
+  updated_at: string;
+}
+
+/** DTO para asignar uno o varios roles a un usuario */
+export interface AssignRoleDto {
+  role_id: number[];
+}
+
+/** DTO para quitar uno o varios roles de un usuario */
+export interface RemoveRoleDto {
+  role_id: number[];
+}

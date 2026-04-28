@@ -1,3 +1,4 @@
+// src/features/roles/components/RolesPage.tsx
 import { useMemo, useState } from "react";
 import { Button, Tag } from "antd";
 import type { TableColumnsType } from "antd";
@@ -7,8 +8,10 @@ import { DataTable } from "@/shared/components/organisms/DataTable";
 import { RowActions } from "@/shared/components/molecules/RowActions";
 import { ConfirmModal } from "@/shared/components/molecules/ConfirmModal";
 import { Can } from "@/shared/components/atoms/Can";
+import { AppTag } from "@/shared/components/atoms/AppTag";
 import { useRoles } from "../hooks/useRoles";
 import type { RolDetalle, RolListItem } from "../types/rol.types";
+import { getPermissionIds } from "../utils/roles.utils";
 import { RoleFilters } from "./RoleFilters";
 import { RoleFormModal } from "./RoleFormModal";
 import { RoleDetailModal } from "./RoleDetailModal";
@@ -39,11 +42,13 @@ const RolesPage = () => {
   const [copyOpen, setCopyOpen] = useState(false);
   const [deleteOpen, setDeleteOpen] = useState(false);
 
+  /* ── Paginación local ── */
   const paginatedData = useMemo(() => {
     const start = (roles.table.state.page - 1) * roles.table.state.pageSize;
     return roles.data.slice(start, start + roles.table.state.pageSize);
   }, [roles.data, roles.table.state.page, roles.table.state.pageSize]);
 
+  /* ── Carga detalle de rol ── */
   const loadRoleDetail = async (roleId: number) => {
     setLoadingDetail(true);
     const detail = await roles.getRoleDetail(roleId);
@@ -52,6 +57,7 @@ const RolesPage = () => {
     return detail;
   };
 
+  /* ── Handlers de apertura ── */
   const handleOpenCreate = async () => {
     setFormMode("create");
     setFormInitialName("");
@@ -66,10 +72,9 @@ const RolesPage = () => {
     setFormMode("edit");
     await roles.fetchPermissionsCatalog();
     const detail = await loadRoleDetail(role.id);
-
     setFormInitialName(detail?.name ?? role.name);
     setFormInitialPermissions(
-      detail ? roles.getPermissionIds(detail.permissions) : [],
+      detail ? getPermissionIds(detail.permissions) : [],
     );
     setFormOpen(true);
   };
@@ -92,6 +97,7 @@ const RolesPage = () => {
     setUsersOpen(true);
   };
 
+  /* ── Handlers de submit ── */
   const handleSubmitRole = async (values: {
     name: string;
     permissionIds: number[];
@@ -133,12 +139,20 @@ const RolesPage = () => {
     }
   };
 
+  /* ── Refresh de usuarios del rol tras asignar/quitar ── */
+  const handleRefreshRoleUsers = () => {
+    if (selectedRole) {
+      roles.fetchUsersByRole(selectedRole);
+    }
+  };
+
+  /* ── Columnas ── */
   const columns: TableColumnsType<RolListItem> = [
     {
       title: "Nombre",
       dataIndex: "name",
       key: "name",
-      width: 180,
+      width: 200,
       align: "left",
       render: (name: string) => (
         <span
@@ -150,25 +164,43 @@ const RolesPage = () => {
       ),
     },
     {
-      title: "Nro Permisos",
+      title: "Permisos",
       key: "nroPermisos",
-      width: 100,
+      width: 90,
       align: "center",
-      render: (_, r: any) => (
-        <span style={{ color: "var(--color-text-secondary)", fontWeight: 600 }}>
-          {r.permissions_count ?? r.permissions?.length ?? "—"}
-        </span>
-      ),
+      render: (_, r) => {
+        const count =
+          (r as any).permissions_count ??
+          (r as any).permissions?.length ??
+          null;
+        return (
+          <span
+            style={{
+              color: "var(--color-text-secondary)",
+              fontWeight: 600,
+              fontSize: 13,
+            }}
+          >
+            {count !== null ? count : "—"}
+          </span>
+        );
+      },
     },
     {
-      title: "Nro Usuarios",
+      title: "Usuarios",
       dataIndex: "users_count",
       key: "users_count",
-      width: 100,
+      width: 90,
       align: "center",
       render: (value?: number) => (
-        <span style={{ color: "var(--color-text-secondary)", fontWeight: 600 }}>
-          {value ?? 0}
+        <span
+          style={{
+            color: "var(--color-text-secondary)",
+            fontWeight: 600,
+            fontSize: 13,
+          }}
+        >
+          {value !== undefined ? value : "—"}
         </span>
       ),
     },
@@ -176,12 +208,13 @@ const RolesPage = () => {
       title: "Estado",
       key: "estado",
       width: 100,
+      align: "center",
       render: (_, role) => {
         const estado = roles.getRoleEstado(role);
         return estado === "activo" ? (
-          <Tag color="success">Activo</Tag>
+          <AppTag tone="success">Activo</AppTag>
         ) : (
-          <Tag color="error">Inactivo</Tag>
+          <AppTag tone="danger">Inactivo</AppTag>
         );
       },
     },
@@ -196,14 +229,14 @@ const RolesPage = () => {
           actions={[
             {
               key: "view",
-              label: "Ver",
+              label: "Ver detalle",
               icon: <Eye size={14} />,
               permission: "roles.ver",
               onClick: () => handleOpenDetail(role),
             },
             {
               key: "permissions",
-              label: "Permisos",
+              label: "Ver permisos",
               icon: <Shield size={14} />,
               permission: "roles.ver",
               onClick: () => handleOpenPermissions(role),
@@ -217,7 +250,7 @@ const RolesPage = () => {
             },
             {
               key: "users",
-              label: "Usuarios con ese rol",
+              label: "Usuarios con este rol",
               icon: <Users size={14} />,
               permission: "usuarios.ver",
               onClick: () => handleOpenUsers(role),
@@ -253,7 +286,7 @@ const RolesPage = () => {
     <div className="p-6">
       <PageHeader
         title="Gestión de Roles"
-        description="Administra roles, permisos, asignaciones de usuarios y copias de rol"
+        description="Administra roles, permisos y asignaciones de usuarios"
         breadcrumbs={[{ label: "Seguridad y Accesos" }, { label: "Roles" }]}
         actions={
           <Can permission="roles.crear">
@@ -282,7 +315,7 @@ const RolesPage = () => {
         data={paginatedData}
         loading={roles.loading}
         emptyText="No hay roles registrados"
-        scrollX={1000}
+        scrollX={900}
         pagination={{
           current: roles.table.state.page,
           pageSize: roles.table.state.pageSize,
@@ -291,6 +324,7 @@ const RolesPage = () => {
         }}
       />
 
+      {/* ── Modales ── */}
       <RoleFormModal
         open={formOpen}
         mode={formMode}
@@ -319,6 +353,7 @@ const RolesPage = () => {
         }}
       />
 
+      {/* RoleUsersModal ahora con onRefresh para re-cargar al asignar/quitar */}
       <RoleUsersModal
         open={usersOpen}
         role={selectedRole}
@@ -328,6 +363,7 @@ const RolesPage = () => {
           setUsersOpen(false);
           roles.clearRoleUsers();
         }}
+        onRefresh={handleRefreshRoleUsers}
       />
 
       <RoleCopyModal
@@ -341,7 +377,7 @@ const RolesPage = () => {
       <ConfirmModal
         open={deleteOpen}
         title="¿Eliminar rol?"
-        description={`Se eliminará el rol ${selectedRole?.name ?? ""}. Esta acción no se puede deshacer.`}
+        description={`Se eliminará el rol "${selectedRole?.name ?? ""}". Esta acción no se puede deshacer.`}
         confirmText="Eliminar"
         cancelText="Cancelar"
         loading={roles.submitting}
