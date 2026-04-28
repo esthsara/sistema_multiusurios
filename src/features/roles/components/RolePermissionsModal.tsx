@@ -1,7 +1,24 @@
-import { useMemo } from "react";
-import { Button, Card, Col, Empty, Modal, Row, Space, Tag, Typography, theme } from "antd";
-import { Pencil, ShieldCheck } from "lucide-react";
+import { useMemo, useState } from "react";
+import {
+  Button,
+  Card,
+  Col,
+  Collapse,
+  Empty,
+  Modal,
+  Row,
+  Space,
+  Tag,
+  Typography,
+  theme,
+  Badge,
+  Flex,
+} from "antd";
+import { Pencil, ShieldCheck, Key, LayoutGrid, Zap } from "lucide-react";
 import type { RolDetalle, RolPermission } from "../types/rol.types";
+import { Divider } from "antd";
+
+const { Title, Text } = Typography;
 
 interface RolePermissionsModalProps {
   open: boolean;
@@ -12,29 +29,22 @@ interface RolePermissionsModalProps {
 
 const toReadableLabel = (value?: string) => {
   if (!value) return "Sin definir";
-  const normalized = value
-    .replace(/[_-]+/g, " ")
-    .replace(/\./g, " ")
-    .trim();
-
+  const normalized = value.replace(/[_-]+/g, " ").replace(/\./g, " ").trim();
   if (!normalized) return "Sin definir";
-
   return normalized
     .split(" ")
-    .map((part) => part.charAt(0).toUpperCase() + part.slice(1))
+    .map((part) => part.charAt(0).toUpperCase() + part.slice(1).toLowerCase())
     .join(" ");
 };
 
 const getModuleName = (permission: RolPermission) => {
   if (permission.modulo?.trim()) return toReadableLabel(permission.modulo);
-
   const [moduleFromName] = String(permission.name ?? "").split(".");
   return toReadableLabel(moduleFromName);
 };
 
 const getActionName = (permission: RolPermission) => {
   if (permission.accion?.trim()) return toReadableLabel(permission.accion);
-
   const [, ...actionParts] = String(permission.name ?? "").split(".");
   return toReadableLabel(actionParts.join("."));
 };
@@ -46,12 +56,16 @@ export const RolePermissionsModal = ({
   onEdit,
 }: RolePermissionsModalProps) => {
   const { token } = theme.useToken();
+  const [activeKeys, setActiveKeys] = useState<string[]>([]);
 
   const moduleGroups = useMemo(() => {
     if (!role) return [];
 
     const grouped = role.permissions.reduce<
-      Record<string, { module: string; permissions: RolPermission[]; actions: Set<string> }>
+      Record<
+        string,
+        { module: string; permissions: RolPermission[]; actions: Set<string> }
+      >
     >((acc, permission) => {
       const module = getModuleName(permission);
       const action = getActionName(permission);
@@ -59,10 +73,8 @@ export const RolePermissionsModal = ({
       if (!acc[module]) {
         acc[module] = { module, permissions: [], actions: new Set<string>() };
       }
-
       acc[module].permissions.push(permission);
       acc[module].actions.add(action);
-
       return acc;
     }, {});
 
@@ -80,94 +92,153 @@ export const RolePermissionsModal = ({
   const totalPermissions = role?.permissions.length ?? 0;
   const totalActions = useMemo(() => {
     const actions = new Set<string>();
-    moduleGroups.forEach((group) => {
-      group.actions.forEach((action) => actions.add(action));
-    });
+    moduleGroups.forEach((group) =>
+      group.actions.forEach((a) => actions.add(a)),
+    );
     return actions.size;
   }, [moduleGroups]);
+
+  // Items para el Collapse
+  const collapseItems = moduleGroups.map((group) => ({
+    key: group.module,
+    label: (
+      <Flex justify="space-between" align="center">
+        <Space>
+          <LayoutGrid size={16} />
+          <Text strong>{group.module}</Text>
+        </Space>
+        <Space>
+          <Tag icon={<Key size={12} />} color="blue">
+            {group.permissions.length} permisos
+          </Tag>
+          <Tag icon={<Zap size={12} />} color="geekblue">
+            {group.actions.size} acciones
+          </Tag>
+        </Space>
+      </Flex>
+    ),
+    children: (
+      <Space direction="vertical" size="middle" style={{ width: "100%" }}>
+        <Flex wrap="wrap" gap="small">
+          {[...group.actions]
+            .sort((a, b) => a.localeCompare(b, "es"))
+            .map((action) => (
+              <Tag key={action} color="processing" style={{ margin: 0 }}>
+                {action}
+              </Tag>
+            ))}
+        </Flex>
+        <Divider style={{ margin: "8px 0" }} />
+        <Flex wrap="wrap" gap="small">
+          {group.permissions.map((permission) => (
+            <Tag
+              key={permission.id}
+              color="default"
+              style={{ margin: 0, fontSize: "12px" }}
+            >
+              {permission.name}
+            </Tag>
+          ))}
+        </Flex>
+      </Space>
+    ),
+  }));
 
   return (
     <Modal
       open={open}
-      title={role ? `Permisos del rol: ${role.name}` : "Permisos del rol"}
-      footer={
-        role && onEdit ? (
-          <Button type="primary" icon={<Pencil size={16} />} onClick={() => onEdit(role)}>
-            Editar permisos
-          </Button>
-        ) : null
-      }
+      footer={null}
       onCancel={onClose}
       width={900}
       centered
-      destroyOnHidden
+      destroyOnClose
+      title={
+        <Flex align="center" gap="middle">
+          <ShieldCheck size={24} style={{ color: token.colorPrimary }} />
+          <div>
+            <Title level={4} style={{ margin: 0 }}>
+              {role ? `Permisos del rol: ${role.name}` : "Permisos del rol"}
+            </Title>
+            <Text type="secondary" style={{ fontSize: "12px" }}>
+              Listado de módulos, acciones y permisos asignados
+            </Text>
+          </div>
+        </Flex>
+      }
+      styles={{
+        mask: { backdropFilter: "blur(6px)" },
+        body: { padding: 0 },
+      }}
     >
       {!role ? (
-        <Empty description="No hay rol seleccionado" />
+        <Empty description="No hay rol seleccionado" style={{ padding: 40 }} />
       ) : (
-        <div className="pt-2">
-          <div
-            style={{
-              border: `1px solid ${token.colorBorder}`,
-              background: token.colorFillTertiary,
-              borderRadius: token.borderRadiusLG,
-              padding: 14,
-              marginBottom: 16,
-            }}
-          >
-            <Space size={10} className="mb-2">
-              <ShieldCheck size={18} color={token.colorPrimary} />
-              <Typography.Text strong style={{ color: token.colorText }}>
-                Vista general de permisos
-              </Typography.Text>
-            </Space>
-
-            <Row gutter={[12, 12]}>
+        <div>
+          {/* Estadísticas */}
+          <div style={{ padding: "24px 24px 0 24px" }}>
+            <Row gutter={[16, 16]}>
               <Col xs={24} sm={8}>
-                <Card size="small" bordered={false} style={{ background: token.colorBgElevated }}>
-                  <Typography.Text type="secondary">Permisos activos</Typography.Text>
-                  <Typography.Title level={4} style={{ margin: 0, color: token.colorPrimary }}>
+                <Card
+                  size="small"
+                  style={{
+                    background: token.colorFillTertiary,
+                    border: "none",
+                  }}
+                >
+                  <Text type="secondary">Permisos activos</Text>
+                  <Title
+                    level={3}
+                    style={{ margin: 0, color: token.colorPrimary }}
+                  >
                     {totalPermissions}
-                  </Typography.Title>
+                  </Title>
                 </Card>
               </Col>
-
               <Col xs={24} sm={8}>
-                <Card size="small" bordered={false} style={{ background: token.colorBgElevated }}>
-                  <Typography.Text type="secondary">Módulos cubiertos</Typography.Text>
-                  <Typography.Title level={4} style={{ margin: 0, color: token.colorText }}>
+                <Card
+                  size="small"
+                  style={{
+                    background: token.colorFillTertiary,
+                    border: "none",
+                  }}
+                >
+                  <Text type="secondary">Módulos cubiertos</Text>
+                  <Title level={3} style={{ margin: 0 }}>
                     {totalModules}
-                  </Typography.Title>
+                  </Title>
                 </Card>
               </Col>
-
               <Col xs={24} sm={8}>
-                <Card size="small" bordered={false} style={{ background: token.colorBgElevated }}>
-                  <Typography.Text type="secondary">Acciones identificadas</Typography.Text>
-                  <Typography.Title level={4} style={{ margin: 0, color: token.colorText }}>
+                <Card
+                  size="small"
+                  style={{
+                    background: token.colorFillTertiary,
+                    border: "none",
+                  }}
+                >
+                  <Text type="secondary">Acciones identificadas</Text>
+                  <Title level={3} style={{ margin: 0 }}>
                     {totalActions}
-                  </Typography.Title>
+                  </Title>
                 </Card>
               </Col>
             </Row>
           </div>
 
-          <Typography.Text
-            strong
-            style={{ color: token.colorText, display: "block", marginBottom: 10 }}
-          >
-            Permisos por módulo
-          </Typography.Text>
+          {/* Lista de permisos por módulo (Collapse) */}
+          <div style={{ padding: 24 }}>
+            <Flex
+              justify="space-between"
+              align="center"
+              style={{ marginBottom: 16 }}
+            >
+              <Space>
+                <Key size={18} />
+                <Text strong>Permisos por módulo</Text>
+              </Space>
+              <Badge count={moduleGroups.length} showZero color="blue" />
+            </Flex>
 
-          <div
-            style={{
-              maxHeight: 420,
-              overflowY: "auto",
-              display: "grid",
-              gap: 12,
-              paddingRight: 4,
-            }}
-          >
             {moduleGroups.length === 0 ? (
               <Card>
                 <Empty
@@ -176,42 +247,36 @@ export const RolePermissionsModal = ({
                 />
               </Card>
             ) : (
-              moduleGroups.map((group) => (
-                <Card
-                  key={group.module}
-                  size="small"
-                  title={
-                    <Space size={8}>
-                      <Typography.Text strong style={{ color: token.colorText }}>
-                        {group.module}
-                      </Typography.Text>
-                      <Tag color="blue">{group.permissions.length} permisos</Tag>
-                    </Space>
-                  }
-                  style={{
-                    borderColor: token.colorBorder,
-                    background: token.colorBgElevated,
-                  }}
-                >
-                  <div className="flex flex-wrap gap-2 mb-3">
-                    {[...group.actions].sort((a, b) => a.localeCompare(b, "es")).map((action) => (
-                      <Tag key={`${group.module}-${action}`} color="processing">
-                        {action}
-                      </Tag>
-                    ))}
-                  </div>
-
-                  <div className="flex flex-wrap gap-2">
-                    {group.permissions.map((permission) => (
-                      <Tag key={permission.id} color="geekblue">
-                        {permission.name}
-                      </Tag>
-                    ))}
-                  </div>
-                </Card>
-              ))
+              <Collapse
+                items={collapseItems}
+                activeKey={activeKeys}
+                onChange={(keys) => setActiveKeys(keys as string[])}
+                expandIconPosition="end"
+                ghost={false}
+                bordered
+                style={{ background: token.colorBgContainer }}
+              />
             )}
           </div>
+
+          {/* Footer con botón de editar (si existe) */}
+          {onEdit && (
+            <Flex
+              justify="end"
+              style={{
+                padding: "16px 24px 24px",
+                borderTop: `1px solid ${token.colorBorder}`,
+              }}
+            >
+              <Button
+                type="primary"
+                icon={<Pencil size={16} />}
+                onClick={() => onEdit(role)}
+              >
+                Editar permisos
+              </Button>
+            </Flex>
+          )}
         </div>
       )}
     </Modal>

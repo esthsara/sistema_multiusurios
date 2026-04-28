@@ -138,6 +138,8 @@ const RolesPage = () => {
       title: "Nombre",
       dataIndex: "name",
       key: "name",
+      width: 180,
+      align: "left",
       render: (name: string) => (
         <span
           className="font-medium"
@@ -150,7 +152,7 @@ const RolesPage = () => {
     {
       title: "Nro Permisos",
       key: "nroPermisos",
-      width: 130,
+      width: 100,
       align: "center",
       render: (_, r: any) => (
         <span style={{ color: "var(--color-text-secondary)", fontWeight: 600 }}>
@@ -162,7 +164,7 @@ const RolesPage = () => {
       title: "Nro Usuarios",
       dataIndex: "users_count",
       key: "users_count",
-      width: 130,
+      width: 100,
       align: "center",
       render: (value?: number) => (
         <span style={{ color: "var(--color-text-secondary)", fontWeight: 600 }}>
@@ -173,7 +175,7 @@ const RolesPage = () => {
     {
       title: "Estado",
       key: "estado",
-      width: 120,
+      width: 100,
       render: (_, role) => {
         const estado = roles.getRoleEstado(role);
         return estado === "activo" ? (
@@ -187,7 +189,7 @@ const RolesPage = () => {
       title: "Acciones",
       key: "acciones",
       fixed: "right",
-      width: 250,
+      width: 80,
       render: (_, role) => (
         <RowActions
           collapseWhenMoreThan={5}

@@ -49,12 +49,12 @@ export const http = {
       });
       const payload = response.data as unknown;
 
-      if (import.meta.env.DEV) {
+     /* if (import.meta.env.DEV) {
         console.groupCollapsed(`[http.getPaginated] ${url}`);
         console.log("params:", params);
         console.log("raw response.data:", payload);
         console.groupEnd();
-      }
+      }*/
 
       /**
        * Soporta ambas formas de backend:
@@ -115,11 +115,11 @@ export const http = {
             },
           };
 
-          if (import.meta.env.DEV) {
+          /*if (import.meta.env.DEV) {
             console.groupCollapsed(`[http.getPaginated] normalized ${url}`);
             console.log("normalized:", normalized);
             console.groupEnd();
-          }
+          }*/
 
           return normalized;
         }
