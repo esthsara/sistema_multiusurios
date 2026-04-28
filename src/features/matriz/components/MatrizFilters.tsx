@@ -1,5 +1,6 @@
-import { Input, Select, Button, Card, Flex } from "antd";
-import { Search, RotateCcw } from "lucide-react";
+// src/features/matriz/components/MatrizFilters.tsx
+import { Button, Flex, Input, Select } from "antd";
+import { RotateCcw, Search } from "lucide-react";
 import type { MatrizFilters } from "../types/matriz.types";
 
 interface MatrizFiltersProps {
@@ -16,72 +17,76 @@ export const MatrizFiltersComponent = ({
   roles,
 }: MatrizFiltersProps) => {
   return (
-    <Card
-      size="small"
+    <div
+      className="matriz-filters flex flex-wrap items-center gap-3 mb-4 p-4"
       style={{
-        marginBottom: 16,
-        borderRadius: "var(--radius-lg)",
-        background: "var(--color-bg-filter)",
+        background: "var(--color-bg-base-2)",
+        borderRadius: "var(--radius-card)",
         border: "1px solid var(--color-border)",
       }}
     >
-      <Flex wrap="wrap" gap="middle" align="center">
-        {/* 🔍 BUSCADOR MEJORADO */}
-        <Input
-          prefix={<Search size={16} />}
-          placeholder="Buscar permiso, acción o nombre..."
-          value={filters.search || ""}
-          onChange={(e) =>
-            setFilters({ ...filters, search: e.target.value })
-          }
-          allowClear
-          style={{ width: 260 }}
-        />
+      {/* 🔍 Búsqueda */}
+      <Input
+        prefix={
+          <Search
+            size={15}
+            style={{ color: "var(--color-primary-400)" }}
+          />
+        }
+        placeholder="Buscar módulo, permiso o acción..."
+        value={filters.search ?? ""}
+        onChange={(e) => setFilters({ ...filters, search: e.target.value })}
+        allowClear
+        style={{ width: 260 }}
+      />
 
-        {/* 📂 FILTRO DE MÓDULOS */}
-        <Select
-          mode="multiple"
-          placeholder="Filtrar por módulos"
-          value={filters.modulos || []}
-          onChange={(value) =>
-            setFilters({ ...filters, modulos: value })
-          }
-          options={modulos.map((m) => ({ label: m, value: m }))}
-          style={{ minWidth: 200 }}
-          maxTagCount="responsive"
-          allowClear
-        />
+      {/* 📂 Módulos */}
+      <Select
+        mode="multiple"
+        placeholder="Filtrar por módulos"
+        value={filters.modulos ?? []}
+        onChange={(value) => setFilters({ ...filters, modulos: value })}
+        options={modulos.map((m) => ({
+          label: m.charAt(0).toUpperCase() + m.slice(1),
+          value: m,
+        }))}
+        style={{
+          minWidth: 200,
+          background: "var(--color-bg-filter)",
+        }}
+        maxTagCount="responsive"
+        allowClear
+      />
 
-        {/* 🎯 MODO FOCO EN UN ROL */}
-        <Select
-          placeholder="Seleccionar rol (modo foco)"
-          value={filters.selectedRol ?? undefined}
-          onChange={(value) =>
-            setFilters({ ...filters, selectedRol: value })
-          }
-          options={roles.map((r) => ({
-            label: r.name,
-            value: r.id,
-          }))}
-          style={{ width: 220 }}
-          allowClear
-        />
+      {/* 🎯 Foco en un rol */}
+      <Select
+        placeholder="Ver un rol específico"
+        value={filters.selectedRol ?? undefined}
+        onChange={(value) =>
+          setFilters({ ...filters, selectedRol: value ?? null })
+        }
+        options={roles.map((r) => ({ label: r.name, value: r.id }))}
+        style={{
+          width: 220,
+          background: "var(--color-bg-filter)",
+        }}
+        allowClear
+      />
 
-        {/* 🧹 LIMPIAR */}
-        <Button
-          icon={<RotateCcw size={16} />}
-          onClick={() =>
-            setFilters({
-              search: "",
-              modulos: [],
-              roles: [],
-              selectedRol: null,
-            })
-          }
-        >
-          Limpiar
-        </Button>
-      </Flex>
-    </Card>
+      {/* Spacer */}
+      <div style={{ flex: 1 }} />
+
+      {/* 🧹 Limpiar */}
+      <Button
+        icon={<RotateCcw size={14} />}
+        onClick={() =>
+          setFilters({ search: "", modulos: [], roles: [], selectedRol: null })
+        }
+        type="default"
+        style={{ borderRadius: "var(--radius-md)" }}
+      >
+        Limpiar
+      </Button>
+    </div>
   );
 };
