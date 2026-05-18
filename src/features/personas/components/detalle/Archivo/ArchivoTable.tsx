@@ -63,7 +63,7 @@ export const ArchivoTable = ({
                         ? "Restaurando..."
                         : "Restaurar",
                     icon: <RotateCcw size={14} />,
-                    permission: "personas.editar",
+                    permission: "archivos.eliminar",
                     onClick: () => onRestore?.(record),
                   },
                   {
@@ -74,7 +74,7 @@ export const ArchivoTable = ({
                         : "Eliminar permanente",
                     icon: <Trash2 size={14} />,
                     danger: true,
-                    permission: "personas.eliminar",
+                    permission: "archivos.eliminar_permanente",
                     onClick: () => onForceDelete?.(record),
                   },
                 ]
@@ -96,7 +96,7 @@ export const ArchivoTable = ({
                     label: "Eliminar",
                     icon: <Trash2 size={14} />,
                     danger: true,
-                    permission: "personas.eliminar",
+                    permission: "archivos.eliminar",
                     onClick: () => onDelete?.(record),
                   },
                 ]

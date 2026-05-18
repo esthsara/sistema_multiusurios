@@ -1,6 +1,6 @@
 // src/features/personas/components/detalle/PersonaDetallePage.tsx
 import { useState } from "react";
-import { useParams, useNavigate } from "react-router-dom";
+import { useParams, useNavigate, Navigate } from "react-router-dom";
 import { Button, Tabs, Skeleton } from "antd";
 import { ArrowLeft, Pencil } from "lucide-react";
 import { toast } from "react-toastify";
@@ -8,6 +8,7 @@ import { PageHeader } from "@/shared/components/molecules/PageHeader";
 import { Can } from "@/shared/components/guards/Can";
 import { AppTag } from "@/shared/components/atoms/AppTag";
 import { APP_ROUTES } from "@/shared/constants/routes.constants";
+import { useAuthStore } from "@/features/auth/store/auth.store";
 import { personasService } from "../../services/personas.service";
 import { usePersonaDetalle } from "../../hooks/usePersonaDetalle";
 import { PersonaFormModal } from "../PersonaFormModal";
@@ -19,9 +20,10 @@ import { PersonaAuditoria } from "./PersonaAuditoria";
 import type { UpdatePersonaDto } from "../../types/persona.types";
 
 const PersonaDetallePage = () => {
-  const { id } = useParams<{ id: string }>();
+  const { id, tab } = useParams<{ id: string; tab?: string }>();
   const navigate = useNavigate();
   const personaId = Number(id);
+  const hasAnyPermission = useAuthStore((s) => s.hasAnyPermission);
 
   const { persona, loading, refetch } = usePersonaDetalle(personaId);
   const [editOpen, setEditOpen] = useState(false);
@@ -73,37 +75,59 @@ const PersonaDetallePage = () => {
       : (persona.razon_social ?? "Sin nombre")
     : "...";
 
-  const tabs = [
-    {
-      key: "info",
-      label: "Información General",
-      children: persona ? (
-        <PersonaInfoGeneral persona={persona} />
-      ) : (
-        <Skeleton active />
-      ),
-    },
-    {
+  const activeTab = tab || "info";
+  const allTabs = [];
+
+  allTabs.push({
+    key: "info",
+    label: "Información General",
+    children: persona ? (
+      <PersonaInfoGeneral persona={persona} />
+    ) : (
+      <Skeleton active />
+    ),
+  });
+
+  if (hasAnyPermission(["contactos.ver"])) {
+    allTabs.push({
       key: "contactos",
       label: "Contactos",
       children: <PersonaContactos personaId={personaId} />,
-    },
-    {
+    });
+  }
+
+  if (hasAnyPermission(["domicilios.ver"])) {
+    allTabs.push({
       key: "domicilios",
       label: "Domicilios",
       children: <PersonaDomicilios personaId={personaId} />,
-    },
-    {
+    });
+  }
+
+  if (hasAnyPermission(["archivos.ver"])) {
+    allTabs.push({
       key: "archivos",
       label: "Archivos",
       children: <PersonaArchivos personaId={personaId} />,
-    },
-    {
+    });
+  }
+
+  if (hasAnyPermission(["auditoria.ver"])) {
+    allTabs.push({
       key: "auditoria",
       label: "Auditoría",
       children: <PersonaAuditoria personaId={personaId} />,
-    },
-  ];
+    });
+  }
+
+  const isValidTab = allTabs.some((t) => t.key === activeTab);
+  if (!isValidTab && tab) {
+    return <Navigate to={APP_ROUTES.UNAUTHORIZED} replace />;
+  }
+
+  const handleTabChange = (key: string) => {
+    navigate(APP_ROUTES.DASHBOARD.PERSONAS.DETALLE(id!, key === "info" ? "" : key));
+  };
 
   return (
     <div>
@@ -152,8 +176,9 @@ const PersonaDetallePage = () => {
       )}
 
       <Tabs
-        items={tabs}
-        defaultActiveKey="info"
+        items={allTabs}
+        activeKey={isValidTab ? activeTab : "info"}
+        onChange={handleTabChange}
         style={{
           backgroundColor: "var(--color-bg-base)",
           borderRadius: "var(--radius-card)",

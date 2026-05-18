@@ -67,7 +67,7 @@ export const ContactoTable = ({
               key: "edit",
               label: "Editar",
               icon: <Pencil size={14} />,
-              permission: "personas.editar",
+              permission: "contactos.editar",
               onClick: () => onEdit(record),
             },
             {
@@ -75,7 +75,7 @@ export const ContactoTable = ({
               label: "Eliminar",
               icon: <Trash2 size={14} />,
               danger: true,
-              permission: "personas.eliminar",
+              permission: "contactos.eliminar",
               onClick: () => onDelete(record),
             },
           ]}

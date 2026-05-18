@@ -44,7 +44,7 @@ export const PersonaContactos = ({ personaId }: PersonaContactosProps) => {
       <div className="flex justify-between items-center">
         <h3 className="text-base font-semibold">Contactos</h3>
 
-        <Can permission="personas.crear">
+        <Can permission="contactos.crear">
           <Button icon={<Plus size={14} />} onClick={modal.openCreate}>
             Nuevo
           </Button>

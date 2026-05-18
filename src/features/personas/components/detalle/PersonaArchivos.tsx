@@ -2,6 +2,7 @@ import { useState } from "react";
 import { Alert, Button } from "antd";
 import { Plus, RotateCcw, Trash2 } from "lucide-react";
 import { toast } from "react-toastify";
+import { Can } from "@/shared/components/guards/Can";
 
 import { useArchivos } from "../../hooks/useArchivos";
 import { ConfirmModal } from "@/shared/components/organisms/ConfirmModal";
@@ -116,17 +117,21 @@ export const PersonaArchivos = ({ personaId }: { personaId: number }) => {
           >
             Activos
           </Button>
-          <Button
-            type={viewMode === "papelera" ? "primary" : "default"}
-            icon={<Trash2 size={14} />}
-            onClick={() => setViewMode("papelera")}
-          >
-            Papelera
-          </Button>
-          {viewMode === "activos" && (
-            <Button icon={<Plus size={14} />} onClick={() => setOpenForm(true)}>
-              Subir
+          <Can permission="archivos.eliminar">
+            <Button
+              type={viewMode === "papelera" ? "primary" : "default"}
+              icon={<Trash2 size={14} />}
+              onClick={() => setViewMode("papelera")}
+            >
+              Papelera
             </Button>
+          </Can>
+          {viewMode === "activos" && (
+            <Can permission="archivos.subir">
+              <Button icon={<Plus size={14} />} onClick={() => setOpenForm(true)}>
+                Subir
+              </Button>
+            </Can>
           )}
         </div>
       </div>
