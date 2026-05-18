@@ -88,8 +88,8 @@ const buildSyncPayloads = (permissionIds: number[]) => [
 ];
 
 export const rolesService = {
-  getAll: (params?: RequestParams) =>
-    http.get<{ total: number; items: RolListItem[] }>("/roles", params),
+  getAll: (params?: RequestParams, silent?: boolean) =>
+    http.get<{ total: number; items: RolListItem[] }>("/roles", params, { silent }),
 
   getById: async (id: number) => {
     const res = await http.get<unknown>(`/roles/${id}`);

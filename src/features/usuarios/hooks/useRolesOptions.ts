@@ -1,6 +1,5 @@
 // src/features/usuarios/hooks/useRolesOptions.ts
 import { useState, useEffect, useCallback } from "react";
-import { toast } from "react-toastify";
 import { rolesService } from "@/features/roles/services/roles.service";
 import type { RolListItem } from "@/features/roles/types/rol.types";
 
@@ -20,10 +19,13 @@ export const useRolesOptions = () => {
   const fetchRoles = useCallback(async () => {
     setLoading(true);
     try {
-      const res = await rolesService.getAll();
+      // Pass silent: true so 403 errors don't show a toast
+      const res = await rolesService.getAll(undefined, true);
       setRoles(res.data.items);
     } catch {
-      toast.error("Error al cargar roles");
+      // Error silencioso: el filtro de roles es auxiliar.
+      // Si el usuario no tiene permiso para ver roles, retornamos vacío
+      // sin interrumpir el flujo de la tabla.
       setRoles([]);
     } finally {
       setLoading(false);

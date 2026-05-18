@@ -1,10 +1,11 @@
 // src/features/usuarios/components/detalle/UsuarioDetallePage.tsx
-import { useParams, useNavigate } from "react-router-dom";
+import { useParams, useNavigate, Navigate } from "react-router-dom";
 import { Button, Tabs, Skeleton, Tag } from "antd";
 import { ArrowLeft, Pencil } from "lucide-react";
 import { PageHeader } from "@/shared/components/molecules/PageHeader";
 import { Can } from "@/shared/components/guards/Can";
 import { APP_ROUTES } from "@/shared/constants/routes.constants";
+import { useAuthStore } from "@/features/auth/store/auth.store";
 import { useUsuarioDetalle } from "../../hooks/useUsuarioDetalle";
 import { useUsuarioForm } from "../../hooks/useUsuarioForm";
 import { UsuarioDatosGenerales } from "./UsuarioDatosGenerales";
@@ -15,8 +16,9 @@ import { UsuarioFormModal } from "../UsuarioFormModal";
 import { getUsuarioDisplayName } from "../../utils/usuario.formatters";
 
 const UsuarioDetallePage = () => {
-  const { id } = useParams<{ id: string }>();
+  const { id, tab } = useParams<{ id: string; tab?: string }>();
   const navigate = useNavigate();
+  const hasAnyPermission = useAuthStore((s) => s.hasAnyPermission);
 
   if (!id) {
     return <div>ID de usuario no válido</div>;
@@ -28,7 +30,6 @@ const UsuarioDetallePage = () => {
     loading,
     toggleBloqueo,
     cerrarSesiones,
-    cambiarRol,
     refetch,
   } = useUsuarioDetalle(usuarioId);
   const form = useUsuarioForm(refetch);
@@ -43,37 +44,58 @@ const UsuarioDetallePage = () => {
 
   const nombreDisplay = getUsuarioDisplayName(usuario);
 
-  const tabs = [
-    {
-      key: "info",
-      label: "Información General",
-      children: (
-        <UsuarioDatosGenerales
-          usuario={usuario}
-          onToggleBloqueo={toggleBloqueo}
-          onCerrarSesiones={cerrarSesiones}
-          onResetPassword={() => {
-            // TODO: Implementar reset password desde aquí
-          }}
-        />
-      ),
-    },
-    {
+  const activeTab = tab || "info";
+  const allTabs = [];
+
+  allTabs.push({
+    key: "info",
+    label: "Información General",
+    children: (
+      <UsuarioDatosGenerales
+        usuario={usuario}
+        onToggleBloqueo={toggleBloqueo}
+        onCerrarSesiones={cerrarSesiones}
+        onResetPassword={() => {
+          // TODO: Implementar reset password desde aquí
+        }}
+      />
+    ),
+  });
+
+  if (hasAnyPermission(["sucursales.ver"])) {
+    allTabs.push({
       key: "sucursales",
       label: "Sucursales",
       children: <UsuarioSucursales usuario={usuario} />,
-    },
-    {
+    });
+  }
+
+  if (hasAnyPermission(["roles.ver"])) {
+    allTabs.push({
       key: "rol",
       label: "Rol",
-      children: <UsuarioRol usuario={usuario} onCambiarRol={cambiarRol} />,
-    },
-    {
+      children: <UsuarioRol usuario={usuario} />,
+    });
+  }
+
+  if (hasAnyPermission(["auditoria.ver"])) {
+    allTabs.push({
       key: "auditoria",
       label: "Auditoría",
       children: <UsuarioAuditoria usuarioId={usuarioId} />,
-    },
-  ];
+    });
+  }
+
+  const isValidTab = allTabs.some((t) => t.key === activeTab);
+  if (!isValidTab && tab) {
+    return <Navigate to={APP_ROUTES.UNAUTHORIZED} replace />;
+  }
+
+  const handleTabChange = (key: string) => {
+    navigate(
+      APP_ROUTES.DASHBOARD.USUARIOS.DETALLE(id!, key === "info" ? "" : key),
+    );
+  };
 
   return (
     <div>
@@ -124,8 +146,9 @@ const UsuarioDetallePage = () => {
       )}
 
       <Tabs
-        items={tabs}
-        defaultActiveKey="info"
+        items={allTabs}
+        activeKey={isValidTab ? activeTab : "info"}
+        onChange={handleTabChange}
         style={{
           backgroundColor: "var(--color-bg-base)",
           borderRadius: "var(--radius-card)",
@@ -138,7 +161,7 @@ const UsuarioDetallePage = () => {
         open={form.modal.isOpen}
         selectedItem={form.modal.selectedItem}
         isEditMode={form.modal.isEditMode}
-        isSubmitting={form.isSubmitting}
+        isSubmitting={form.modal.isSubmitting}
         onSubmit={form.handleSubmit}
         onCancel={form.modal.close}
       />

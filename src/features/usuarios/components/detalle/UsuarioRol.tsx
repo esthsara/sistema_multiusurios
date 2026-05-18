@@ -29,6 +29,7 @@ import type {
   RolDetalle as UsuarioRolDetalle,
 } from "../../types/usuario.types";
 import { getModuloStyles } from "@/features/roles/utils/roles.utils";
+import { useAuthStore } from "@/features/auth/store/auth.store";
 
 /** Alias local compatible con roles_detalle del usuario */
 type RolDetalleSimple = UsuarioRolDetalle;
@@ -65,6 +66,9 @@ const accionTone = (
 export const UsuarioRol = ({ usuario, onRolesChanged }: UsuarioRolProps) => {
   const { token } = theme.useToken();
   const [modalOpen, setModalOpen] = useState(false);
+  const hasPermission = useAuthStore((s) => s.hasPermission);
+  const canGestionarRoles =
+    hasPermission("roles.ver") && hasPermission("permisos.asignar");
 
   // Roles actuales del usuario (como objetos con id+name)
   const [rolesActuales, setRolesActuales] = useState<RolDetalleSimple[]>(
@@ -151,7 +155,7 @@ export const UsuarioRol = ({ usuario, onRolesChanged }: UsuarioRolProps) => {
             Roles y permisos
           </Title>
         </Flex>
-        <Can permission="roles.editar">
+        {canGestionarRoles && (
           <Button
             type="primary"
             size="middle"
@@ -161,7 +165,7 @@ export const UsuarioRol = ({ usuario, onRolesChanged }: UsuarioRolProps) => {
           >
             Gestionar roles
           </Button>
-        </Can>
+        )}
       </Flex>
 
       <Card

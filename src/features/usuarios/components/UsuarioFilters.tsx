@@ -2,6 +2,7 @@ import { Input, Select, Button, DatePicker } from "antd";
 import { Search, RotateCcw } from "lucide-react";
 import dayjs from "dayjs";
 import type { UsuarioFilters } from "../types/usuario.types";
+import { useAuthStore } from "@/features/auth/store/auth.store";
 import "@/index.css";
 
 interface UsuarioFiltersProps {
@@ -23,6 +24,9 @@ export const UsuarioFiltersBar = ({
   onFilter,
   onReset,
 }: UsuarioFiltersProps) => {
+  const hasPermission = useAuthStore((s) => s.hasPermission);
+  const canVerRoles = hasPermission("roles.ver");
+
   const selectedDate =
     filters.fecha_desde &&
     filters.fecha_hasta &&
@@ -91,18 +95,20 @@ export const UsuarioFiltersBar = ({
         }}
       />
 
-      {/* Rol */}
-      <Select
-        placeholder="Rol"
-        value={filters.rol || undefined}
-        onChange={(val) => onFilter({ rol: val ?? "" })}
-        allowClear
-        style={{
-          width: 180,
-          background: "var(--color-bg-filter)",
-        }}
-        options={roleOptions}
-      />
+      {/* Rol — solo visible si tiene roles.ver */}
+      {canVerRoles && (
+        <Select
+          placeholder="Rol"
+          value={filters.rol || undefined}
+          onChange={(val) => onFilter({ rol: val ?? "" })}
+          allowClear
+          style={{
+            width: 180,
+            background: "var(--color-bg-filter)",
+          }}
+          options={roleOptions}
+        />
+      )}
 
       {/* Sucursal (por ahora visual/API) */}
       <Select
