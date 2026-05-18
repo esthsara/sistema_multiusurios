@@ -60,7 +60,7 @@ export const SucursalContacto = ({ sucursalId }: SucursalContactoProps) => {
       <div className="flex justify-between items-center">
         <h3 className="text-base font-semibold">Contactos de Sucursal</h3>
 
-        <Can permission="sucursales.crear">
+        <Can permission="contactos.crear">
           <Button icon={<Plus size={14} />} onClick={modal.openCreate}>
             Nuevo
           </Button>

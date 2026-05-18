@@ -4,6 +4,8 @@ import type { TableColumnsType } from "antd";
 import { Plus, Eye , UserMinus } from "lucide-react";
 import { toast } from "react-toastify";
 import { useNavigate } from "react-router-dom";
+import { Can } from "@/shared/components/guards/Can";
+import { useAuthStore } from "@/features/auth/store/auth.store";
 
 import { DataTableSimple } from "@/shared/components/organisms/DataTableSimple";
 import { RowActions } from "@/shared/components/molecules/RowActions";
@@ -25,6 +27,9 @@ interface Props {
 
 export const SucursalUsuarioAsignado = ({ sucursal }: Props) => {
   const navigate = useNavigate();
+  const hasPermission = useAuthStore((s) => s.hasPermission);
+  const canAsignar = hasPermission("asignaciones.asignar");
+  const canQuitar = hasPermission("asignaciones.quitar");
 
   const { asignar, quitar } = useAsignaciones();
 
@@ -165,13 +170,17 @@ export const SucursalUsuarioAsignado = ({ sucursal }: Props) => {
               onClick: () =>
                 navigate(APP_ROUTES.DASHBOARD.USUARIOS.DETALLE(record.id)),
             },
-            {
-              key: "remove",
-              label: "Desvincular",
-              icon: <UserMinus size={14} />,
-              danger: true,
-              onClick: () => handleQuitar(record.id),
-            },
+            ...(canQuitar
+              ? [
+                  {
+                    key: "remove",
+                    label: "Desvincular",
+                    icon: <UserMinus size={14} />,
+                    danger: true,
+                    onClick: () => handleQuitar(record.id),
+                  },
+                ]
+              : []),
           ]}
         />
       ),
@@ -188,14 +197,16 @@ export const SucursalUsuarioAsignado = ({ sucursal }: Props) => {
         <h3 className="text-base font-semibold m-0 text-[var(--color-text-primary)]">
           Usuarios Asignados
         </h3>
-        <Button
-          type="primary"
-          icon={<Plus size={14} />}
-          loading={loadingUsers}
-          onClick={handleOpenAssignModal}
-        >
-          Asignar Usuario
-        </Button>
+        <Can permission="asignaciones.asignar">
+          <Button
+            type="primary"
+            icon={<Plus size={14} />}
+            loading={loadingUsers}
+            onClick={handleOpenAssignModal}
+          >
+            Asignar Usuario
+          </Button>
+        </Can>
       </div>
 
       <DataTableSimple

@@ -68,7 +68,7 @@ export const getContactoTable = ({
               key: "edit",
               label: "Editar",
               icon: <Pencil size={14} />,
-              permission: "sucursales.editar",
+              permission: "contactos.editar",
               onClick: () => onEdit(record),
             },
             {
@@ -76,7 +76,7 @@ export const getContactoTable = ({
               label: "Eliminar",
               icon: <Trash2 size={14} />,
               danger: true,
-              permission: "sucursales.eliminar",
+              permission: "contactos.eliminar",
               onClick: () => onDelete(record),
             },
           ]}

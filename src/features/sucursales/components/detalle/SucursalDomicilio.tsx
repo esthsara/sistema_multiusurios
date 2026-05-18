@@ -50,7 +50,7 @@ export const SucursalDomicilio = ({ sucursalId }: SucursalDomicilioProps) => {
     <div className="space-y-4">
       <div className="flex justify-between items-center">
         <h3 className="text-base font-semibold">Domicilios</h3>
-        <Can permission="sucursales.crear">
+        <Can permission="domicilios.crear">
           <Button icon={<Plus size={14} />} onClick={modal.openCreate}>
             Nuevo
           </Button>

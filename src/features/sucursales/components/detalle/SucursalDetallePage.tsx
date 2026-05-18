@@ -1,8 +1,9 @@
 import { Button, Skeleton, Tabs, Tag } from "antd";
 import { ArrowLeft } from "lucide-react";
-import { useNavigate, useParams } from "react-router-dom";
+import { useNavigate, useParams, Navigate } from "react-router-dom";
 import { PageHeader } from "@/shared/components/molecules/PageHeader";
 import { APP_ROUTES } from "@/shared/constants/routes.constants";
+import { useAuthStore } from "@/features/auth/store/auth.store";
 import { useSucursalDetalle } from "../../hooks/useSucursalDetalle";
 import { SucursalInfoGeneral } from "./SucursalInfoGeneral";
 import { SucursalContacto } from "./SucursalContacto";
@@ -12,8 +13,9 @@ import { SucursalUsuarioAsignado } from "./SucursalUsuarioAsignado";
 import { SucursalAuditoria } from "./SucursalAuditoria";
 
 const SucursalDetallePage = () => {
-  const { id } = useParams<{ id: string }>();
+  const { id, tab } = useParams<{ id: string; tab?: string }>();
   const navigate = useNavigate();
+  const hasAnyPermission = useAuthStore((s) => s.hasAnyPermission);
 
   if (!id) return <div>ID de sucursal no válido</div>;
 
@@ -23,38 +25,65 @@ const SucursalDetallePage = () => {
   if (loading) return <Skeleton active />;
   if (!sucursal) return <div>Sucursal no encontrada</div>;
 
-  const tabs = [
-    {
-      key: "general",
-      label: "Información General",
-      children: <SucursalInfoGeneral sucursal={sucursal} />,
-    },
-    {
+  const activeTab = tab || "general";
+  const allTabs = [];
+
+  allTabs.push({
+    key: "general",
+    label: "Información General",
+    children: <SucursalInfoGeneral sucursal={sucursal} />,
+  });
+
+  if (hasAnyPermission(["contactos.ver"])) {
+    allTabs.push({
       key: "contactos",
       label: "Contactos",
       children: <SucursalContacto sucursalId={sucursal.id} />,
-    },
-    {
+    });
+  }
+
+  if (hasAnyPermission(["domicilios.ver"])) {
+    allTabs.push({
       key: "domicilios",
       label: "Domicilios",
       children: <SucursalDomicilio sucursalId={sucursal.id} />,
-    },
-    {
+    });
+  }
+
+  if (hasAnyPermission(["archivos.ver"])) {
+    allTabs.push({
       key: "archivos",
       label: "Archivos",
       children: <SucursalArchivo sucursalId={sucursal.id} />,
-    },
-    {
+    });
+  }
+
+  if (hasAnyPermission(["asignaciones.ver"])) {
+    allTabs.push({
       key: "usuarios",
       label: "Usuarios Asignados",
       children: <SucursalUsuarioAsignado sucursal={sucursal} />,
-    },
-    {
+    });
+  }
+
+  if (hasAnyPermission(["auditoria.ver"])) {
+    allTabs.push({
       key: "auditoria",
       label: "Auditoría",
       children: <SucursalAuditoria sucursalId={sucursal.id} />,
-    },
-  ];
+    });
+  }
+
+  const isValidTab = allTabs.some((t) => t.key === activeTab);
+  if (!isValidTab && tab) {
+    return <Navigate to={APP_ROUTES.UNAUTHORIZED} replace />;
+  }
+
+  const handleTabChange = (key: string) => {
+    navigate(
+      APP_ROUTES.DASHBOARD.SUCURSALES.DETALLE(id!, key === "general" ? "" : key),
+    );
+  };
 
   return (
     <div>
@@ -84,8 +113,9 @@ const SucursalDetallePage = () => {
       </div>
 
       <Tabs
-        items={tabs}
-        defaultActiveKey="general"
+        items={allTabs}
+        activeKey={isValidTab ? activeTab : "general"}
+        onChange={handleTabChange}
         style={{
           backgroundColor: "var(--color-bg-base)",
           borderRadius: "var(--radius-card)",

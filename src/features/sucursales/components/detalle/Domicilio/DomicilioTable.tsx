@@ -60,7 +60,7 @@ export const DomicilioTable = ({
         r.principal ? (
           <AppTag tone="gold">Principal</AppTag>
         ) : (
-          <Can permission="sucursales.editar">
+          <Can permission="domicilios.editar">
             <Tooltip title="Marcar como principal">
               <Button
                 size="small"
@@ -95,7 +95,7 @@ export const DomicilioTable = ({
               key: "edit",
               label: "Editar",
               icon: <Pencil size={14} />,
-              permission: "sucursales.editar",
+              permission: "domicilios.editar",
               onClick: () => onEdit(record),
             },
             {
@@ -103,7 +103,7 @@ export const DomicilioTable = ({
               label: "Eliminar",
               icon: <Trash2 size={14} />,
               danger: true,
-              permission: "sucursales.eliminar",
+              permission: "domicilios.eliminar",
               onClick: () => onDelete(record),
             },
           ]}
