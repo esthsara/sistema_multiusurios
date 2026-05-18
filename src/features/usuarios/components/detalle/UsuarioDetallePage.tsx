@@ -3,7 +3,7 @@ import { useParams, useNavigate } from "react-router-dom";
 import { Button, Tabs, Skeleton, Tag } from "antd";
 import { ArrowLeft, Pencil } from "lucide-react";
 import { PageHeader } from "@/shared/components/molecules/PageHeader";
-import { Can } from "@/shared/components/atoms/Can";
+import { Can } from "@/shared/components/guards/Can";
 import { APP_ROUTES } from "@/shared/constants/routes.constants";
 import { useUsuarioDetalle } from "../../hooks/useUsuarioDetalle";
 import { useUsuarioForm } from "../../hooks/useUsuarioForm";

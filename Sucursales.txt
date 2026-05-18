@@ -1,0 +1,596 @@
+
+Primeramente debemos estar logueados para ver que usuario somos despues de eso:
+Par obtener las sucursales del usuario logueado:
+{{kUrlApiV1}}/users/branches
+{
+    "success": true,
+    "message": "",
+    "data": {
+        "total": 6,
+        "items": [
+            {
+                "id": 6,
+                "nombre": "sucursal 1",
+                "codigo": "sc-0021",
+                "es_administrador": 1,
+                "activa": true,
+                "asignacion_activa": 1,
+                "es_actual": false,
+                "email": "sucursal12@gmail.com",
+                "direccion": "principal12",
+                "horario": "08:00 - 18:00",
+                "logo": null
+            },
+            {
+                "id": 2,
+                "nombre": "Sucursal Norte",
+                "codigo": "KAE23",
+                "es_administrador": 1,
+                "activa": true,
+                "asignacion_activa": 1,
+                "es_actual": false,
+                "email": "norte@example.com",
+                "direccion": "AVENIDA KAE",
+                "horario": "08:00 - 18:00",
+                "logo": null
+            },
+            {
+                "id": 1,
+                "nombre": "Sucursal Norte Modificada",
+                "codigo": "MATRIZ",
+                "es_administrador": 1,
+                "activa": true,
+                "asignacion_activa": 1,
+                "es_actual": true,
+                "email": "matriz@example.com",
+                "direccion": "Dirección por defecto",
+                "horario": "08:00 - 19:00",
+                "logo": "http://127.0.0.1:8000/storage/sucursales/logos/logo_matriz_1774514153.png"
+            },
+            {
+                "id": 3,
+                "nombre": "Sucursal Nortea",
+                "codigo": "KAE235",
+                "es_administrador": 1,
+                "activa": false,
+                "asignacion_activa": 1,
+                "es_actual": false,
+                "email": "nortea@example.com",
+                "direccion": "AVENIDA KAE2",
+                "horario": "08:00 - 18:00",
+                "logo": null
+            },
+            {
+                "id": 4,
+                "nombre": "Sucursal oeres",
+                "codigo": "SC-09",
+                "es_administrador": 1,
+                "activa": true,
+                "asignacion_activa": 1,
+                "es_actual": false,
+                "email": "Sucurs@example.com",
+                "direccion": "suucursal",
+                "horario": "08:00 - 18:00",
+                "logo": null
+            },
+            {
+                "id": 5,
+                "nombre": "SucursalPrueba",
+                "codigo": "SP-1270",
+                "es_administrador": 1,
+                "activa": true,
+                "asignacion_activa": 1,
+                "es_actual": false,
+                "email": "sucursal1@example.com",
+                "direccion": "Avenida Vazques",
+                "horario": "08:00 - 18:00",
+                "logo": null
+            }
+        ],
+        "sucursal_actual": 1
+    }
+}
+Tambien podemos obtener las sucursales de esta manera: aqui podriamos jalar la sucursales : {{kUrlApiV1}}/sucursales/selector
+{
+    "success": true,
+    "message": "",
+    "data": [
+        {
+            "id": 6,
+            "nombre": "sucursal 1",
+            "codigo": "sc-0021"
+        },
+        {
+            "id": 2,
+            "nombre": "Sucursal Norte",
+            "codigo": "KAE23"
+        },
+        {
+            "id": 1,
+            "nombre": "Sucursal Norte Modificada",
+            "codigo": "MATRIZ"
+        },
+        {
+            "id": 4,
+            "nombre": "Sucursal oeres",
+            "codigo": "SC-09"
+        },
+        {
+            "id": 5,
+            "nombre": "SucursalPrueba",
+            "codigo": "SP-1270"
+        }
+    ]
+}
+Aqui estamos para obtener de una sucursal x
+
+{
+    "success": true,
+    "message": "",
+    "data": {
+        "id": 1,
+        "nombre": "Sucursal Norte Modificada",
+        "codigo": "MATRIZ",
+        "activa": true,
+        "email": "matriz@example.com",
+        "descripcion": "Sucursal principal",
+        "horario_apertura": "08:00",
+        "horario_cierre": "19:00",
+        "horario_completo": "08:00 - 19:00",
+        "direccion": "Dirección por defecto",
+        "logo": "http://127.0.0.1:8000/storage/sucursales/logos/logo_matriz_1774514153.png",
+        "logo_path": "sucursales/logos/logo_matriz_1774514153.png",
+        "usuarios": [
+            {
+                "id": 1,
+                "username": "admin",
+                "email": "admin@example.com",
+                "activo": true,
+                "persona": {
+                    "id": 1,
+                    "tipo_persona": "FISICA",
+                    "tipo_texto": "Física",
+                    "identificacion_principal": "KaeReyes123",
+                    "fecha_nacimiento": "1990-01-01",
+                    "genero": "Otro",
+                    "foto": null,
+                    "foto_path": null,
+                    "estado": "INACTIVO",
+                    "estado_texto": "Inactivo",
+                    "created_at": "2026-03-24 15:23:39",
+                    "updated_at": "2026-03-25 05:10:27",
+                    "nombre": "Admin",
+                    "apellido": "Sistema",
+                    "nombre_completo": null
+                },
+                "ultimo_acceso": "23 minutes ago",
+                "created_at": "2026-03-24 15:23:39",
+                "created_at_humano": "2 weeks ago"
+            },
+            {
+                "id": 2,
+                "username": "nuevousuario12",
+                "email": "kae.usuari1234@example.com",
+                "activo": true,
+                "persona": {
+                    "id": 2,
+                    "tipo_persona": "FISICA",
+                    "tipo_texto": "Física",
+                    "identificacion_principal": "KaeReyes1234",
+                    "fecha_nacimiento": "1990-01-01",
+                    "genero": "Otro",
+                    "foto": null,
+                    "foto_path": null,
+                    "estado": "ACTIVO",
+                    "estado_texto": "Activo",
+                    "created_at": "2026-03-24 15:23:39",
+                    "updated_at": "2026-03-24 18:43:28",
+                    "nombre": "Kae",
+                    "apellido": "Reyes",
+                    "nombre_completo": null
+                },
+                "ultimo_acceso": null,
+                "created_at": "2026-03-24 15:23:40",
+                "created_at_humano": "2 weeks ago"
+            },
+            {
+                "id": 3,
+                "username": "nuevousuario124",
+                "email": "nuevo.usuari1234@example.com",
+                "activo": true,
+                "persona": {
+                    "id": 3,
+                    "tipo_persona": "MORAL",
+                    "tipo_texto": "Moral",
+                    "identificacion_principal": "987654390",
+                    "fecha_nacimiento": null,
+                    "genero": null,
+                    "foto": null,
+                    "foto_path": null,
+                    "estado": "ACTIVO",
+                    "estado_texto": "Activo",
+                    "created_at": "2026-03-24 16:49:17",
+                    "updated_at": "2026-03-24 16:49:17",
+                    "razon_social": "Empresa Moral"
+                },
+                "ultimo_acceso": "2 weeks ago",
+                "created_at": "2026-03-25 03:56:53",
+                "created_at_humano": "2 weeks ago"
+            },
+            {
+                "id": 4,
+                "username": "pruebita",
+                "email": "pruebita3@example.com",
+                "activo": false,
+                "persona": {
+                    "id": 17,
+                    "tipo_persona": "FISICA",
+                    "tipo_texto": "Física",
+                    "identificacion_principal": "2335258",
+                    "fecha_nacimiento": "1985-07-20",
+                    "genero": "F",
+                    "foto": null,
+                    "foto_path": null,
+                    "estado": "ACTIVO",
+                    "estado_texto": "Activo",
+                    "created_at": "2026-03-26 00:55:25",
+                    "updated_at": "2026-03-26 00:55:25",
+                    "nombre": "Ana",
+                    "apellido": "Martínez",
+                    "nombre_completo": null
+                },
+                "ultimo_acceso": null,
+                "created_at": "2026-03-26 00:57:35",
+                "created_at_humano": "2 weeks ago"
+            }
+        ],
+        "usuarios_count": 4,
+        "administradores": [
+            {
+                "id": 1,
+                "persona_id": 1,
+                "email": "admin@example.com",
+                "username": "admin",
+                "current_branch_id": 1,
+                "activo": true,
+                "created_at": "2026-03-24T15:23:39.000000Z",
+                "updated_at": "2026-03-24T15:23:39.000000Z",
+                "deleted_at": null,
+                "pivot": {
+                    "sucursal_id": 1,
+                    "usuario_id": 1,
+                    "es_administrador": 1,
+                    "activo": 1,
+                    "created_at": "2026-03-24T15:23:39.000000Z",
+                    "updated_at": "2026-03-24T15:23:39.000000Z"
+                },
+                "persona": {
+                    "id": 1,
+                    "tipo_persona": "FISICA",
+                    "nombre": "Admin",
+                    "apellido": "Sistema",
+                    "razon_social": null,
+                    "identificacion_principal": "KaeReyes123",
+                    "fecha_nacimiento": "1990-01-01T00:00:00.000000Z",
+                    "genero": "Otro",
+                    "foto_path": null,
+                    "estado": "INACTIVO",
+                    "created_at": "2026-03-24T15:23:39.000000Z",
+                    "updated_at": "2026-03-25T05:10:27.000000Z",
+                    "deleted_at": null
+                }
+            },
+            {
+                "id": 2,
+                "persona_id": 2,
+                "email": "kae.usuari1234@example.com",
+                "username": "nuevousuario12",
+                "current_branch_id": 1,
+                "activo": true,
+                "created_at": "2026-03-24T15:23:40.000000Z",
+                "updated_at": "2026-03-26T03:43:37.000000Z",
+                "deleted_at": null,
+                "pivot": {
+                    "sucursal_id": 1,
+                    "usuario_id": 2,
+                    "es_administrador": 1,
+                    "activo": 1,
+                    "created_at": "2026-03-24T15:23:40.000000Z",
+                    "updated_at": "2026-03-24T15:23:40.000000Z"
+                },
+                "persona": {
+                    "id": 2,
+                    "tipo_persona": "FISICA",
+                    "nombre": "Kae",
+                    "apellido": "Reyes",
+                    "razon_social": null,
+                    "identificacion_principal": "KaeReyes1234",
+                    "fecha_nacimiento": "1990-01-01T00:00:00.000000Z",
+                    "genero": "Otro",
+                    "foto_path": null,
+                    "estado": "ACTIVO",
+                    "created_at": "2026-03-24T15:23:39.000000Z",
+                    "updated_at": "2026-03-24T18:43:28.000000Z",
+                    "deleted_at": null
+                }
+            }
+        ],
+        "contactos": [],
+        "domicilios": [],
+        "archivos": [
+            {
+                "id": 4,
+                "nombre": "Kae CI",
+                "ruta": "sucursals/1/ci/kae-ci_1774514275_zAmQ1ZvRU2.png",
+                "url": "http://127.0.0.1:8000/storage/sucursals/1/ci/kae-ci_1774514275_zAmQ1ZvRU2.png",
+                "tipo": "CI",
+                "tipo_texto": "CI",
+                "fecha_expiracion": null,
+                "created_at": "2026-03-26 08:37:55"
+            }
+        ],
+        "created_at": "2026-03-24 15:23:39",
+        "updated_at": "2026-03-26 08:35:53"
+    }
+}
+
+Después tenemos el crear sucursal: {{kUrlApiV1}}/sucursales y se cambia automáticamente 
+aqui el body:
+nombre
+codigo
+email
+descripcion
+horario_apertura
+horario_cierre
+direccion
+activa
+logo este es de tipo file 
+todos datso se entregaron e form-data
+respuesta:
+{
+    "success": true,
+    "message": "Sucursal creada exitosamente",
+    "data": {
+        "id": 7,
+        "nombre": "Sucursal Norte SARA",
+        "codigo": "KAE2353",
+        "activa": true,
+        "email": "nortesara@example.com",
+        "descripcion": "Atención al cliente zona norte",
+        "horario_apertura": "08:00",
+        "horario_cierre": "18:00",
+        "horario_completo": "08:00 - 18:00",
+        "direccion": "AVENIDA KAE",
+        "logo": null,
+        "logo_path": null,
+        "usuarios": [
+            {
+                "id": 1,
+                "username": "admin",
+                "email": "admin@example.com",
+                "activo": true,
+                "ultimo_acceso": "26 minutes ago",
+                "created_at": "2026-03-24 15:23:39",
+                "created_at_humano": "2 weeks ago"
+            }
+        ],
+        "administradores": [
+            {
+                "id": 1,
+                "persona_id": 1,
+                "email": "admin@example.com",
+                "username": "admin",
+                "current_branch_id": 1,
+                "activo": true,
+                "created_at": "2026-03-24T15:23:39.000000Z",
+                "updated_at": "2026-03-24T15:23:39.000000Z",
+                "deleted_at": null,
+                "pivot": {
+                    "sucursal_id": 7,
+                    "usuario_id": 1,
+                    "es_administrador": 1,
+                    "activo": 1,
+                    "created_at": "2026-04-11T14:11:07.000000Z",
+                    "updated_at": "2026-04-11T14:11:07.000000Z"
+                }
+            }
+        ],
+        "created_at": "2026-04-11 14:11:07",
+        "updated_at": "2026-04-11 14:11:07"
+    }
+}
+Al crear una sucursal se cambia automáticamente la sucursal pero si quiero cambiarla yo manualmente me diante la interfaz usare este tipo :  {{kUrlApiV1}}/users/switch-branch/1
+{
+    "success": true,
+    "message": "Sucursal cambiada a Sucursal Norte Modificada",
+    "data": {
+        "sucursal_anterior": {
+            "id": 1,
+            "nombre": "Sucursal Norte Modificada",
+            "codigo": "MATRIZ",
+            "activa": true,
+            "email": "matriz@example.com",
+            "logo_path": "sucursales/logos/logo_matriz_1774514153.png",
+            "descripcion": "Sucursal principal",
+            "horario_apertura": "08:00",
+            "horario_cierre": "19:00",
+            "direccion": "Dirección por defecto",
+            "created_at": "2026-03-24T15:23:39.000000Z",
+            "updated_at": "2026-03-26T08:35:53.000000Z"
+        },
+        "sucursal_actual": {
+            "id": 1,
+            "nombre": "Sucursal Norte Modificada",
+            "codigo": "MATRIZ",
+            "activa": true,
+            "email": "matriz@example.com",
+            "logo_path": "sucursales/logos/logo_matriz_1774514153.png",
+            "descripcion": "Sucursal principal",
+            "horario_apertura": "08:00",
+            "horario_cierre": "19:00",
+            "direccion": "Dirección por defecto",
+            "created_at": "2026-03-24T15:23:39.000000Z",
+            "updated_at": "2026-03-26T08:35:53.000000Z",
+            "pivot": {
+                "usuario_id": 1,
+                "sucursal_id": 1,
+                "es_administrador": 1,
+                "activo": 1,
+                "created_at": "2026-03-24T15:23:39.000000Z",
+                "updated_at": "2026-03-24T15:23:39.000000Z"
+            }
+        },
+        "mensaje": "Sucursal cambiada a Sucursal Norte Modificada"
+    }
+}
+en este caso se cambio por la sucursal 1
+el obtener roles sera segun sucursal es decir un rol solo pertenece a uan sucursal pero a una sucursal spuede tener varias roles , es decir cuando creo un rol se relaciona en la sucursal que ha sido creada
+Para Actualizar: http://localhost:8000/api/v1/sucursales/1
+{
+    "success": true,
+    "message": "Sucursal actualizada exitosamente",
+    "data": {
+        "id": 1,
+        "nombre": "Sucursal Norte Modificada SARA",
+        "codigo": "MATRIZ",
+        "activa": true,
+        "email": "matriz@example.com",
+        "descripcion": "Sucursal principal",
+        "horario_apertura": "08:00",
+        "horario_cierre": "19:00",
+        "horario_completo": "08:00 - 19:00",
+        "direccion": "Dirección por defecto",
+        "logo": "http://localhost:8000/storage/sucursales/logos/logo_matriz_1775917280.png",
+        "logo_path": "sucursales/logos/logo_matriz_1775917280.png",
+        "created_at": "2026-03-24 15:23:39",
+        "updated_at": "2026-04-11 14:21:20"
+    }
+}
+{{kUrlApiV1}}/sucursales/{{idSucursal}}/toggle-status
+para activar y desactivar sucursal
+{
+    "success": true,
+    "message": "Sucursal activada",
+    "data": {
+        "id": 7,
+        "nombre": "Sucursal Norte SARA",
+        "activa": true
+    }
+}
+tambien si queiro agregar nuevos ocntactos ami sucrsal seria :
+{{kUrlApiV1}}/contactos
+{
+    "sucursal_id": 1,
+    "tipo": "EMAIL",
+    "valor": "cliente@example.com"
+}
+resultado:
+{
+    "success": true,
+    "message": "Contacto creado exitosamente",
+    "data": {
+        "id": 1,
+        "tipo": "EMAIL",
+        "tipo_texto": "Email",
+        "valor": "cliente@example.com",
+        "created_at": "2026-04-11 15:57:04",
+        "updated_at": "2026-04-11 15:57:04"
+    }
+}
+tambien el obtener contacto de sucursal
+{{kUrlApiV1}}/sucursales/1/contactos
+resultado:{
+    "success": true,
+    "message": "",
+    "data": {
+        "total": 1,
+        "items": [
+            {
+                "id": 1,
+                "tipo": "EMAIL",
+                "tipo_texto": "Email",
+                "valor": "cliente@example.com",
+                "created_at": "2026-04-11 15:57:04",
+                "updated_at": "2026-04-11 15:57:04"
+            }
+        ]
+    }
+}
+aqui actualizamos
+{{kUrlApiV1}}/contactos/{{idContactoSucursal}}
+{
+    "tipo": "EMAIL",
+    "valor": "kae@example.com"
+}
+resultado
+    "success": true,
+    "message": "Contacto actualizado exitosamente",
+    "data": {
+        "id": 1,
+        "tipo": "EMAIL",
+        "tipo_texto": "Email",
+        "valor": "kae@example.com",
+        "created_at": "2026-04-11 15:57:04",
+        "updated_at": "2026-04-11 15:58:54"
+    }
+}
+y eliminamos contacto 
+{{kUrlApiV1}}/contactos/{{idContactoSucursal}}
+{
+    "success": true,
+    "message": "Contacto eliminado exitosamente",
+    "data": null
+} y tambien para sus domicilios
+{{kUrlApiV1}}/domicilios
+{
+    "sucursal_id": 1,
+    "tipo": "FISCAL",
+    "direccion": "Av. Principal #123, Zona Central",
+    "ciudad": "Santa Cruz",
+    "pais": "Bolivia",
+    "codigo_postal": "12345",
+    "principal": true
+}
+{
+    "success": true,
+    "message": "Domicilio creado exitosamente",
+    "data": {
+        "id": 1,
+        "tipo": "FISCAL",
+        "tipo_texto": "Fiscal",
+        "pais": "Bolivia",
+        "ciudad": "Santa Cruz",
+        "direccion": "Av. Principal #123, Zona Central",
+        "codigo_postal": "12345",
+        "principal": true,
+        "created_at": "2026-04-11 16:00:33",
+        "updated_at": "2026-04-11 16:00:33"
+    }
+}
+para obtener los domicilios
+{{kUrlApiV1}}/sucursales/1/domicilios
+resultado
+{
+    "success": true,
+    "message": "",
+    "data": {
+        "total": 1,
+        "items": [
+            {
+                "id": 1,
+                "tipo": "FISCAL",
+                "tipo_texto": "Fiscal",
+                "pais": "Bolivia",
+                "ciudad": "Santa Cruz",
+                "direccion": "Av. Principal #123, Zona Central",
+                "codigo_postal": "12345",
+                "principal": true,
+                "created_at": "2026-04-11 16:00:33",
+                "updated_at": "2026-04-11 16:00:33"
+            }
+        ]
+    }
+} 
+eliminar y actualizar domicilio
+
+

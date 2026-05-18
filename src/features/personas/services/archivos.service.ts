@@ -22,6 +22,8 @@ export const archivosService = {
       `/personas/${personaId}/archivos`,
     ),
 
+  getById: (id: number) => http.get<ArchivoResource>(`/archivos/${id}`),
+
   upload: async ({
     personaId,
     file,
@@ -57,27 +59,53 @@ export const archivosService = {
   getDownloadUrl: (id: number) => getBackendUrl(`/archivos/${id}/download`),
 
   getPublicUrl: async (id: number) => {
-    const response = await apiClient.get<unknown>(`/archivos/${id}/url`);
-    const payload = response.data as
-      | string
-      | { url?: string }
-      | ApiResponse<{ url: string } | string>;
+    const response = await archivosService.getById(id);
+    return getResolvedFileUrl(response.data.url ?? response.data.ruta ?? "");
+  },
 
-    if (typeof payload === "string") {
-      return getResolvedFileUrl(payload);
+  getTrashByPersona: async (personaId: number) => {
+    const candidateRequests: Array<() => Promise<unknown>> = [
+      () => apiClient.get(`/personas/${personaId}/archivos/papelera`),
+      () =>
+        apiClient.get(`/personas/${personaId}/archivos`, {
+          params: { only_trashed: true },
+        }),
+      () =>
+        apiClient.get(`/personas/${personaId}/archivos`, {
+          params: { trashed: "only" },
+        }),
+    ];
+
+    for (const request of candidateRequests) {
+      try {
+        const response = await request();
+        const payload = (response as { data: unknown }).data as
+          | ApiResponse<{ total?: number; items?: ArchivoResource[] }>
+          | { total?: number; items?: ArchivoResource[] };
+
+        const data =
+          payload && typeof payload === "object" && "data" in payload
+            ? payload.data
+            : payload;
+
+        if (data && typeof data === "object" && Array.isArray(data.items)) {
+          return {
+            total: data.total ?? data.items.length,
+            items: data.items,
+          };
+        }
+      } catch {
+        // probar siguiente candidato
+      }
     }
 
-    if (payload && typeof payload === "object" && "data" in payload) {
-      const data = payload.data;
-      return typeof data === "string"
-        ? getResolvedFileUrl(data)
-        : getResolvedFileUrl(data.url);
-    }
-
-    return getResolvedFileUrl(payload.url ?? "");
+    return { total: 0, items: [] as ArchivoResource[] };
   },
 
   remove: (id: number) => http.delete(`/archivos/${id}`),
+
+  forceDelete: (id: number) => http.delete(`/archivos/${id}/force`),
+
   restore: (id: number) =>
     http.post<ArchivoResource, Record<string, never>>(
       `/archivos/${id}/restore`,

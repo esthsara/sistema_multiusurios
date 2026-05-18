@@ -2,10 +2,9 @@
 import { createElement, type ReactNode } from "react";
 import { PowerOff, RotateCcw, Trash2 } from "lucide-react";
 import type { SucursalListItem } from "../types/sucursal.types";
+import { getResolvedFileUrl } from "@/shared/utils/file-url.utils";
 
 const TIME_24H_REGEX = /^([01]\d|2[0-3]):([0-5]\d)$/;
-
-
 
 export const getSucursalInitials = (nombre: string): string => {
   const parts = nombre.trim().split(/\s+/).filter(Boolean).slice(0, 2);
@@ -14,22 +13,8 @@ export const getSucursalInitials = (nombre: string): string => {
   return parts.map((part) => part.charAt(0).toUpperCase()).join("");
 };
 
-export const normalizeLogoUrl = (logo: string, apiOrigin: string): string => {
-  try {
-    const parsed = new URL(logo);
-    if (parsed.origin !== apiOrigin) {
-      return `${apiOrigin}${parsed.pathname}`;
-    }
-    return parsed.toString();
-  } catch {
-    if (logo.startsWith("/")) {
-      return `${apiOrigin}${logo}`;
-    }
-    return `${apiOrigin}/${logo}`;
-  }
-};
-
-
+export const normalizeLogoUrl = (logo: string): string =>
+  getResolvedFileUrl(logo);
 
 export interface ConfirmConfig {
   title: string;

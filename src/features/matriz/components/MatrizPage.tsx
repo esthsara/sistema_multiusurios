@@ -2,7 +2,7 @@ import { Fragment, useMemo, useState } from "react";
 import { Button, Checkbox, Input, Spin, Tag, Tooltip } from "antd";
 import { Save, RotateCcw, AlertTriangle, Search } from "lucide-react";
 import { PageHeader } from "@/shared/components/molecules/PageHeader";
-import { Can } from "@/shared/components/atoms/Can";
+import { Can } from "@/shared/components/guards/Can";
 import { useMatriz } from "../hooks/useMatriz";
 import { MatrizConfirmModal } from "./MatrizConfirmModal";
 

@@ -1,8 +1,8 @@
 import { useState } from "react";
 import { Button } from "antd";
 import { Plus } from "lucide-react";
-import { Can } from "@/shared/components/atoms/Can";
-import { ConfirmModal } from "@/shared/components/molecules/ConfirmModal";
+import { Can } from "@/shared/components/guards/Can";
+import { ConfirmModal } from "@/shared/components/organisms/ConfirmModal";
 import { useContactos } from "../../hooks/useContactos";
 import type { Contacto } from "../../components/detalle/Contacto/contacto.constants";
 
@@ -49,7 +49,6 @@ export const PersonaContactos = ({ personaId }: PersonaContactosProps) => {
             Nuevo
           </Button>
         </Can>
-        
       </div>
 
       {/* TABLA */}

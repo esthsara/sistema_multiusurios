@@ -9,7 +9,8 @@ import {
   ShieldOff,
   Users,
 } from "lucide-react";
-import { Can } from "@/shared/components/atoms/Can";
+import { Can } from "@/shared/components/guards/Can";
+import { getResolvedFileUrl } from "@/shared/utils/file-url.utils";
 import type { SucursalDetalle } from "../../types/sucursal.types";
 
 interface Props {
@@ -18,10 +19,7 @@ interface Props {
   onConfigurar?: () => void;
 }
 
-export const SucursalInfoGeneral = ({
-  sucursal,
-  onToggleEstado,
-}: Props) => {
+export const SucursalInfoGeneral = ({ sucursal, onToggleEstado }: Props) => {
   // Iniciales para el avatar en caso de que no haya logo
   const initials = sucursal.nombre
     .split(" ")
@@ -46,7 +44,9 @@ export const SucursalInfoGeneral = ({
             <div className="relative">
               <Avatar
                 size={80}
-                src={sucursal.logo ?? undefined}
+                src={
+                  sucursal.logo ? getResolvedFileUrl(sucursal.logo) : undefined
+                }
                 icon={<Building2 size={32} />}
                 style={{
                   backgroundColor: "var(--color-primary-600)",
@@ -114,7 +114,6 @@ export const SucursalInfoGeneral = ({
                 >
                   {sucursal.activa ? "Desactivar" : "Activar"}
                 </Button>
-
               </Can>
             </div>
           </div>

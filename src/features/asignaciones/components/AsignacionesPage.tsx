@@ -14,7 +14,7 @@ import { UserPlus, UserMinus, Search, Crown } from "lucide-react";
 import { toast } from "react-toastify";
 
 import { useAsignaciones } from "../hooks/useAsignaciones";
-import { Can } from "@/shared/components/atoms/Can";
+import { Can } from "@/shared/components/guards/Can";
 import { sucursalesService } from "@/features/sucursales/services/sucursales.service";
 import { usuariosService } from "@/features/usuarios/services/usuarios.service";
 import type { SucursalListItem } from "@/features/sucursales/types/sucursal.types";
@@ -36,7 +36,6 @@ const COLORS = [
   "#F8B88B",
   "#95E1D3",
 ];
-
 
 const getUserColor = (userId: number): string => COLORS[userId % COLORS.length];
 

@@ -14,9 +14,9 @@ import type { TableColumnsType } from "antd";
 
 import { PageHeader } from "@/shared/components/molecules/PageHeader";
 import { DataTable } from "@/shared/components/organisms/DataTable";
-import { ConfirmModal } from "@/shared/components/molecules/ConfirmModal";
+import { ConfirmModal } from "@/shared/components/organisms/ConfirmModal";
 import { RowActions } from "@/shared/components/molecules/RowActions";
-import { Can } from "@/shared/components/atoms/Can";
+import { Can } from "@/shared/components/guards/Can";
 
 import { useNavigate } from "react-router-dom";
 import { APP_ROUTES } from "@/shared/constants/routes.constants";

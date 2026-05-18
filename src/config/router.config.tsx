@@ -6,7 +6,6 @@ import { PermissionGuard } from "@/shared/components/guards/PermissionGuard";
 import { APP_ROUTES } from "@/shared/constants/routes.constants";
 import { useUIStore } from "@/shared/store/ui.store";
 
-
 /* ── Layouts ── */
 const AuthLayout = lazy(() => import("@/layouts/AuthLayout"));
 const DashboardLayout = lazy(() => import("@/layouts/DashboardLayout"));
@@ -18,9 +17,7 @@ const NoBranchPage = lazy(
 );
 
 /* ── Páginas privadas ── */
-const HomePage = lazy(
-  () => import("@/features/dashboard/components/HomePage"),
-);
+const HomePage = lazy(() => import("@/features/dashboard/components/HomePage"));
 const ProfilePage = lazy(
   () => import("@/features/auth/components/ProfilePage"),
 );
@@ -34,8 +31,7 @@ const SucursalesPage = lazy(
   () => import("@/features/sucursales/components/SucursalesPage"),
 );
 const SucursalDetallePage = lazy(
-  () =>
-    import("@/features/sucursales/components/detalle/SucursalDetallePage"),
+  () => import("@/features/sucursales/components/detalle/SucursalDetallePage"),
 );
 const UsuariosPage = lazy(
   () => import("@/features/usuarios/components/UsuariosPage"),
@@ -43,12 +39,8 @@ const UsuariosPage = lazy(
 const UsuarioDetallePage = lazy(
   () => import("@/features/usuarios/components/detalle/UsuarioDetallePage"),
 );
-const RolesPage = lazy(
-  () => import("@/features/roles/components/RolesPage"),
-);
-const PermisosPage = lazy(
-  () => import("@/features/permisos/components/PermisosPage"),
-);
+const RolesPage = lazy(() => import("@/features/roles/components/RolesPage"));
+
 const MatrizPage = lazy(
   () => import("@/features/matriz/components/MatrizPage"),
 );
@@ -58,9 +50,10 @@ const AsignacionesPage = lazy(
 const AuditoriaPage = lazy(
   () => import("@/features/auditoria/components/AuditoriaPage"),
 );
-const NotFoundPage = lazy(
-  () => import("@/shared/components/NotFoundPage"),
+const SessionsPage = lazy(
+  () => import("@/features/sessions/components/SessionPage"),
 );
+const NotFoundPage = lazy(() => import("@/shared/components/NotFoundPage"));
 const UnauthorizedPage = lazy(
   () => import("@/shared/components/UnauthorizedPage"),
 );
@@ -110,9 +103,7 @@ export const router = createBrowserRouter([
   /* ── Rutas públicas ── */
   {
     element: withSuspense(AuthLayout),
-    children: [
-      { path: APP_ROUTES.LOGIN, element: withSuspense(LoginPage) },
-    ],
+    children: [{ path: APP_ROUTES.LOGIN, element: withSuspense(LoginPage) }],
   },
 
   /* Ruta semi-pública: usuario autenticado pero sin sucursal asignada.
@@ -237,6 +228,12 @@ export const router = createBrowserRouter([
                 element: withSuspense(AuditoriaPage),
               },
             ],
+          },
+
+          /* ── Sesiones (no requiere permiso específico) ── */
+          {
+            path: APP_ROUTES.DASHBOARD.SESIONES,
+            element: withSuspense(SessionsPage),
           },
         ],
       },

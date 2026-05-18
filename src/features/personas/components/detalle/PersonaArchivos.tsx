@@ -1,10 +1,10 @@
 import { useState } from "react";
-import { Button } from "antd";
-import { Plus } from "lucide-react";
+import { Alert, Button } from "antd";
+import { Plus, RotateCcw, Trash2 } from "lucide-react";
 import { toast } from "react-toastify";
 
 import { useArchivos } from "../../hooks/useArchivos";
-import { ConfirmModal } from "@/shared/components/molecules/ConfirmModal";
+import { ConfirmModal } from "@/shared/components/organisms/ConfirmModal";
 import { archivosService } from "../../services/archivos.service";
 
 import { ArchivoTable } from "./Archivo/ArchivoTable";
@@ -20,19 +20,35 @@ import {
 export const PersonaArchivos = ({ personaId }: { personaId: number }) => {
   const {
     archivos,
+    papelera,
     loading,
+    loadingTrash,
     uploading,
     deleting,
+    restoring,
+    forceDeleting,
+    error,
     handleUpload,
     handleDelete,
+    handleRestore,
+    handleForceDelete,
     handleDownload,
   } = useArchivos(personaId);
 
+  const activeIds = new Set(archivos.map((item) => item.id));
+  const papeleraVisible = papelera.filter((item) => !activeIds.has(item.id));
+
+  const [viewMode, setViewMode] = useState<"activos" | "papelera">("activos");
   const [openForm, setOpenForm] = useState(false);
   const [previewItem, setPreviewItem] = useState<ArchivoResource | null>(null);
   const [deleteTarget, setDeleteTarget] = useState<ArchivoResource | null>(
     null,
   );
+  const [restoreTarget, setRestoreTarget] = useState<ArchivoResource | null>(
+    null,
+  );
+  const [forceDeleteTarget, setForceDeleteTarget] =
+    useState<ArchivoResource | null>(null);
 
   const onSubmit = async (values: {
     file: File;
@@ -75,24 +91,62 @@ export const PersonaArchivos = ({ personaId }: { personaId: number }) => {
     setDeleteTarget(null);
   };
 
+  const confirmRestore = async () => {
+    if (!restoreTarget) return;
+    await handleRestore(restoreTarget.id);
+    setRestoreTarget(null);
+  };
+
+  const confirmForceDelete = async () => {
+    if (!forceDeleteTarget) return;
+    await handleForceDelete(forceDeleteTarget.id);
+    setForceDeleteTarget(null);
+  };
+
   return (
     <div>
       {/* HEADER */}
       <div className="flex justify-between mb-3">
         <h3 className="font-semibold">Archivos</h3>
 
-        <Button icon={<Plus size={14} />} onClick={() => setOpenForm(true)}>
-          Subir
-        </Button>
+        <div className="flex gap-2">
+          <Button
+            type={viewMode === "activos" ? "primary" : "default"}
+            onClick={() => setViewMode("activos")}
+          >
+            Activos
+          </Button>
+          <Button
+            type={viewMode === "papelera" ? "primary" : "default"}
+            icon={<Trash2 size={14} />}
+            onClick={() => setViewMode("papelera")}
+          >
+            Papelera
+          </Button>
+          {viewMode === "activos" && (
+            <Button icon={<Plus size={14} />} onClick={() => setOpenForm(true)}>
+              Subir
+            </Button>
+          )}
+        </div>
       </div>
+
+      {error && (
+        <Alert type="error" showIcon message={error} className="mb-3" />
+      )}
 
       {/* TABLE */}
       <ArchivoTable
-        data={archivos}
-        loading={loading}
+        data={viewMode === "activos" ? archivos : papeleraVisible}
+        loading={viewMode === "activos" ? loading : loadingTrash}
+        mode={viewMode}
+        restoringId={restoring}
+        forceDeletingId={forceDeleting}
         onView={handlePreview}
         onDownload={(item) => handleDownload(item.id)}
         onDelete={(item) => setDeleteTarget(item)}
+        onRestore={(item) => setRestoreTarget(item)}
+        onForceDelete={(item) => setForceDeleteTarget(item)}
       />
 
       {/* MODAL UPLOAD */}
@@ -118,6 +172,28 @@ export const PersonaArchivos = ({ personaId }: { personaId: number }) => {
         loading={deleting === deleteTarget?.id}
         onConfirm={confirmDelete}
         onCancel={() => setDeleteTarget(null)}
+      />
+
+      <ConfirmModal
+        open={!!restoreTarget}
+        title="¿Restaurar archivo?"
+        description={`Se restaurará "${getArchivoDisplayName(restoreTarget ?? { nombre_original: null, nombre: null })}".`}
+        confirmText="Restaurar"
+        icon={<RotateCcw size={18} />}
+        loading={restoring === restoreTarget?.id}
+        onConfirm={confirmRestore}
+        onCancel={() => setRestoreTarget(null)}
+      />
+
+      <ConfirmModal
+        open={!!forceDeleteTarget}
+        title="¿Eliminar permanentemente?"
+        description={`"${getArchivoDisplayName(forceDeleteTarget ?? { nombre_original: null, nombre: null })}" se eliminará de forma permanente.`}
+        confirmText="Eliminar permanente"
+        danger
+        loading={forceDeleting === forceDeleteTarget?.id}
+        onConfirm={confirmForceDelete}
+        onCancel={() => setForceDeleteTarget(null)}
       />
     </div>
   );

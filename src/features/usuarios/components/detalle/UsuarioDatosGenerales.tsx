@@ -11,7 +11,7 @@ import {
   ExternalLink,
 } from "lucide-react";
 import { useNavigate } from "react-router-dom";
-import { Can } from "@/shared/components/atoms/Can";
+import { Can } from "@/shared/components/guards/Can";
 import { APP_ROUTES } from "@/shared/constants/routes.constants";
 import type { UsuarioDetalle } from "../../types/usuario.types";
 

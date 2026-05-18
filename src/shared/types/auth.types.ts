@@ -1,7 +1,7 @@
 // src/shared/types/auth.types.ts
 
 export type TipoPersona = "FISICA" | "MORAL";
-export type EstadoPersona = "ACTIVO" | "INACTIVO" | "BLOQUEADO";
+export type EstadoPersona = "ACTIVO" | "INACTIVO";
 export type RoleName = string;
 
 /**

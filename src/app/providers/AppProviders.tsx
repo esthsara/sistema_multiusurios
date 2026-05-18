@@ -8,7 +8,7 @@ import { lightTheme, darkTheme } from "@/config/theme.config";
 import { useTheme } from "@/shared/hooks/useTheme";
 import { useAuthStore } from "@/features/auth/store/auth.store";
 import { GlobalLoader } from "@/shared/components/molecules/GlobalLoader";
-import { SessionExpiredModal } from "@/shared/components/molecules/SessionExpiredModal";
+import { SessionExpiredModal } from "@/shared/components/organisms/SessionExpiredModal";
 import { useUIStore } from "@/shared/store/ui.store";
 
 interface AppProvidersProps {

@@ -1,4 +1,19 @@
 // src/shared/constants/navigation.constants.ts
+/*
+* Definimos la estructura de navegación
+* Aquí es donde configuramos el menú de navegación , incluyendo qué ítems mostrar y qué permisos se requieren para cada uno.
+* Esto es crucial para controlar el acceso a diferentes partes de la aplicación según los roles y permisos del usuario.
+* Cada ítem del menú tiene las siguientes propiedades:
+*
+* | Propiedad   | Significado               |
+| ----------- | ------------------------- |
+| key         | identificador interno     |
+| label       | texto que verá el usuario |
+| icon        | ícono                     |
+| path        | ruta a la página          |
+| permissions | permisos necesarios       |
+
+ */
 import type { PermissionString } from "@/shared/types/auth.types";
 import type { LucideIcon } from "lucide-react";
 import {
@@ -8,7 +23,6 @@ import {
   Building2,
   GitMerge,
   ShieldCheck,
-  KeyRound,
   LayoutGrid,
   MonitorCheck,
   ClipboardList,
@@ -18,14 +32,9 @@ import { APP_ROUTES } from "@/shared/constants/routes.constants";
 /**
  * NavItem — Un ítem del menú de navegación.
  *
- * permissions: lista de permisos requeridos (OR lógico).
+ * permissions: lista de permisos requeridos 
  *   - Array vacío [] → visible para cualquier usuario autenticado.
  *   - Con valores → visible solo si el usuario tiene AL MENOS uno.
- *
- * El Sidebar aplica filterNavItems recursivamente:
- *   - Si un grupo NO tiene hijos visibles, el grupo se oculta también.
- *   - Los grupos padre tienen los permisos acumulados de sus hijos
- *     como salvaguarda extra (aunque el filtro de hijos es suficiente).
  */
 export interface NavItem {
   key: string;
@@ -37,8 +46,6 @@ export interface NavItem {
 }
 
 /**
- * NAV_CONFIG — Configuración centralizada de la navegación.
- *
  * Reglas aplicadas:
  *   - Dashboard y Perfil: sin permiso específico (solo autenticación).
  *   - Cada módulo hoja tiene su permiso `.ver` correspondiente.

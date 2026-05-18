@@ -1,97 +1,88 @@
-import { useState } from "react";
-import {
-  Button,
-  Modal,
-  Form,
-  Input,
-  Select,
-  Upload,
-  Table,
-  Tooltip,
-} from "antd";
-import type { TableColumnsType } from "antd";
-import { Plus, Download, Trash2, Eye } from "lucide-react";
-import { Can } from "@/shared/components/atoms/Can";
-import { ConfirmModal } from "@/shared/components/molecules/ConfirmModal";
+﻿import { useState } from "react";
+import { Alert, Button } from "antd";
+import { Plus, Trash2, RotateCcw } from "lucide-react";
+import { toast } from "react-toastify";
+
 import { useSucursalArchivos } from "../../hooks/useSucursalArchivos";
-import type { SucursalArchivo as Archivo } from "../../types/sucursal.types";
+import { ConfirmModal } from "@/shared/components/organisms/ConfirmModal";
 
-const TIPO_OPTIONS = [
-  { value: "CI", label: "CI" },
-  { value: "CONTRATO", label: "Contrato" },
-  { value: "CERTIFICADO", label: "Certificado" },
-  { value: "FOTO", label: "Foto" },
-  { value: "OTRO", label: "Otro" },
-];
+import { ArchivoTable } from "./Archivo/ArchivoTable";
+import { ArchivoFormModal } from "./Archivo/ArchivoFormModal";
+import { ArchivoViewImage } from "./Archivo/ArchivoViewImage";
+import {
+  getArchivoDisplayName,
+  isImageArchivo,
+  isPdfArchivo,
+  type ArchivoResource,
+} from "./Archivo/archivo.constants";
 
-const getResolvedFileUrl = (rawUrl: string) => {
-  if (!rawUrl) return "";
-  if (/^https?:\/\//i.test(rawUrl)) return rawUrl;
-
-  const apiBase = (import.meta.env.VITE_API_URL as string | undefined) ?? "";
-  if (!apiBase) return rawUrl;
-
-  const normalizedApi = apiBase.replace(/\/$/, "");
-  const origin = normalizedApi.replace(/\/api(\/v\d+)?$/i, "");
-  return `${origin}${rawUrl.startsWith("/") ? rawUrl : `/${rawUrl}`}`;
-};
-
-interface SucursalArchivoProps {
-  sucursalId: number;
-}
-
-export const SucursalArchivo = ({ sucursalId }: SucursalArchivoProps) => {
+export const SucursalArchivo = ({ sucursalId }: { sucursalId: number }) => {
   const {
     archivos,
+    papelera,
     loading,
+    loadingTrash,
     uploading,
     deleting,
+    restoring,
+    forceDeleting,
+    error,
     handleUpload,
     handleDelete,
+    handleRestore,
+    handleForceDelete,
     handleDownload,
+    getPublicUrl,
   } = useSucursalArchivos(sucursalId);
 
-  const [modalOpen, setModalOpen] = useState(false);
-  const [deleteTarget, setDeleteTarget] = useState<Archivo | null>(null);
-  const [form] = Form.useForm();
+  const activeIds = new Set(archivos.map((item) => item.id));
+  const papeleraVisible = papelera.filter((item) => !activeIds.has(item.id));
 
-  const handleUploadFile = async () => {
-    try {
-      const values = await form.validateFields();
-      const selectedFile =
-        values.archivo?.file?.originFileObj ?? values.archivo?.file;
+  const [viewMode, setViewMode] = useState<"activos" | "papelera">("activos");
+  const [openForm, setOpenForm] = useState(false);
+  const [previewItem, setPreviewItem] = useState<ArchivoResource | null>(null);
 
-      if (!(selectedFile instanceof File)) {
-        return;
-      }
-      await handleUpload(
-        selectedFile,
-        values.tipo,
-        values.nombre,
+  const [deleteTarget, setDeleteTarget] = useState<ArchivoResource | null>(
+    null,
+  );
+  const [restoreTarget, setRestoreTarget] = useState<ArchivoResource | null>(
+    null,
+  );
+  const [forceDeleteTarget, setForceDeleteTarget] =
+    useState<ArchivoResource | null>(null);
 
-      );
-      setModalOpen(false);
-      form.resetFields();
-    } catch {
-      /* validación antd */
-    }
+  const onSubmit = async (values: {
+    file: File;
+    tipo: string;
+    nombre?: string;
+    fechaExpiracion?: string;
+  }) => {
+    await handleUpload(
+      values.file,
+      values.tipo,
+      values.nombre || "",
+      values.fechaExpiracion,
+    );
+    setOpenForm(false);
   };
 
-  const handlePreview = async (archivo: Archivo) => {
+  const handlePreview = async (item: ArchivoResource) => {
     try {
-      const maybeImageOrPdf = /\.(jpg|jpeg|png|gif|webp|pdf)$/i.test(
-        archivo.url,
-      );
-
-      if (maybeImageOrPdf) {
-        const resolved = getResolvedFileUrl(archivo.url);
-        window.open(resolved, "_blank", "noopener,noreferrer");
+      if (isImageArchivo(item)) {
+        setPreviewItem(item);
         return;
       }
 
-      await handleDownload(archivo.id);
+      const publicUrl =
+        (await getPublicUrl(item.id)) || item.url || (item as any).ruta || "";
+      if (isPdfArchivo(item)) {
+        window.open(publicUrl, "_blank", "noopener,noreferrer");
+        return;
+      }
+
+      window.open(publicUrl, "_blank", "noopener,noreferrer");
     } catch {
-      /* error handling in hook */
+      toast.error("No se pudo previsualizar el archivo");
     }
   };
 
@@ -101,170 +92,105 @@ export const SucursalArchivo = ({ sucursalId }: SucursalArchivoProps) => {
     setDeleteTarget(null);
   };
 
-  const columns: TableColumnsType<Archivo> = [
-    {
-      title: "Previsualizar",
-      key: "preview",
-      width: 100,
-      render: (_, r) => (
-        <Tooltip title="Previsualizar">
-          <Button
-            type="text"
-            size="small"
-            icon={<Eye size={15} />}
-            onClick={() => handlePreview(r)}
-          />
-        </Tooltip>
-      ),
-    },
-    {
-      title: "Nombre",
-      dataIndex: "nombre",
-      key: "nombre",
-    },
-    {
-      title: "Tipo",
-      key: "tipo",
-      width: 100,
-      render: (_, r) => r.tipo_texto,
-    },
-    {
-      title: "Fecha subida",
-      key: "fecha",
-      width: 120,
-      render: (_, r) => (
-        <span
-          className="text-xs"
-          style={{ color: "var(--color-text-secondary)" }}
-        >
-          {r.created_at.slice(0, 10)}
-        </span>
-      ),
-    },
-    {
-      title: "Descargar",
-      key: "descargar",
-      width: 90,
-      render: (_, record) => (
-        <div className="flex gap-1">
-          <Tooltip title="Descargar">
-            <Button
-              type="text"
-              size="small"
-              icon={<Download size={14} />}
-              onClick={() => handleDownload(record.id)}
-            />
-          </Tooltip>
-          <Can permission="sucursales.eliminar">
-            <Tooltip title="Eliminar">
-              <Button
-                type="text"
-                size="small"
-                danger
-                icon={<Trash2 size={14} />}
-                onClick={() => setDeleteTarget(record)}
-              />
-            </Tooltip>
-          </Can>
-        </div>
-      ),
-    },
-  ];
+  const confirmRestore = async () => {
+    if (!restoreTarget) return;
+    await handleRestore(restoreTarget.id);
+    setRestoreTarget(null);
+  };
+
+  const confirmForceDelete = async () => {
+    if (!forceDeleteTarget) return;
+    await handleForceDelete(forceDeleteTarget.id);
+    setForceDeleteTarget(null);
+  };
 
   return (
     <div>
-      <div className="flex justify-between items-center mb-4">
-        <h3
-          className="font-semibold text-base m-0"
-          style={{ color: "var(--color-text-primary)" }}
-        >
-          Archivos
-        </h3>
-        <Can permission="sucursales.crear">
+      <div className="flex justify-between mb-3">
+        <h3 className="font-semibold">Archivos</h3>
+
+        <div className="flex gap-2">
           <Button
-            type="primary"
-            size="small"
-            icon={<Plus size={14} />}
-            onClick={() => setModalOpen(true)}
+            type={viewMode === "activos" ? "primary" : "default"}
+            onClick={() => setViewMode("activos")}
           >
-            Subir Archivo
+            Activos
           </Button>
-        </Can>
+          <Button
+            type={viewMode === "papelera" ? "primary" : "default"}
+            icon={<Trash2 size={14} />}
+            onClick={() => setViewMode("papelera")}
+          >
+            Papelera
+          </Button>
+          {viewMode === "activos" && (
+            <Button icon={<Plus size={14} />} onClick={() => setOpenForm(true)}>
+              Subir
+            </Button>
+          )}
+        </div>
       </div>
 
-      <Table
-        dataSource={archivos}
-        columns={columns}
-        rowKey="id"
-        loading={loading}
-        pagination={false}
-        size="small"
-        locale={{ emptyText: "Sin archivos registrados" }}
-        style={{
-          backgroundColor: "var(--color-bg-base)",
-          borderRadius: "var(--radius-card)",
-        }}
+      {error && (
+        <Alert type="error" showIcon message={error} className="mb-3" />
+      )}
+
+      <ArchivoTable
+        data={viewMode === "activos" ? archivos : papeleraVisible}
+        loading={viewMode === "activos" ? loading : loadingTrash}
+        mode={viewMode}
+        restoringId={restoring}
+        forceDeletingId={forceDeleting}
+        onView={handlePreview}
+        onDownload={(item) => handleDownload(item.id)}
+        onDelete={(item) => setDeleteTarget(item)}
+        onRestore={(item) => setRestoreTarget(item)}
+        onForceDelete={(item) => setForceDeleteTarget(item)}
       />
 
-      <Modal
-        open={modalOpen}
-        title="Subir Archivo"
-        onOk={handleUploadFile}
-        onCancel={() => {
-          setModalOpen(false);
-          form.resetFields();
-        }}
-        okText="Subir"
-        cancelText="Cancelar"
-        okButtonProps={{ loading: uploading }}
-        width={760}
-        centered
-        destroyOnClose
-      >
-        <Form
-          form={form}
-          layout="vertical"
-          size="large"
-          requiredMark={false}
-          className="mt-4"
-        >
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-x-4">
-            <Form.Item
-              name="nombre"
-              label="Nombre del archivo"
-              rules={[{ required: true, message: "Ingresa un nombre" }]}
-            >
-              <Input placeholder="Ej: Contrato de sucursal" />
-            </Form.Item>
-            <Form.Item
-              name="tipo"
-              label="Tipo de documento"
-              rules={[{ required: true, message: "Selecciona el tipo" }]}
-            >
-              <Select options={TIPO_OPTIONS} placeholder="Ej: Seleccionar tipo" />
-            </Form.Item>
-          </div>
-          <Form.Item
-            name="archivo"
-            label="Archivo"
-            rules={[{ required: true, message: "Selecciona un archivo" }]}
-          >
-            <Upload beforeUpload={() => false} maxCount={1} accept="*/*">
-              <Button size="large" icon={<Plus size={14} />}>Seleccionar archivo</Button>
-            </Upload>
-          </Form.Item>
-        </Form>
-      </Modal>
+      <ArchivoFormModal
+        open={openForm}
+        loading={uploading}
+        onCancel={() => setOpenForm(false)}
+        onSubmit={onSubmit}
+      />
+
+      <ArchivoViewImage
+        open={!!previewItem}
+        item={previewItem}
+        onClose={() => setPreviewItem(null)}
+      />
 
       <ConfirmModal
         open={!!deleteTarget}
-        title="¿Eliminar este archivo?"
-        description={`El archivo "${deleteTarget?.nombre}" será eliminado.`}
+        title="¿Eliminar archivo?"
+        description={`Se eliminará "${getArchivoDisplayName(deleteTarget ?? { nombre_original: null, nombre: null })}".`}
         confirmText="Eliminar"
-        danger
         loading={deleting === deleteTarget?.id}
         onConfirm={confirmDelete}
         onCancel={() => setDeleteTarget(null)}
+      />
+
+      <ConfirmModal
+        open={!!restoreTarget}
+        title="¿Restaurar archivo?"
+        description={`Se restaurará "${getArchivoDisplayName(restoreTarget ?? { nombre_original: null, nombre: null })}".`}
+        confirmText="Restaurar"
+        icon={<RotateCcw size={18} />}
+        loading={restoring === restoreTarget?.id}
+        onConfirm={confirmRestore}
+        onCancel={() => setRestoreTarget(null)}
+      />
+
+      <ConfirmModal
+        open={!!forceDeleteTarget}
+        title="¿Eliminar permanentemente?"
+        description={`"${getArchivoDisplayName(forceDeleteTarget ?? { nombre_original: null, nombre: null })}" se eliminará de forma permanente.`}
+        confirmText="Eliminar permanente"
+        danger
+        loading={forceDeleting === forceDeleteTarget?.id}
+        onConfirm={confirmForceDelete}
+        onCancel={() => setForceDeleteTarget(null)}
       />
     </div>
   );

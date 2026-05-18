@@ -6,7 +6,7 @@ import { APP_ROUTES } from "@/shared/constants/routes.constants";
 import { useUIStore } from "@/shared/store/ui.store";
 
 /**
- * AuthGuard — Protege rutas que requieren autenticación.
+ * AuthGuard — Protege rutas que requieren autenticación.Para ver si el usurio esta autenticado
  *
  * Validaciones en orden:
  * 1. Si está cargando → mostrar GlobalLoader (sin redirigir prematuramente)

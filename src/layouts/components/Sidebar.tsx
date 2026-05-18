@@ -45,13 +45,22 @@ const filterNavItems = (
   hasAnyPerm: (p: PermissionString[]) => boolean,
 ): NavItem[] => {
   return items.reduce<NavItem[]>((acc, item) => {
-    if (!userCanSee(item, hasAnyPerm)) return acc;
-
     if (item.children) {
       const visibleChildren = filterNavItems(item.children, hasAnyPerm);
-      if (visibleChildren.length === 0) return acc;
-      acc.push({ ...item, children: visibleChildren });
-    } else {
+      const canSeeSelf = userCanSee(item, hasAnyPerm);
+
+      // Show group if it has visible children OR if parent itself is visible
+      if (visibleChildren.length === 0 && !canSeeSelf) return acc;
+
+      if (visibleChildren.length > 0) {
+        acc.push({ ...item, children: visibleChildren });
+        return acc;
+      }
+
+      if (canSeeSelf) {
+        acc.push(item);
+      }
+    } else if (userCanSee(item, hasAnyPerm)) {
       acc.push(item);
     }
     return acc;

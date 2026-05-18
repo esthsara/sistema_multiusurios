@@ -1,5 +1,5 @@
 import { Button, Tooltip } from "antd";
-import { Can } from "@/shared/components/atoms/Can";
+import { Can } from "@/shared/components/guards/Can";
 import type { TableColumnsType } from "antd";
 import { Eye, Pencil, Star, Trash2 } from "lucide-react";
 import { DataTableSimple } from "@/shared/components/organisms/DataTableSimple";

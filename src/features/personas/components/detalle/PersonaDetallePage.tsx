@@ -5,7 +5,7 @@ import { Button, Tabs, Skeleton } from "antd";
 import { ArrowLeft, Pencil } from "lucide-react";
 import { toast } from "react-toastify";
 import { PageHeader } from "@/shared/components/molecules/PageHeader";
-import { Can } from "@/shared/components/atoms/Can";
+import { Can } from "@/shared/components/guards/Can";
 import { AppTag } from "@/shared/components/atoms/AppTag";
 import { APP_ROUTES } from "@/shared/constants/routes.constants";
 import { personasService } from "../../services/personas.service";

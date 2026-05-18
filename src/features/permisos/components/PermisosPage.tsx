@@ -5,8 +5,8 @@ import { Pencil, Plus, Trash2 } from "lucide-react";
 import { PageHeader } from "@/shared/components/molecules/PageHeader";
 import { DataTable } from "@/shared/components/organisms/DataTable";
 import { RowActions } from "@/shared/components/molecules/RowActions";
-import { ConfirmModal } from "@/shared/components/molecules/ConfirmModal";
-import { Can } from "@/shared/components/atoms/Can";
+import { ConfirmModal } from "@/shared/components/organisms/ConfirmModal";
+import { Can } from "@/shared/components/guards/Can";
 import { usePermisos } from "../hooks/usePermisos";
 import type { PermisoItem } from "../types/permiso.types";
 import { PermisoFilters } from "./PermisoFilters";
@@ -168,7 +168,6 @@ const PermisosPage = () => {
           </Can>
         }
       />
-
 
       <PermisoFilters
         search={permisos.table.state.search}

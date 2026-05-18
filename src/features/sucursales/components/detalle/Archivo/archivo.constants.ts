@@ -1,4 +1,4 @@
-// src/features/personas/components/detalle/Archivo/archivo.constants.ts
+// src/features/sucursales/components/detalle/Archivo/archivo.constants.ts
 
 import type { TableColumnsType } from "antd";
 import { getResolvedFileUrl } from "@/shared/utils/file-url.utils";

@@ -9,25 +9,43 @@ import type {
 
 export const useArchivos = (personaId: number) => {
   const [archivos, setArchivos] = useState<ArchivoResource[]>([]);
+  const [papelera, setPapelera] = useState<ArchivoResource[]>([]);
   const [loading, setLoading] = useState(false);
+  const [loadingTrash, setLoadingTrash] = useState(false);
   const [uploading, setUploading] = useState(false);
   const [deleting, setDeleting] = useState<number | null>(null);
+  const [restoring, setRestoring] = useState<number | null>(null);
+  const [forceDeleting, setForceDeleting] = useState<number | null>(null);
+  const [error, setError] = useState<string | null>(null);
 
   const fetch = useCallback(async () => {
     setLoading(true);
+    setError(null);
     try {
       const res = await archivosService.getByPersona(personaId);
       setArchivos(res.data.items ?? []);
     } catch {
+      setError("Error al cargar archivos");
       toast.error("Error al cargar archivos");
     } finally {
       setLoading(false);
     }
   }, [personaId]);
 
+  const fetchPapelera = useCallback(async () => {
+    setLoadingTrash(true);
+    try {
+      const res = await archivosService.getTrashByPersona(personaId);
+      setPapelera(res.items ?? []);
+    } finally {
+      setLoadingTrash(false);
+    }
+  }, [personaId]);
+
   useEffect(() => {
     fetch();
-  }, [fetch]);
+    fetchPapelera();
+  }, [fetch, fetchPapelera]);
 
   const handleUpload = async (
     file: File,
@@ -45,7 +63,7 @@ export const useArchivos = (personaId: number) => {
         fechaExpiracion,
       });
       toast.success("Archivo subido");
-      fetch();
+      await fetch();
     } catch {
       toast.error("Error al subir archivo");
     } finally {
@@ -58,7 +76,13 @@ export const useArchivos = (personaId: number) => {
     try {
       await archivosService.remove(id);
       toast.success("Archivo eliminado");
-      fetch();
+      const deletedItem = archivos.find((item) => item.id === id);
+      setArchivos((prev) => prev.filter((item) => item.id !== id));
+      if (deletedItem) {
+        setPapelera((prev) => [deletedItem, ...prev]);
+      } else {
+        await fetchPapelera();
+      }
     } catch {
       toast.error("Error al eliminar archivo");
     } finally {
@@ -67,12 +91,29 @@ export const useArchivos = (personaId: number) => {
   };
 
   const handleRestore = async (id: number) => {
+    setRestoring(id);
     try {
       await archivosService.restore(id);
       toast.success("Archivo restaurado");
-      fetch();
+      setPapelera((prev) => prev.filter((item) => item.id !== id));
+      await fetch();
     } catch {
       toast.error("Error al restaurar archivo");
+    } finally {
+      setRestoring(null);
+    }
+  };
+
+  const handleForceDelete = async (id: number) => {
+    setForceDeleting(id);
+    try {
+      await archivosService.forceDelete(id);
+      toast.success("Archivo eliminado permanentemente");
+      setPapelera((prev) => prev.filter((item) => item.id !== id));
+    } catch {
+      toast.error("Error al eliminar permanentemente el archivo");
+    } finally {
+      setForceDeleting(null);
     }
   };
 
@@ -92,12 +133,20 @@ export const useArchivos = (personaId: number) => {
 
   return {
     archivos,
+    papelera,
     loading,
+    loadingTrash,
     uploading,
     deleting,
+    restoring,
+    forceDeleting,
+    error,
+    fetch,
+    fetchPapelera,
     handleUpload,
     handleDelete,
     handleRestore,
+    handleForceDelete,
     handleDownload,
   };
 };

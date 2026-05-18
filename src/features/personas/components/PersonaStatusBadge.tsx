@@ -8,11 +8,10 @@ interface PersonaStatusBadgeProps {
 
 const STATUS_CONFIG: Record<
   EstadoPersona,
-  { status: "success" | "error" | "warning"; text: string }
+  { status: "success" | "error"; text: string }
 > = {
   ACTIVO: { status: "success", text: "Activo" },
   INACTIVO: { status: "error", text: "Inactivo" },
-  BLOQUEADO: { status: "warning", text: "Bloqueado" },
 };
 
 export const PersonaStatusBadge = ({ estado }: PersonaStatusBadgeProps) => {

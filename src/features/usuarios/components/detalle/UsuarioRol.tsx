@@ -21,10 +21,13 @@ import {
   UserCog,
   XCircle,
 } from "lucide-react";
-import { Can } from "@/shared/components/atoms/Can";
+import { Can } from "@/shared/components/guards/Can";
 import { AppTag } from "@/shared/components/atoms/AppTag";
 import { useRolesUsuario } from "@/features/roles/hooks/useRolesUsuario";
-import type { UsuarioDetalle, RolDetalle as UsuarioRolDetalle } from "../../types/usuario.types";
+import type {
+  UsuarioDetalle,
+  RolDetalle as UsuarioRolDetalle,
+} from "../../types/usuario.types";
 import { getModuloStyles } from "@/features/roles/utils/roles.utils";
 
 /** Alias local compatible con roles_detalle del usuario */
@@ -59,10 +62,7 @@ const accionTone = (
   return "success";
 };
 
-export const UsuarioRol = ({
-  usuario,
-  onRolesChanged,
-}: UsuarioRolProps) => {
+export const UsuarioRol = ({ usuario, onRolesChanged }: UsuarioRolProps) => {
   const { token } = theme.useToken();
   const [modalOpen, setModalOpen] = useState(false);
 
@@ -74,8 +74,14 @@ export const UsuarioRol = ({
   // IDs de roles seleccionados en el modal (para asignar/quitar)
   const [selectedRoleIds, setSelectedRoleIds] = useState<number[]>([]);
 
-  const { roles, loadingRoles, submitting, fetchRoles, asignarRoles, quitarRoles } =
-    useRolesUsuario(usuario.id);
+  const {
+    roles,
+    loadingRoles,
+    submitting,
+    fetchRoles,
+    asignarRoles,
+    quitarRoles,
+  } = useRolesUsuario(usuario.id);
 
   /* ── Sync con prop externa ── */
   useEffect(() => {
@@ -140,10 +146,7 @@ export const UsuarioRol = ({
       {/* ── Header ── */}
       <Flex justify="space-between" align="center" style={{ marginBottom: 16 }}>
         <Flex align="center" gap={8}>
-          <ShieldCheck
-            size={18}
-            style={{ color: token.colorPrimary }}
-          />
+          <ShieldCheck size={18} style={{ color: token.colorPrimary }} />
           <Title level={5} style={{ margin: 0 }}>
             Roles y permisos
           </Title>
@@ -191,7 +194,11 @@ export const UsuarioRol = ({
               </AppTag>
             ) : (
               rolesNombres.map((rol) => (
-                <AppTag key={rol} tone="primary" icon={<ShieldCheck size={12} />}>
+                <AppTag
+                  key={rol}
+                  tone="primary"
+                  icon={<ShieldCheck size={12} />}
+                >
                   {rol}
                 </AppTag>
               ))
@@ -430,9 +437,7 @@ export const UsuarioRol = ({
             <Space direction="vertical" style={{ width: "100%" }} size={8}>
               {roles.map((rol) => {
                 const isSelected = selectedRoleIds.includes(rol.id);
-                const wasOriginal = rolesActuales.some(
-                  (r) => r.id === rol.id,
-                );
+                const wasOriginal = rolesActuales.some((r) => r.id === rol.id);
                 const changed = isSelected !== wasOriginal;
 
                 return (

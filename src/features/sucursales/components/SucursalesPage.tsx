@@ -1,15 +1,13 @@
 // src/features/sucursales/screens/SucursalesPage.tsx
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useState } from "react";
 import { Avatar, Button } from "antd";
 import { Eye, Pencil, Plus, PowerOff, RotateCcw, Trash2 } from "lucide-react";
 import type { TableColumnsType } from "antd";
-
-import apiClient from "@/config/axios.config";
 import { PageHeader } from "@/shared/components/molecules/PageHeader";
 import { DataTable } from "@/shared/components/organisms/DataTable";
-import { ConfirmModal } from "@/shared/components/molecules/ConfirmModal";
+import { ConfirmModal } from "@/shared/components/organisms/ConfirmModal";
 import { RowActions } from "@/shared/components/molecules/RowActions";
-import { Can } from "@/shared/components/atoms/Can";
+import { Can } from "@/shared/components/guards/Can";
 
 import { useNavigate } from "react-router-dom";
 import { APP_ROUTES } from "@/shared/constants/routes.constants";
@@ -23,10 +21,10 @@ import { SucursalFormModal } from "../components/SucursalFormModal";
 import type { SucursalListItem, ConfirmState } from "../types/sucursal.types";
 import {
   getSucursalInitials,
-  normalizeLogoUrl,
   getConfirmConfig,
   getHorarioDisplay,
 } from "../utils/sucursal.utils";
+import { getResolvedFileUrl } from "@/shared/utils/file-url.utils";
 
 const SucursalesPage = () => {
   const navigate = useNavigate();
@@ -42,20 +40,6 @@ const SucursalesPage = () => {
     item: null,
     loading: false,
   });
-
-  /* ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-     LOGO MANAGEMENT */
-
-  const [logoSrcById, setLogoSrcById] = useState<Record<number, string>>({});
-  const createdObjectUrlsRef = useRef<string[]>([]);
-
-  const apiOrigin = useMemo(() => {
-    try {
-      return new URL(import.meta.env.VITE_API_URL).origin;
-    } catch {
-      return window.location.origin;
-    }
-  }, []);
 
   /* ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
      CONFIRM ACTIONS */
@@ -83,59 +67,6 @@ const SucursalesPage = () => {
   };
 
   /* ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-     LOGO LOADING */
-
-  useEffect(() => {
-    let isMounted = true;
-    const abortControllers: AbortController[] = [];
-
-    const clearObjectUrls = () => {
-      createdObjectUrlsRef.current.forEach((url) => URL.revokeObjectURL(url));
-      createdObjectUrlsRef.current = [];
-    };
-
-    const loadLogos = async () => {
-      clearObjectUrls();
-      const nextLogoMap: Record<number, string> = {};
-
-      for (const sucursal of sucursales.data) {
-        if (!sucursal.logo) continue;
-
-        try {
-          const controller = new AbortController();
-          abortControllers.push(controller);
-
-          const response = await apiClient.get<Blob>(
-            normalizeLogoUrl(sucursal.logo, apiOrigin),
-            {
-              responseType: "blob",
-              signal: controller.signal,
-            },
-          );
-
-          const objectUrl = URL.createObjectURL(response.data);
-          createdObjectUrlsRef.current.push(objectUrl);
-          nextLogoMap[sucursal.id] = objectUrl;
-        } catch {
-          // Si falla (403/no existe), el avatar mostrará iniciales
-        }
-      }
-
-      if (isMounted) {
-        setLogoSrcById(nextLogoMap);
-      }
-    };
-
-    void loadLogos();
-
-    return () => {
-      isMounted = false;
-      abortControllers.forEach((controller) => controller.abort());
-      clearObjectUrls();
-    };
-  }, [sucursales.data, apiOrigin]);
-
-  /* ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
      COLUMNAS DE LA TABLA */
 
   const columns: TableColumnsType<SucursalListItem> = [
@@ -146,7 +77,7 @@ const SucursalesPage = () => {
       render: (_, r) => (
         <Avatar
           size={42}
-          src={logoSrcById[r.id] ?? undefined}
+          src={r.logo ? getResolvedFileUrl(r.logo) : undefined}
           style={{
             backgroundColor: "var(--color-primary-100)",
             color: "var(--color-primary-700)",

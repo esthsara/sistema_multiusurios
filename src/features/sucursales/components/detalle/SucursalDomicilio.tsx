@@ -2,8 +2,8 @@
 import { useState } from "react";
 import { Button } from "antd";
 import { Plus } from "lucide-react";
-import { ConfirmModal } from "@/shared/components/molecules/ConfirmModal";
-import { Can } from "@/shared/components/atoms/Can";
+import { ConfirmModal } from "@/shared/components/organisms/ConfirmModal";
+import { Can } from "@/shared/components/guards/Can";
 import { useSucursalDomicilios } from "../../hooks/useSucursalDomicilios";
 import type { Domicilio } from "./Domicilio/domicilio.constants";
 
