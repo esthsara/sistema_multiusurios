@@ -22,9 +22,17 @@ export const http = {
    * GET — Recurso único
    * Usado para: obtener detalle de una entidad
    */
-  async get<T>(url: string, params?: RequestParams): Promise<ApiResponse<T>> {
+  async get<T>(
+    url: string,
+    params?: RequestParams,
+    options?: { silent?: boolean }
+  ): Promise<ApiResponse<T>> {
     try {
-      const response = await apiClient.get<ApiResponse<T>>(url, { params });
+      const headers: Record<string, string> = {};
+      if (options?.silent) {
+        headers["X-Silent-Error"] = "true";
+      }
+      const response = await apiClient.get<ApiResponse<T>>(url, { params, headers });
       return response.data;
     } catch (error) {
       throw handleHttpError(error, true);

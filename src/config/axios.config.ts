@@ -155,9 +155,11 @@ apiClient.interceptors.response.use(
       return Promise.reject(error);
     }
 
+    const isSilentError = error.config?.headers?.["X-Silent-Error"] === "true" || error.config?.headers?.["x-silent-error"] === "true";
+
     /* 403 — Sin permisos  */
     if (status === 403) {
-      if (isAuthRequest) {
+      if (isAuthRequest || isSilentError) {
         return Promise.reject(error);
       }
       handleHttpError(error);
