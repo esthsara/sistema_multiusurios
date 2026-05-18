@@ -18,17 +18,20 @@ export const APP_ROUTES = {
     PERSONAS: {
       ROOT: "/dashboard/personas",
       NUEVA: "/dashboard/personas/nueva",
-      DETALLE: (id: number | string) => `/dashboard/personas/${id}`,
+      DETALLE: (id: number | string, tab?: string) =>
+        `/dashboard/personas/${id}${tab ? `/${tab}` : ""}`,
     },
     SUCURSALES: {
       ROOT: "/dashboard/sucursales",
       NUEVA: "/dashboard/sucursales/nueva",
-      DETALLE: (id: number | string) => `/dashboard/sucursales/${id}`,
+      DETALLE: (id: number | string, tab?: string) =>
+        `/dashboard/sucursales/${id}${tab ? `/${tab}` : ""}`,
     },
     USUARIOS: {
       ROOT: "/dashboard/usuarios",
       NUEVO: "/dashboard/usuarios/nuevo",
-      DETALLE: (id: number | string) => `/dashboard/usuarios/${id}`,
+      DETALLE: (id: number | string, tab?: string) =>
+        `/dashboard/usuarios/${id}${tab ? `/${tab}` : ""}`,
     },
     ROLES: "/dashboard/roles",
     MATRIZ: "/dashboard/matriz-rol-permiso",

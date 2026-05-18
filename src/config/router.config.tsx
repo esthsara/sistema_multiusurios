@@ -150,7 +150,7 @@ export const router = createBrowserRouter([
                 element: withSuspense(PersonasPage),
               },
               {
-                path: `${APP_ROUTES.DASHBOARD.PERSONAS.ROOT}/:id`,
+                path: `${APP_ROUTES.DASHBOARD.PERSONAS.ROOT}/:id/:tab?`,
                 element: withSuspense(PersonaDetallePage),
               },
             ],
@@ -165,7 +165,7 @@ export const router = createBrowserRouter([
                 element: withSuspense(SucursalesPage),
               },
               {
-                path: `${APP_ROUTES.DASHBOARD.SUCURSALES.ROOT}/:id`,
+                path: `${APP_ROUTES.DASHBOARD.SUCURSALES.ROOT}/:id/:tab?`,
                 element: withSuspense(SucursalDetallePage),
               },
             ],
@@ -180,7 +180,7 @@ export const router = createBrowserRouter([
                 element: withSuspense(UsuariosPage),
               },
               {
-                path: `${APP_ROUTES.DASHBOARD.USUARIOS.ROOT}/:id`,
+                path: `${APP_ROUTES.DASHBOARD.USUARIOS.ROOT}/:id/:tab?`,
                 element: withSuspense(UsuarioDetallePage),
               },
             ],

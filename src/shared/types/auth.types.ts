@@ -37,10 +37,26 @@ type KnownPermission =
   | "permisos.asignar"
   // ── Asignaciones usuario-sucursal ─────────
   | "asignaciones.ver"
-  | "asignaciones.crear"
-  | "asignaciones.eliminar"
+  | "asignaciones.asignar"
+  | "asignaciones.quitar"
+  // ── Contactos ─────────────────────────────
+  | "contactos.ver"
+  | "contactos.crear"
+  | "contactos.editar"
+  | "contactos.eliminar"
+  // ── Domicilios ────────────────────────────
+  | "domicilios.ver"
+  | "domicilios.crear"
+  | "domicilios.editar"
+  | "domicilios.eliminar"
+  // ── Archivos ──────────────────────────────
+  | "archivos.ver"
+  | "archivos.subir"
+  | "archivos.eliminar"
+  | "archivos.eliminar_permanente"
   // ── Auditoría ─────────────────────────────
-  | "auditoria.ver";
+  | "auditoria.ver"
+  | "auditoria.exportar";
 
 type DynamicPermission = string & {};
 export type PermissionString = KnownPermission | DynamicPermission;
