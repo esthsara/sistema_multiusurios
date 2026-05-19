@@ -2,18 +2,21 @@
 import { useCallback, useEffect, useState } from "react";
 import { toast } from "react-toastify";
 import { sucursalArchivosService } from "../services/sucursal-archivos.service";
+import {
+  downloadBlobUrl,
+  getFileExtension,
+  getResponseContentDisposition,
+  resolveFileName,
+  revokeBlobUrlLater,
+  toBlobUrlFromResponse,
+} from "@/shared/utils/file-download.utils";
 import type { SucursalArchivo } from "../types/sucursal.types";
 
 export const useSucursalArchivos = (sucursalId: number) => {
   const [archivos, setArchivos] = useState<SucursalArchivo[]>([]);
-  const [papelera, setPapelera] = useState<SucursalArchivo[]>([]);
   const [loading, setLoading] = useState(false);
-  const [loadingTrash, setLoadingTrash] = useState(false);
   const [uploading, setUploading] = useState(false);
   const [deleting, setDeleting] = useState<number | null>(null);
-  const [restoring, setRestoring] = useState<number | null>(null);
-  const [forceDeleting, setForceDeleting] = useState<number | null>(null);
-  const [downloading, setDownloading] = useState<number | null>(null);
   const [error, setError] = useState<string | null>(null);
 
   const fetch = useCallback(async () => {
@@ -30,21 +33,8 @@ export const useSucursalArchivos = (sucursalId: number) => {
     }
   }, [sucursalId]);
 
-  const fetchPapelera = useCallback(async () => {
-    setLoadingTrash(true);
-    try {
-      const res = await sucursalArchivosService.getTrashBySucursal(sucursalId);
-      setPapelera(res.items ?? []);
-    } catch {
-      // ignore
-    } finally {
-      setLoadingTrash(false);
-    }
-  }, [sucursalId]);
-
   useEffect(() => {
     fetch();
-    void fetchPapelera();
   }, [fetch]);
 
   const handleUpload = useCallback(
@@ -79,14 +69,8 @@ export const useSucursalArchivos = (sucursalId: number) => {
       setDeleting(id);
       try {
         await sucursalArchivosService.remove(id);
-        toast.success("Archivo eliminado correctamente");
-        const deletedItem = archivos.find((item) => item.id === id);
-        setArchivos((prev) => prev.filter((item) => item.id !== id));
-        if (deletedItem) {
-          setPapelera((prev) => [deletedItem, ...prev]);
-        } else {
-          await fetchPapelera();
-        }
+        toast.success("Archivo eliminado");
+        await fetch();
       } catch {
         toast.error("Error al eliminar archivo");
       } finally {
@@ -96,52 +80,37 @@ export const useSucursalArchivos = (sucursalId: number) => {
     [fetch],
   );
 
-  const handleRestore = useCallback(
+  const handleDownload = useCallback(
     async (id: number) => {
-      setRestoring(id);
+      const item = archivos.find((archivo) => archivo.id === id);
+      if (!item) return;
+
+      const toastId = toast.loading("Preparando descarga...");
       try {
-        await sucursalArchivosService.restore(id);
-        toast.success("Archivo restaurado correctamente");
-        setPapelera((prev) => prev.filter((item) => item.id !== id));
-        await fetch();
+        const response = await sucursalArchivosService.download(id);
+        const extension = getFileExtension(item.extension, item.ruta, item.url);
+
+        const { url } = toBlobUrlFromResponse(response, extension);
+        const fileName = resolveFileName({
+          contentDisposition: getResponseContentDisposition(response),
+          fallbackName: item.nombre_original ?? item.nombre ?? "archivo",
+          extension,
+        });
+
+        downloadBlobUrl({ blobUrl: url, fileName });
+        revokeBlobUrlLater(url);
+        toast.dismiss(toastId);
       } catch {
-        toast.error("Error al restaurar archivo");
-      } finally {
-        setRestoring(null);
+        toast.update(toastId, {
+          render: "Error al descargar archivo",
+          type: "error",
+          isLoading: false,
+          autoClose: 3000,
+        });
       }
     },
-    [fetch],
+    [archivos],
   );
-
-  const handleForceDelete = useCallback(
-    async (id: number) => {
-      setForceDeleting(id);
-      try {
-        await sucursalArchivosService.forceDelete(id);
-        toast.success("Archivo eliminado permanentemente");
-        setPapelera((prev) => prev.filter((item) => item.id !== id));
-      } catch {
-        toast.error("Error al eliminar el archivo permanentemente");
-      } finally {
-        setForceDeleting(null);
-      }
-    },
-    [fetch],
-  );
-
-  const handleDownload = useCallback(async (id: number) => {
-    try {
-      const link = document.createElement("a");
-      link.href = sucursalArchivosService.getDownloadUrl(id);
-      link.target = "_blank";
-      link.rel = "noopener noreferrer";
-      document.body.appendChild(link);
-      link.click();
-      link.parentNode?.removeChild(link);
-    } catch {
-      toast.error("Error al descargar archivo");
-    }
-  }, []);
 
   const getPublicUrl = useCallback(async (id: number) => {
     try {
@@ -153,18 +122,12 @@ export const useSucursalArchivos = (sucursalId: number) => {
 
   return {
     archivos,
-    papelera,
     loading,
-    loadingTrash,
     uploading,
     deleting,
-    restoring,
-    forceDeleting,
     error,
     handleUpload,
     handleDelete,
-    handleRestore,
-    handleForceDelete,
     handleDownload,
     getPublicUrl,
   };

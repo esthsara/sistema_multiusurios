@@ -1,11 +1,15 @@
-import { Tag, Badge } from "antd";
+import { Badge } from "antd";
 import type { TableColumnsType, TableProps } from "antd";
 import { Eye } from "lucide-react";
 
+import { AppTag } from "@/shared/components/atoms/AppTag";
 import { DataTableSimple } from "@/shared/components/organisms/DataTableSimple";
 import { RowActions } from "@/shared/components/molecules/RowActions";
 
-import { ACCION_COLOR, type AuditoriaItem } from "./auditoria.constants";
+import {
+  getAuditoriaActionTone,
+  type AuditoriaItem,
+} from "./auditoria.constants";
 
 interface Props {
   data: AuditoriaItem[];
@@ -27,9 +31,9 @@ export const AuditoriaTable = ({
       render: (_, r) => (
         <div className="space-y-1 py-1">
           <div className="flex items-center justify-between gap-2">
-            <Tag color={ACCION_COLOR[r.accion] ?? "default"} className="m-0">
+            <AppTag tone={getAuditoriaActionTone(r.accion, r.accion_texto)}>
               {r.accion_texto}
-            </Tag>
+            </AppTag>
             <span
               className="text-[11px]"
               style={{ color: "var(--color-text-secondary)" }}
@@ -99,12 +103,9 @@ export const AuditoriaTable = ({
       width: 160,
       responsive: ["sm"],
       render: (_, r) => (
-        <Tag
-          color={ACCION_COLOR[r.accion] ?? "default"}
-          className="m-0 px-3 py-0.5 rounded-full"
-        >
+        <AppTag tone={getAuditoriaActionTone(r.accion, r.accion_texto)}>
           {r.accion_texto}
-        </Tag>
+        </AppTag>
       ),
     },
     {

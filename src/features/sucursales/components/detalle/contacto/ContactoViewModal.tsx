@@ -1,15 +1,8 @@
-import {
-  Modal,
-  Button,
-  Tooltip,
-  message,
-  Tag,
-  ConfigProvider,
-  theme,
-} from "antd";
+import { Modal, Button, Tooltip, message, ConfigProvider, theme } from "antd";
 import { Copy, Mail, Phone, Calendar, Info, Check } from "lucide-react";
 import { useState } from "react";
 import type { Contacto } from "../../detalle/contacto/contacto.constants";
+import { AppTag } from "@/shared/components/atoms/AppTag";
 
 interface Props {
   open: boolean;
@@ -91,9 +84,12 @@ export const ContactoViewModal = ({ open, item, onClose }: Props) => {
               >
                 Tipo
               </span>
-              <Tag className="m-0 border-none px-3 py-0.5 rounded-full font-semibold bg-blue-500/10 text-blue-400">
+              <AppTag
+                className="m-0 px-3 py-0.5 rounded-full font-semibold"
+                tone="cyan"
+              >
                 {item.tipo_texto}
-              </Tag>
+              </AppTag>
             </div>
 
             {/* VALOR (EL DATO PRINCIPAL) */}

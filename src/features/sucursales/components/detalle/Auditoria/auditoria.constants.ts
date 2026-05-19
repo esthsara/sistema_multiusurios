@@ -16,22 +16,34 @@ export interface AuditoriaItem {
   fecha: string;
 }
 
-export const ACCION_COLOR: Record<string, string> = {
-  LOGIN_SUCCESS: "green",
-  LOGOUT: "orange",
-  CREATE: "blue",
-  UPDATE: "cyan",
-  DELETE: "red",
-  CONTACTO_CREADO: "blue",
-  CONTACTO_ELIMINADO: "red",
-  DOMICILIO_CREADO: "gold",
-  DOMICILIO_ACTUALIZADO: "cyan",
-  DOMICILIO_ELIMINADO: "red",
-  USUARIO_ASIGNADO: "purple",
-  USUARIO_CREADO: "blue",
-  USUARIO_ACTUALIZADO: "cyan",
-  USUARIO_ACTIVADO: "green",
-  USUARIO_DESACTIVADO: "red",
-  SWITCH_BRANCH: "purple",
-  USUARIO_ASIGNADO_SUCURSAL: "gold",
+export const ACCION_TONE: Record<
+  string,
+  "neutral" | "success" | "danger" | "geekblue" | "purple"
+> = {
+  "Archivo subido": "success",
+  "Archivo eliminado": "danger",
+  ARCHIVO_RESTAURADO: "purple",
+  "Archivo actualizado": "geekblue",
+  "Sucursal creada": "success",
+  "Sucursal actualizada": "geekblue",
+  "Sucursal eliminada": "danger",
+  "Sucursal restaurada": "purple",
+  "Usuario creado": "success",
+  "Usuario actualizado": "geekblue",
+  "Usuario eliminado": "danger",
+  "Usuario restaurado": "purple",
+  "Persona creada": "success",
+  "Persona actualizada": "geekblue",
+  "Persona eliminada": "danger",
+  "Persona restaurada": "purple",
+  "Inicio de sesión": "success",
+  "Cierre de sesión": "neutral",
+  "Domicilio creado": "success",
+  "Domicilio actualizado": "geekblue",
+  "Domicilio eliminado": "danger",
+  "Domicilio restaurado": "purple",
+  
 };
+
+export const getAuditoriaActionTone = (accion: string, accionTexto?: string) =>
+  ACCION_TONE[accionTexto ?? ""] ?? ACCION_TONE[accion] ?? "neutral";

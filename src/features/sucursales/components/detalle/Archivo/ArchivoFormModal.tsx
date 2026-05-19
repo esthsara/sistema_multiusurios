@@ -99,7 +99,7 @@ export const ArchivoFormModal = ({
         confirmLoading={loading}
         width={720}
         centered
-        destroyOnClose
+        destroyOnHidden
       >
         <Form
           form={form}

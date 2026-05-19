@@ -1,4 +1,4 @@
-import { Button, Skeleton, Tabs, Tag } from "antd";
+import { Button, Skeleton, Tabs } from "antd";
 import { ArrowLeft } from "lucide-react";
 import { useNavigate, useParams, Navigate } from "react-router-dom";
 import { PageHeader } from "@/shared/components/molecules/PageHeader";
@@ -11,6 +11,7 @@ import { SucursalDomicilio } from "./SucursalDomicilio";
 import { SucursalArchivo } from "./SucursalArchivo";
 import { SucursalUsuarioAsignado } from "./SucursalUsuarioAsignado";
 import { SucursalAuditoria } from "./SucursalAuditoria";
+import { AppTag } from "@/shared/components/atoms/AppTag";
 
 const SucursalDetallePage = () => {
   const { id, tab } = useParams<{ id: string; tab?: string }>();
@@ -81,7 +82,10 @@ const SucursalDetallePage = () => {
 
   const handleTabChange = (key: string) => {
     navigate(
-      APP_ROUTES.DASHBOARD.SUCURSALES.DETALLE(id!, key === "general" ? "" : key),
+      APP_ROUTES.DASHBOARD.SUCURSALES.DETALLE(
+        id!,
+        key === "general" ? "" : key,
+      ),
     );
   };
 
@@ -106,10 +110,10 @@ const SucursalDetallePage = () => {
       />
 
       <div className="mb-4 flex gap-2">
-        <Tag color={sucursal.activa ? "green" : "red"}>
+        <AppTag tone={sucursal.activa ? "success" : "danger"}>
           {sucursal.activa ? "Activa" : "Inactiva"}
-        </Tag>
-        <Tag color="blue">{sucursal.codigo}</Tag>
+        </AppTag>
+        <AppTag tone="blue">{sucursal.codigo}</AppTag>
       </div>
 
       <Tabs

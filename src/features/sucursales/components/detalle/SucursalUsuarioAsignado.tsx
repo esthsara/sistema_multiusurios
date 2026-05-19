@@ -229,7 +229,7 @@ export const SucursalUsuarioAsignado = ({ sucursal }: Props) => {
         okButtonProps={{ loading: assigningLoading }}
         width={600}
         centered
-        destroyOnClose
+        destroyOnHidden
       >
         <Form form={form} layout="vertical" size="large" className="mt-4">
           <Form.Item

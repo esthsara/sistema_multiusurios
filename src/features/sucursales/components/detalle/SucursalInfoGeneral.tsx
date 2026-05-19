@@ -12,6 +12,7 @@ import {
 import { Can } from "@/shared/components/guards/Can";
 import { getResolvedFileUrl } from "@/shared/utils/file-url.utils";
 import type { SucursalDetalle } from "../../types/sucursal.types";
+import { AppTag } from "@/shared/components/atoms/AppTag";
 
 interface Props {
   sucursal: SucursalDetalle;
@@ -84,19 +85,12 @@ export const SucursalInfoGeneral = ({ sucursal, onToggleEstado }: Props) => {
             </div>
 
             {/* Badge de Estado */}
-            <span
+            <AppTag
               className="px-3 py-1 rounded-full text-xs font-medium"
-              style={{
-                background: sucursal.activa
-                  ? "var(--color-alert-success-bg)"
-                  : "var(--color-bg-subtle)",
-                color: sucursal.activa
-                  ? "var(--color-success-500)"
-                  : "var(--color-text-secondary)",
-              }}
+              tone={sucursal.activa ? "success" : "muted"}
             >
               {sucursal.activa ? "Sede Activa" : "Sede Inactiva"}
-            </span>
+            </AppTag>
 
             {/* Acciones Rápidas */}
             <div className="w-full flex flex-col gap-2">

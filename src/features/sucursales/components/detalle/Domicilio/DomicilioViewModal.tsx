@@ -1,6 +1,7 @@
-import { Modal, Button, Tag, ConfigProvider, theme } from "antd";
+import { Modal, Button, ConfigProvider, theme } from "antd";
 import { Home, Calendar, CheckCircle2 } from "lucide-react";
 import type { Domicilio } from "./domicilio.constants";
+import { AppTag } from "@/shared/components/atoms/AppTag";
 
 interface Props {
   open: boolean;
@@ -61,9 +62,12 @@ export const DomicilioViewModal = ({ open, item, onClose }: Props) => {
               >
                 Tipo
               </span>
-              <Tag className="m-0 border-none px-3 py-0.5 rounded-full font-semibold bg-blue-500/10 text-blue-400">
+              <AppTag
+                className="m-0 px-3 py-0.5 rounded-full font-semibold"
+                tone="cyan"
+              >
                 {item.tipo_texto}
-              </Tag>
+              </AppTag>
             </div>
 
             <div className="p-4 rounded-lg border border-[var(--color-border)] bg-[var(--color-bg-subtle)]">

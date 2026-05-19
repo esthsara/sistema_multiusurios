@@ -61,7 +61,7 @@ export const ArchivoViewImage = ({ open, item, onClose }: Props) => {
         onCancel={onClose}
         width={860}
         centered
-        destroyOnClose
+        destroyOnHidden
       >
         <div className="pt-3">
           <div className="flex items-center gap-3 mb-5">
