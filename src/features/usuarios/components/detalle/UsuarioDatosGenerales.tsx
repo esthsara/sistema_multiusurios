@@ -1,15 +1,6 @@
 // src/features/usuarios/components/detalle/UsuarioDatosGenerales.tsx
 import { Avatar, Card, Button } from "antd";
-import {
-  User,
-  Monitor,
-  Smartphone,
-  LogOut,
-  Shield,
-  ShieldOff,
-  KeyRound,
-  ExternalLink,
-} from "lucide-react";
+import { User, Monitor, Smartphone, LogOut, ExternalLink } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { Can } from "@/shared/components/guards/Can";
 import { APP_ROUTES } from "@/shared/constants/routes.constants";
@@ -29,12 +20,7 @@ const getDeviceIcon = (d: string) =>
     <Monitor size={14} />
   );
 
-export const UsuarioDatosGenerales = ({
-  usuario,
-  onToggleBloqueo,
-  onCerrarSesiones,
-  onResetPassword,
-}: Props) => {
+export const UsuarioDatosGenerales = ({ usuario, onCerrarSesiones }: Props) => {
   const navigate = useNavigate();
 
   const nombre =
@@ -119,33 +105,6 @@ export const UsuarioDatosGenerales = ({
             >
               {usuario.activo ? "Activo" : "Bloqueado"}
             </span>
-
-            {/* Acciones */}
-            <div className="w-full flex flex-col gap-2">
-              <Can permission="usuarios.editar">
-                <Button
-                  block
-                  icon={
-                    usuario.activo ? (
-                      <ShieldOff size={14} />
-                    ) : (
-                      <Shield size={14} />
-                    )
-                  }
-                  onClick={onToggleBloqueo}
-                >
-                  {usuario.activo ? "Bloquear" : "Desbloquear"}
-                </Button>
-
-                <Button
-                  block
-                  icon={<KeyRound size={14} />}
-                  onClick={onResetPassword}
-                >
-                  Reiniciar contraseña
-                </Button>
-              </Can>
-            </div>
           </div>
         </Card>
 
