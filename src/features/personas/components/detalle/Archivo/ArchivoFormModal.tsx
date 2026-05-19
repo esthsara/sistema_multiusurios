@@ -99,7 +99,13 @@ export const ArchivoFormModal = ({
         confirmLoading={loading}
         width={720}
         centered
-        destroyOnClose
+        destroyOnHidden
+        styles={{
+          mask: {
+            backdropFilter: "blur(6px)",
+            WebkitBackdropFilter: "blur(6px)",
+          },
+        }}
       >
         <Form
           form={form}

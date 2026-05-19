@@ -1,4 +1,4 @@
-import { useEffect } from "react";
+import React, { useEffect } from "react";
 import { Modal, Form, Input, Select, DatePicker } from "antd";
 import { User, Building2 } from "lucide-react";
 import dayjs from "dayjs";
@@ -24,7 +24,11 @@ type PersonaFormModalProps = {
   onCancel: () => void;
 };
 
-export const PersonaFormModal = ({
+type PersonaFormContentProps = Omit<PersonaFormModalProps, "tipo"> & {
+  tipo: TipoPersona;
+};
+
+const PersonaFormContent = ({
   open,
   tipo,
   selectedItem,
@@ -32,28 +36,34 @@ export const PersonaFormModal = ({
   isSubmitting,
   onSubmit,
   onCancel,
-}: PersonaFormModalProps) => {
+}: PersonaFormContentProps) => {
   const [form] = Form.useForm();
 
-  useEffect(() => {
-    if (!open) return;
+  const initialData = React.useMemo(() => {
+    if (!isEditMode || !selectedItem) return undefined;
 
-    if (isEditMode && selectedItem) {
-      const hasFechaNacimiento =
-        "fecha_nacimiento" in selectedItem && selectedItem.fecha_nacimiento;
+    const cleanItem = Object.fromEntries(
+      Object.entries(selectedItem).map(([k, v]) => [
+        k,
+        v === null ? undefined : v,
+      ]),
+    ) as Record<string, any>;
 
-      form.setFieldsValue({
-        ...selectedItem,
-        fecha_nacimiento: hasFechaNacimiento
-          ? dayjs(selectedItem.fecha_nacimiento)
-          : null,
-      });
-    } else {
-      form.resetFields();
+    if (
+      tipo === "MORAL" &&
+      !cleanItem.razon_social &&
+      cleanItem.nombre_completo
+    ) {
+      cleanItem.razon_social = cleanItem.nombre_completo;
     }
-  }, [open, isEditMode, selectedItem, form]);
 
-  if (!tipo) return null;
+    return {
+      ...cleanItem,
+      fecha_nacimiento: cleanItem.fecha_nacimiento
+        ? dayjs(cleanItem.fecha_nacimiento)
+        : undefined,
+    };
+  }, [isEditMode, selectedItem, tipo]);
 
   const handleOk = async () => {
     try {
@@ -137,6 +147,7 @@ export const PersonaFormModal = ({
         requiredMark={false}
         preserve={false}
         className="p-8"
+        initialValues={initialData}
       >
         <div className="space-y-5">
           {/* FISICA */}
@@ -224,4 +235,12 @@ export const PersonaFormModal = ({
       </Form>
     </Modal>
   );
+};
+
+export const PersonaFormModal = (props: PersonaFormModalProps) => {
+  if (!props.tipo) {
+    return null;
+  }
+
+  return <PersonaFormContent {...props} tipo={props.tipo} />;
 };

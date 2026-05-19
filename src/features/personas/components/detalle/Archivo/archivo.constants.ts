@@ -54,11 +54,9 @@ export const getArchivoDisplayName = (
 export const isImageArchivo = (
   archivo: Pick<ArchivoResource, "tipo" | "url" | "extension" | "mime_type">,
 ) => {
-  const extension = (
-    archivo.extension ??
-    archivo.url.split(".").pop() ??
-    ""
-  ).toLowerCase();
+  const extension = (archivo.extension ?? archivo.url.split(".").pop() ?? "")
+    .toLowerCase()
+    .split("?")[0];
   const mimeType = (archivo.mime_type ?? "").toLowerCase();
 
   return (
@@ -71,11 +69,9 @@ export const isImageArchivo = (
 export const isPdfArchivo = (
   archivo: Pick<ArchivoResource, "url" | "extension" | "mime_type">,
 ) => {
-  const extension = (
-    archivo.extension ??
-    archivo.url.split(".").pop() ??
-    ""
-  ).toLowerCase();
+  const extension = (archivo.extension ?? archivo.url.split(".").pop() ?? "")
+    .toLowerCase()
+    .split("?")[0];
   const mimeType = (archivo.mime_type ?? "").toLowerCase();
 
   return extension === "pdf" || mimeType === "application/pdf";
