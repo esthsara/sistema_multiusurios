@@ -15,6 +15,7 @@ import { toast } from "react-toastify";
 
 import { useAsignaciones } from "../hooks/useAsignaciones";
 import { Can } from "@/shared/components/guards/Can";
+import { useAuth } from "@/shared/hooks/useAuth";
 import { sucursalesService } from "@/features/sucursales/services/sucursales.service";
 import { usuariosService } from "@/features/usuarios/services/usuarios.service";
 import type { SucursalListItem } from "@/features/sucursales/types/sucursal.types";
@@ -68,9 +69,9 @@ const matchesSearch = (usuario: UsuarioListItem, search: string): boolean => {
 
 export const AsignacionesPage = () => {
   const { asignar, quitar } = useAsignaciones();
+  const { sucursales: misSucursales } = useAuth();
 
   // Estado esencial
-  const [sucursales, setSucursales] = useState<SucursalListItem[]>([]);
   const [usuarios, setUsuarios] = useState<UsuarioListItem[]>([]);
   const [asignadosIds, setAsignadosIds] = useState<Set<number>>(new Set());
   const [selectedSucursal, setSelectedSucursal] = useState<number | null>(null);
@@ -84,21 +85,10 @@ export const AsignacionesPage = () => {
   ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ */
 
   useEffect(() => {
-    const loadSucursales = async () => {
-      setLoading(true);
-      try {
-        const res = await sucursalesService.getAll({ per_page: 100 });
-        const lista = res.data ?? [];
-        setSucursales(lista);
-        if (lista.length > 0) setSelectedSucursal(lista[0].id);
-      } catch {
-        toast.error("Error al cargar sucursales");
-      } finally {
-        setLoading(false);
-      }
-    };
-    loadSucursales();
-  }, []);
+    if (misSucursales.length > 0 && !selectedSucursal) {
+      setSelectedSucursal(misSucursales[0].id);
+    }
+  }, [misSucursales, selectedSucursal]);
 
   /* ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
      CARGA DE DATOS AL CAMBIAR SUCURSAL
@@ -303,7 +293,7 @@ export const AsignacionesPage = () => {
     );
   }
 
-  const sucursalSeleccionada = sucursales.find(
+  const sucursalSeleccionada = misSucursales.find(
     (s) => s.id === selectedSucursal,
   );
 
@@ -346,8 +336,8 @@ export const AsignacionesPage = () => {
               onChange={setSelectedSucursal}
               style={{ width: "100%", maxWidth: "400px" }}
               placeholder="Selecciona una sucursal"
-              options={sucursales.map((s) => ({
-                label: `${s.nombre} (${s.codigo})`,
+              options={misSucursales.map((s) => ({
+                label: `${s.nombre} ${s.clave ? `(${s.clave})` : ""}`,
                 value: s.id,
               }))}
             />

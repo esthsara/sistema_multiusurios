@@ -79,13 +79,13 @@ const PersonaFormContent = ({
     } catch {}
   };
 
-  const getIcon = () => {
+  /*const getIcon = () => {
     return tipo === "FISICA" ? (
       <User size={22} className="text-[var(--color-primary-600)]" />
     ) : (
       <Building2 size={22} className="text-[var(--color-primary-400)]" />
     );
-  };
+  };*/
 
   const title = isEditMode
     ? `Editar Persona ${tipo === "FISICA" ? "Física" : "Moral"}`
