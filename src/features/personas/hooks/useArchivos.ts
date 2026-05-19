@@ -2,20 +2,25 @@
 import { useState, useEffect, useCallback } from "react";
 import { toast } from "react-toastify";
 import { archivosService } from "../services/archivos.service";
+import {
+  downloadBlobUrl,
+  getFileExtension,
+  getResponseContentDisposition,
+  resolveFileName,
+  revokeBlobUrlLater,
+  toBlobUrlFromResponse,
+} from "@/shared/utils/file-download.utils";
 import type {
   ArchivoResource,
   TipoArchivo,
 } from "../components/detalle/Archivo/archivo.constants";
 
+
 export const useArchivos = (personaId: number) => {
   const [archivos, setArchivos] = useState<ArchivoResource[]>([]);
-  const [papelera, setPapelera] = useState<ArchivoResource[]>([]);
   const [loading, setLoading] = useState(false);
-  const [loadingTrash, setLoadingTrash] = useState(false);
   const [uploading, setUploading] = useState(false);
   const [deleting, setDeleting] = useState<number | null>(null);
-  const [restoring, setRestoring] = useState<number | null>(null);
-  const [forceDeleting, setForceDeleting] = useState<number | null>(null);
   const [error, setError] = useState<string | null>(null);
 
   const fetch = useCallback(async () => {
@@ -32,20 +37,9 @@ export const useArchivos = (personaId: number) => {
     }
   }, [personaId]);
 
-  const fetchPapelera = useCallback(async () => {
-    setLoadingTrash(true);
-    try {
-      const res = await archivosService.getTrashByPersona(personaId);
-      setPapelera(res.items ?? []);
-    } finally {
-      setLoadingTrash(false);
-    }
-  }, [personaId]);
-
   useEffect(() => {
     fetch();
-    fetchPapelera();
-  }, [fetch, fetchPapelera]);
+  }, [fetch]);
 
   const handleUpload = async (
     file: File,
@@ -76,77 +70,53 @@ export const useArchivos = (personaId: number) => {
     try {
       await archivosService.remove(id);
       toast.success("Archivo eliminado");
-      const deletedItem = archivos.find((item) => item.id === id);
-      setArchivos((prev) => prev.filter((item) => item.id !== id));
-      if (deletedItem) {
-        setPapelera((prev) => [deletedItem, ...prev]);
-      } else {
-        await fetchPapelera();
-      }
+      await fetch();
     } catch {
       toast.error("Error al eliminar archivo");
     } finally {
       setDeleting(null);
     }
   };
-
-  const handleRestore = async (id: number) => {
-    setRestoring(id);
-    try {
-      await archivosService.restore(id);
-      toast.success("Archivo restaurado");
-      setPapelera((prev) => prev.filter((item) => item.id !== id));
-      await fetch();
-    } catch {
-      toast.error("Error al restaurar archivo");
-    } finally {
-      setRestoring(null);
-    }
-  };
-
-  const handleForceDelete = async (id: number) => {
-    setForceDeleting(id);
-    try {
-      await archivosService.forceDelete(id);
-      toast.success("Archivo eliminado permanentemente");
-      setPapelera((prev) => prev.filter((item) => item.id !== id));
-    } catch {
-      toast.error("Error al eliminar permanentemente el archivo");
-    } finally {
-      setForceDeleting(null);
-    }
-  };
+  // restore/force-delete removed — backend handles soft delete on remove
 
   const handleDownload = async (id: number) => {
+    const item = archivos.find((archivo) => archivo.id === id);
+    if (!item) return;
+
+    const toastId = toast.loading("Preparando descarga...");
     try {
-      const link = document.createElement("a");
-      link.href = archivosService.getDownloadUrl(id);
-      link.target = "_blank";
-      link.rel = "noopener noreferrer";
-      document.body.appendChild(link);
-      link.click();
-      link.parentNode?.removeChild(link);
+      const response = await archivosService.download(id);
+      const extension = getFileExtension(item.extension, item.ruta, item.url);
+
+      const { url } = toBlobUrlFromResponse(response, extension);
+      const fileName = resolveFileName({
+        contentDisposition: getResponseContentDisposition(response),
+        fallbackName: item.nombre_original ?? item.nombre ?? "archivo",
+        extension,
+      });
+
+      downloadBlobUrl({ blobUrl: url, fileName });
+      revokeBlobUrlLater(url);
+      toast.dismiss(toastId);
     } catch {
-      toast.error("Error al descargar archivo");
+      toast.update(toastId, {
+        render: "Error al descargar archivo",
+        type: "error",
+        isLoading: false,
+        autoClose: 3000,
+      });
     }
   };
 
   return {
     archivos,
-    papelera,
     loading,
-    loadingTrash,
     uploading,
     deleting,
-    restoring,
-    forceDeleting,
     error,
     fetch,
-    fetchPapelera,
     handleUpload,
     handleDelete,
-    handleRestore,
-    handleForceDelete,
     handleDownload,
   };
 };

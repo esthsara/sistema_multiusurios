@@ -159,7 +159,7 @@ export const PersonaInfoGeneral = ({ persona }: PersonaInfoGeneralProps) => {
           >
             <p
               className="text-[10px] font-semibold mb-2 tracking-wider"
-              style={{ color: "var(--color-text-secondary)" }}
+              style={{ color: "var(--color-text-disabled)" }}
             >
               METADATA
             </p>
@@ -170,7 +170,7 @@ export const PersonaInfoGeneral = ({ persona }: PersonaInfoGeneralProps) => {
                 { label: "updated_at", value: persona.updated_at },
               ].map(({ label, value }) => (
                 <div key={label} className="flex justify-between text-xs">
-                  <span style={{ color: "var(--color-text-secondary)" }}>
+                  <span style={{ color: "var(--color-text-primary)" }}>
                     {label}
                   </span>
                   <span style={{ color: "var(--color-text-primary)" }}>

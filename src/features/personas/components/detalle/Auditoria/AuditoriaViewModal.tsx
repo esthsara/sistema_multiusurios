@@ -3,7 +3,10 @@ import { User, Globe, Calendar } from "lucide-react";
 
 import { AppTag } from "@/shared/components/atoms/AppTag";
 
-import { ACCION_TONE, type AuditoriaItem } from "./auditoria.constants";
+import {
+  getAuditoriaActionTone,
+  type AuditoriaItem,
+} from "./auditoria.constants";
 
 interface Props {
   open: boolean;
@@ -69,7 +72,9 @@ export const AuditoriaViewModal = ({ open, item, onClose }: Props) => {
               Acción
             </span>
             <div className="mt-1">
-              <AppTag tone={ACCION_TONE[item.accion] ?? "neutral"}>
+              <AppTag
+                tone={getAuditoriaActionTone(item.accion, item.accion_texto)}
+              >
                 {item.accion_texto}
               </AppTag>
             </div>
@@ -127,6 +132,7 @@ export const AuditoriaViewModal = ({ open, item, onClose }: Props) => {
             style={{ color: "var(--color-text-secondary)" }}
           >
             <Calendar size={12} />
+            
             {item.fecha} ({item.created_at_humano})
           </div>
 

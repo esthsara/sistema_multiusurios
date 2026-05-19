@@ -5,7 +5,10 @@ import { DataTableSimple } from "@/shared/components/organisms/DataTableSimple";
 import { RowActions } from "@/shared/components/molecules/RowActions";
 import { AppTag } from "@/shared/components/atoms/AppTag";
 
-import { ACCION_TONE, type AuditoriaItem } from "./auditoria.constants";
+import {
+  getAuditoriaActionTone,
+  type AuditoriaItem,
+} from "./auditoria.constants";
 
 interface Props {
   data: AuditoriaItem[];
@@ -21,7 +24,10 @@ export const AuditoriaTable = ({ data, loading, onView }: Props) => {
       render: (_, r) => (
         <div className="space-y-1 py-1">
           <div className="flex items-center justify-between gap-2">
-            <AppTag tone={ACCION_TONE[r.accion] ?? "danger"} className="m-0">
+            <AppTag
+              tone={getAuditoriaActionTone(r.accion, r.accion_texto)}
+              className="m-0"
+            >
               {r.accion_texto}
             </AppTag>
             <span
@@ -93,7 +99,7 @@ export const AuditoriaTable = ({ data, loading, onView }: Props) => {
       width: 160,
       responsive: ["sm"],
       render: (_, r) => (
-        <AppTag tone={ACCION_TONE[r.accion] ?? "neutral"}>
+        <AppTag tone={getAuditoriaActionTone(r.accion, r.accion_texto)}>
           {r.accion_texto}
         </AppTag>
       ),
