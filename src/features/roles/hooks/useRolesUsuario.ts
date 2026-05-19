@@ -2,13 +2,14 @@
 import { useState, useCallback } from "react";
 import { toast } from "react-toastify";
 import { rolesService } from "../services/roles.service";
-import type { RolListItem, RolDetalleSimple } from "../types/rol.types";
+import type { RolListItem, UsuarioConRoles } from "../types/rol.types";
+import { useAuthStore } from "@/features/auth/store/auth.store";
 
 /**
  * Hook para gestionar la asignación/desasignación de roles a un usuario concreto.
  * Centraliza los endpoints:
  *   POST /users/{userId}/assign-role
- *   POST /users/{userId}/remove-role
+ *   DELETE /users/{userId}/remove-role
  *
  * Uso: en detalle de usuario (UsuarioRol.tsx) o cualquier componente que necesite
  * gestionar roles de un usuario específico.
@@ -17,6 +18,9 @@ export const useRolesUsuario = (userId: number | null) => {
   const [roles, setRoles] = useState<RolListItem[]>([]);
   const [loadingRoles, setLoadingRoles] = useState(false);
   const [submitting, setSubmitting] = useState(false);
+  const hasPermission = useAuthStore((state) => state.hasPermission);
+  const canGestionarRoles =
+    hasPermission("roles.ver") && hasPermission("usuarios.editar");
 
   /**
    * Carga el catálogo completo de roles disponibles en el sistema
@@ -40,7 +44,12 @@ export const useRolesUsuario = (userId: number | null) => {
    * @returns Los roles actualizados del usuario o null si falla
    */
   const asignarRoles = useCallback(
-    async (roleIds: number[]): Promise<RolDetalleSimple[] | null> => {
+    async (roleIds: number[]): Promise<UsuarioConRoles | null> => {
+      if (!canGestionarRoles) {
+        toast.error("No tienes permisos para gestionar roles de usuarios");
+        return null;
+      }
+
       if (!userId || roleIds.length === 0) return null;
       setSubmitting(true);
       try {
@@ -48,7 +57,7 @@ export const useRolesUsuario = (userId: number | null) => {
           role_id: roleIds,
         });
         toast.success("Rol asignado exitosamente");
-        return res.data?.roles_detalle ?? null;
+        return res.data ?? null;
       } catch {
         toast.error("Error al asignar el rol");
         return null;
@@ -56,7 +65,7 @@ export const useRolesUsuario = (userId: number | null) => {
         setSubmitting(false);
       }
     },
-    [userId],
+    [canGestionarRoles, userId],
   );
 
   /**
@@ -65,7 +74,12 @@ export const useRolesUsuario = (userId: number | null) => {
    * @returns Los roles actualizados del usuario o null si falla
    */
   const quitarRoles = useCallback(
-    async (roleIds: number[]): Promise<RolDetalleSimple[] | null> => {
+    async (roleIds: number[]): Promise<UsuarioConRoles | null> => {
+      if (!canGestionarRoles) {
+        toast.error("No tienes permisos para gestionar roles de usuarios");
+        return null;
+      }
+
       if (!userId || roleIds.length === 0) return null;
       setSubmitting(true);
       try {
@@ -73,7 +87,7 @@ export const useRolesUsuario = (userId: number | null) => {
           role_id: roleIds,
         });
         toast.success("Rol removido exitosamente");
-        return res.data?.roles_detalle ?? null;
+        return res.data ?? null;
       } catch {
         toast.error("Error al quitar el rol");
         return null;
@@ -81,7 +95,7 @@ export const useRolesUsuario = (userId: number | null) => {
         setSubmitting(false);
       }
     },
-    [userId],
+    [canGestionarRoles, userId],
   );
 
   /**

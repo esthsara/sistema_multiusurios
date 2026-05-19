@@ -21,7 +21,6 @@ import {
   UserCog,
   XCircle,
 } from "lucide-react";
-import { Can } from "@/shared/components/guards/Can";
 import { AppTag } from "@/shared/components/atoms/AppTag";
 import { useRolesUsuario } from "@/features/roles/hooks/useRolesUsuario";
 import type {
@@ -30,6 +29,7 @@ import type {
 } from "../../types/usuario.types";
 import { getModuloStyles } from "@/features/roles/utils/roles.utils";
 import { useAuthStore } from "@/features/auth/store/auth.store";
+import type { UsuarioConRoles } from "@/features/roles/types/rol.types";
 
 /** Alias local compatible con roles_detalle del usuario */
 type RolDetalleSimple = UsuarioRolDetalle;
@@ -53,26 +53,19 @@ const formatPermiso = (permiso: string) => {
   };
 };
 
-const accionTone = (
-  accion: string,
-): "success" | "warning" | "danger" | "primary" | "neutral" => {
-  if (accion.includes("eliminar")) return "danger";
-  if (accion.includes("exportar")) return "warning";
-  if (accion.includes("crear") || accion.includes("subir")) return "primary";
-  if (accion.includes("editar")) return "warning";
-  return "success";
-};
-
 export const UsuarioRol = ({ usuario, onRolesChanged }: UsuarioRolProps) => {
   const { token } = theme.useToken();
   const [modalOpen, setModalOpen] = useState(false);
   const hasPermission = useAuthStore((s) => s.hasPermission);
   const canGestionarRoles =
-    hasPermission("roles.ver") && hasPermission("permisos.asignar");
+    hasPermission("roles.ver") && hasPermission("usuarios.editar");
 
   // Roles actuales del usuario (como objetos con id+name)
   const [rolesActuales, setRolesActuales] = useState<RolDetalleSimple[]>(
     usuario.roles_detalle ?? [],
+  );
+  const [permisosActuales, setPermisosActuales] = useState<string[]>(
+    usuario.permisos ?? [],
   );
 
   // IDs de roles seleccionados en el modal (para asignar/quitar)
@@ -90,10 +83,12 @@ export const UsuarioRol = ({ usuario, onRolesChanged }: UsuarioRolProps) => {
   /* ── Sync con prop externa ── */
   useEffect(() => {
     setRolesActuales(usuario.roles_detalle ?? []);
-  }, [usuario.roles_detalle]);
+    setPermisosActuales(usuario.permisos ?? []);
+  }, [usuario.roles_detalle, usuario.permisos]);
 
   /* ── Abrir modal → cargar catálogo de roles ── */
   const handleOpenModal = async () => {
+    if (!canGestionarRoles) return;
     setSelectedRoleIds(rolesActuales.map((r) => r.id));
     await fetchRoles();
     setModalOpen(true);
@@ -101,6 +96,8 @@ export const UsuarioRol = ({ usuario, onRolesChanged }: UsuarioRolProps) => {
 
   /* ── Guardar cambios en el modal ── */
   const handleGuardar = async () => {
+    if (!canGestionarRoles) return;
+
     const actualesIds = rolesActuales.map((r) => r.id);
     const idsAAsignar = selectedRoleIds.filter(
       (id) => !actualesIds.includes(id),
@@ -109,18 +106,19 @@ export const UsuarioRol = ({ usuario, onRolesChanged }: UsuarioRolProps) => {
       (id) => !selectedRoleIds.includes(id),
     );
 
-    let rolesResultado: RolDetalleSimple[] | null = null;
+    let resultado: UsuarioConRoles | null = null;
 
     if (idsAAsignar.length > 0) {
-      rolesResultado = await asignarRoles(idsAAsignar);
+      resultado = await asignarRoles(idsAAsignar);
     }
     if (idsAQuitar.length > 0) {
-      rolesResultado = await quitarRoles(idsAQuitar);
+      resultado = await quitarRoles(idsAQuitar);
     }
 
-    if (rolesResultado !== null) {
-      setRolesActuales(rolesResultado);
-      onRolesChanged?.(rolesResultado);
+    if (resultado !== null) {
+      setRolesActuales(resultado.roles_detalle ?? []);
+      setPermisosActuales(resultado.permisos ?? []);
+      onRolesChanged?.(resultado.roles_detalle ?? []);
     }
 
     setModalOpen(false);
@@ -136,10 +134,10 @@ export const UsuarioRol = ({ usuario, onRolesChanged }: UsuarioRolProps) => {
   };
 
   /* ── Clasificación de permisos ── */
-  const permisosNormales = usuario.permisos.filter(
+  const permisosNormales = permisosActuales.filter(
     (p) => !ACCIONES_CRITICAS.some((a) => p.endsWith(`.${a}`)),
   );
-  const permisosRestringidos = usuario.permisos.filter((p) =>
+  const permisosRestringidos = permisosActuales.filter((p) =>
     ACCIONES_CRITICAS.some((a) => p.endsWith(`.${a}`)),
   );
 

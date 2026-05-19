@@ -89,7 +89,9 @@ const buildSyncPayloads = (permissionIds: number[]) => [
 
 export const rolesService = {
   getAll: (params?: RequestParams, silent?: boolean) =>
-    http.get<{ total: number; items: RolListItem[] }>("/roles", params, { silent }),
+    http.get<{ total: number; items: RolListItem[] }>("/roles", params, {
+      silent,
+    }),
 
   getById: async (id: number) => {
     const res = await http.get<unknown>(`/roles/${id}`);
@@ -153,10 +155,10 @@ export const rolesService = {
 
   /**
    * Quita uno o varios roles de un usuario
-   * POST /users/{userId}/remove-role
+   * DELETE /users/{userId}/remove-role
    */
   removeRoleFromUser: (userId: number, data: RemoveRoleDto) =>
-    http.post<UsuarioConRoles, RemoveRoleDto>(
+    http.delete<UsuarioConRoles, RemoveRoleDto>(
       `/users/${userId}/remove-role`,
       data,
     ),

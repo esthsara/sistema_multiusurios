@@ -38,6 +38,7 @@ import { toast } from "react-toastify";
 import { rolesService } from "../services/roles.service";
 import { usuariosService } from "@/features/usuarios/services/usuarios.service";
 import type { RolListItem, RolUsuarioItem } from "../types/rol.types";
+import { useAuthStore } from "@/features/auth/store/auth.store";
 
 const { Title, Text } = Typography;
 
@@ -79,8 +80,7 @@ const AVATAR_COLORS = [
   "var(--tag-magenta-text)",
   "var(--tag-geekblue-text)",
 ];
-const getAvatarColor = (id: number) =>
-  AVATAR_COLORS[id % AVATAR_COLORS.length];
+const getAvatarColor = (id: number) => AVATAR_COLORS[id % AVATAR_COLORS.length];
 
 export const RoleUsersModal = ({
   open,
@@ -93,6 +93,9 @@ export const RoleUsersModal = ({
   const { token } = theme.useToken();
   const [search, setSearch] = useState("");
   const [removingId, setRemovingId] = useState<number | null>(null);
+  const hasPermission = useAuthStore((state) => state.hasPermission);
+  const canGestionarRoles =
+    hasPermission("roles.ver") && hasPermission("usuarios.editar");
 
   /* ── Asignación de nuevo usuario ── */
   const [allUsers, setAllUsers] = useState<
@@ -151,7 +154,11 @@ export const RoleUsersModal = ({
 
   /** Quitar rol de un usuario */
   const handleRemoveRole = async (userId: number) => {
-    if (!role) return;
+    if (!role || !canGestionarRoles) {
+      toast.error("No tienes permisos para desasignar roles");
+      return;
+    }
+
     setRemovingId(userId);
     try {
       await rolesService.removeRoleFromUser(userId, { role_id: [role.id] });
@@ -167,6 +174,11 @@ export const RoleUsersModal = ({
   /** Asignar rol a un nuevo usuario */
   const handleAssignRole = async () => {
     if (!role || !selectedNewUserId) return;
+    if (!canGestionarRoles) {
+      toast.error("No tienes permisos para asignar roles");
+      return;
+    }
+
     setAssigning(true);
     try {
       await rolesService.assignRoleToUser(selectedNewUserId, {
@@ -264,20 +276,23 @@ export const RoleUsersModal = ({
           </Tag>
         ),
     },
-    {
+  ];
+
+  if (canGestionarRoles) {
+    columns.push({
       title: "",
       key: "acciones",
-      width: 60,
+      width: 164,
       align: "center",
       render: (_, user) => (
         <Popconfirm
-          title={`¿Quitar el rol "${role?.name}" a este usuario?`}
-          okText="Quitar"
-          cancelText="No"
+          title={`¿Desasignar el rol "${role?.name}" a este usuario?`}
+          okText="Desasignar"
+          cancelText="Cancelar"
           okButtonProps={{ danger: true }}
           onConfirm={() => handleRemoveRole(user.id)}
         >
-          <Tooltip title="Quitar rol">
+          <Tooltip title="Desasignar Rol">
             <Button
               type="text"
               danger
@@ -285,12 +300,14 @@ export const RoleUsersModal = ({
               loading={removingId === user.id}
               icon={<UserMinus size={15} />}
               style={{ borderRadius: "var(--radius-md)" }}
-            />
+            >
+              Desasignar Rol
+            </Button>
           </Tooltip>
         </Popconfirm>
       ),
-    },
-  ];
+    });
+  }
 
   return (
     <Modal
@@ -318,65 +335,66 @@ export const RoleUsersModal = ({
         body: { padding: 0 },
       }}
     >
-      {/* ── Asignar nuevo usuario ── */}
-      <div
-        style={{
-          padding: "16px 24px",
-          background: "var(--color-bg-base-2)",
-          borderBottom: `1px solid ${token.colorBorder}`,
-        }}
-      >
-        <Text
-          strong
+      {canGestionarRoles ? (
+        <div
           style={{
-            display: "block",
-            marginBottom: 8,
-            color: "var(--color-text-primary)",
+            padding: "16px 24px",
+            background: "var(--color-bg-base-2)",
+            borderBottom: `1px solid ${token.colorBorder}`,
           }}
         >
-          <UserPlus
-            size={14}
-            style={{ marginRight: 6, verticalAlign: "middle" }}
-          />
-          Asignar rol a un usuario
-        </Text>
-        <Flex gap={8}>
-          <Select
-            showSearch
-            placeholder="Buscar usuario para asignarle este rol..."
-            value={selectedNewUserId ?? undefined}
-            onChange={setSelectedNewUserId}
-            loading={loadingAllUsers}
-            filterOption={(input, option) =>
-              String(option?.label ?? "")
-                .toLowerCase()
-                .includes(input.toLowerCase())
-            }
-            options={availableToAssign.map((u) => ({
-              value: u.id,
-              label: u.label,
-            }))}
-            style={{ flex: 1 }}
-            allowClear
-            notFoundContent={
-              <Text type="secondary" style={{ fontSize: 12 }}>
-                {loadingAllUsers
-                  ? "Cargando..."
-                  : "Todos los usuarios ya tienen este rol"}
-              </Text>
-            }
-          />
-          <Button
-            type="primary"
-            icon={<UserPlus size={15} />}
-            onClick={handleAssignRole}
-            loading={assigning}
-            disabled={!selectedNewUserId}
+          <Text
+            strong
+            style={{
+              display: "block",
+              marginBottom: 8,
+              color: "var(--color-text-primary)",
+            }}
           >
-            Asignar
-          </Button>
-        </Flex>
-      </div>
+            <UserPlus
+              size={14}
+              style={{ marginRight: 6, verticalAlign: "middle" }}
+            />
+            Asignar rol a un usuario
+          </Text>
+          <Flex gap={8}>
+            <Select
+              showSearch
+              placeholder="Buscar usuario para asignarle este rol..."
+              value={selectedNewUserId ?? undefined}
+              onChange={setSelectedNewUserId}
+              loading={loadingAllUsers}
+              filterOption={(input, option) =>
+                String(option?.label ?? "")
+                  .toLowerCase()
+                  .includes(input.toLowerCase())
+              }
+              options={availableToAssign.map((u) => ({
+                value: u.id,
+                label: u.label,
+              }))}
+              style={{ flex: 1 }}
+              allowClear
+              notFoundContent={
+                <Text type="secondary" style={{ fontSize: 12 }}>
+                  {loadingAllUsers
+                    ? "Cargando..."
+                    : "Todos los usuarios ya tienen este rol"}
+                </Text>
+              }
+            />
+            <Button
+              type="primary"
+              icon={<UserPlus size={15} />}
+              onClick={handleAssignRole}
+              loading={assigning}
+              disabled={!selectedNewUserId}
+            >
+              Asignar
+            </Button>
+          </Flex>
+        </div>
+      ) : null}
 
       {/* ── Lista de usuarios con el rol ── */}
       <div style={{ padding: "12px 24px 20px" }}>

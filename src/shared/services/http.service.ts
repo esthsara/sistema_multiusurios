@@ -25,14 +25,17 @@ export const http = {
   async get<T>(
     url: string,
     params?: RequestParams,
-    options?: { silent?: boolean }
+    options?: { silent?: boolean },
   ): Promise<ApiResponse<T>> {
     try {
       const headers: Record<string, string> = {};
       if (options?.silent) {
         headers["X-Silent-Error"] = "true";
       }
-      const response = await apiClient.get<ApiResponse<T>>(url, { params, headers });
+      const response = await apiClient.get<ApiResponse<T>>(url, {
+        params,
+        headers,
+      });
       return response.data;
     } catch (error) {
       throw handleHttpError(error, true);
@@ -57,12 +60,12 @@ export const http = {
       });
       const payload = response.data as unknown;
 
-     /* if (import.meta.env.DEV) {
-        console.groupCollapsed(`[http.getPaginated] ${url}`);
-        console.log("params:", params);
-        console.log("raw response.data:", payload);
-        console.groupEnd();
-      }*/
+      /* if (import.meta.env.DEV) {
+         console.groupCollapsed(`[http.getPaginated] ${url}`);
+         console.log("params:", params);
+         console.log("raw response.data:", payload);
+         console.groupEnd();
+       }*/
 
       /**
        * Soporta ambas formas de backend:
@@ -192,9 +195,14 @@ export const http = {
    * DELETE — Eliminar recurso (soft delete en Laravel)
    * ApiResponse<void>: DELETE exitoso no devuelve data
    */
-  async delete(url: string): Promise<ApiResponse<void>> {
+  async delete<TResponse = void, TBody = unknown>(
+    url: string,
+    body?: TBody,
+  ): Promise<ApiResponse<TResponse>> {
     try {
-      const response = await apiClient.delete<ApiResponse<void>>(url);
+      const response = await apiClient.delete<ApiResponse<TResponse>>(url, {
+        data: body,
+      });
       return response.data;
     } catch (error) {
       throw handleHttpError(error, true);

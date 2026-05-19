@@ -19,13 +19,10 @@ export const useRolesOptions = () => {
   const fetchRoles = useCallback(async () => {
     setLoading(true);
     try {
-      // Pass silent: true so 403 errors don't show a toast
-      const res = await rolesService.getAll(undefined, true);
+      const res = await rolesService.getAll();
       setRoles(res.data.items);
     } catch {
-      // Error silencioso: el filtro de roles es auxiliar.
-      // Si el usuario no tiene permiso para ver roles, retornamos vacío
-      // sin interrumpir el flujo de la tabla.
+      //toast.error("Error al cargar roles");
       setRoles([]);
     } finally {
       setLoading(false);
