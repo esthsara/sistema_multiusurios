@@ -2,6 +2,7 @@
 import { Avatar, Card, Button } from "antd";
 import { User, Monitor, Smartphone, LogOut, ExternalLink } from "lucide-react";
 import { useNavigate } from "react-router-dom";
+import { AppTag } from "@/shared/components/atoms/AppTag";
 import { Can } from "@/shared/components/guards/Can";
 import { APP_ROUTES } from "@/shared/constants/routes.constants";
 import type { UsuarioDetalle } from "../../types/usuario.types";
@@ -92,19 +93,9 @@ export const UsuarioDatosGenerales = ({ usuario, onCerrarSesiones }: Props) => {
             </div>
 
             {/* Estado */}
-            <span
-              className="px-3 py-1 rounded-full text-xs"
-              style={{
-                background: usuario.activo
-                  ? "var(--color-alert-success-bg)"
-                  : "var(--color-bg-subtle)",
-                color: usuario.activo
-                  ? "var(--color-success-500)"
-                  : "var(--color-text-secondary)",
-              }}
-            >
+            <AppTag tone={usuario.activo ? "success" : "danger"}>
               {usuario.activo ? "Activo" : "Bloqueado"}
-            </span>
+            </AppTag>
           </div>
         </Card>
 
@@ -122,12 +113,16 @@ export const UsuarioDatosGenerales = ({ usuario, onCerrarSesiones }: Props) => {
             <div className="flex justify-between items-center">
               <div>
                 <p className="text-sm font-medium m-0">{nombre}</p>
-                <p
-                  className="text-xs"
-                  style={{ color: "var(--color-text-secondary)" }}
+                <AppTag
+                  tone={
+                    usuario.persona.tipo_persona === "FISICA"
+                      ? "blue"
+                      : "purple"
+                  }
+                  style={{ marginTop: 6 }}
                 >
                   {usuario.persona.tipo_texto}
-                </p>
+                </AppTag>
               </div>
 
               <Button

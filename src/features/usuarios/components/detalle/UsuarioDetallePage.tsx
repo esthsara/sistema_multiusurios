@@ -1,11 +1,12 @@
 // src/features/usuarios/components/detalle/UsuarioDetallePage.tsx
 import { useParams, useNavigate, Navigate } from "react-router-dom";
-import { Button, Tabs, Skeleton, Tag } from "antd";
+import { Button, Tabs, Skeleton } from "antd";
 import { ArrowLeft, Pencil } from "lucide-react";
 import { PageHeader } from "@/shared/components/molecules/PageHeader";
 import { Can } from "@/shared/components/guards/Can";
 import { APP_ROUTES } from "@/shared/constants/routes.constants";
 import { useAuthStore } from "@/features/auth/store/auth.store";
+import { AppTag } from "@/shared/components/atoms/AppTag";
 import { useUsuarioDetalle } from "../../hooks/useUsuarioDetalle";
 import { useUsuarioForm } from "../../hooks/useUsuarioForm";
 import { UsuarioDatosGenerales } from "./UsuarioDatosGenerales";
@@ -25,13 +26,8 @@ const UsuarioDetallePage = () => {
   }
 
   const usuarioId = parseInt(id);
-  const {
-    usuario,
-    loading,
-    toggleBloqueo,
-    cerrarSesiones,
-    refetch,
-  } = useUsuarioDetalle(usuarioId);
+  const { usuario, loading, toggleBloqueo, cerrarSesiones, refetch } =
+    useUsuarioDetalle(usuarioId);
   const form = useUsuarioForm(refetch);
 
   if (loading) {
@@ -132,16 +128,14 @@ const UsuarioDetallePage = () => {
 
       {usuario && (
         <div className="mb-4 flex gap-2">
-          <Tag color={usuario.activo ? "green" : "red"}>
+          <AppTag tone={usuario.activo ? "success" : "danger"}>
             {usuario.activo ? "Activo" : "Inactivo"}
-          </Tag>
-          <Tag
-            color={
-              usuario.persona.tipo_persona === "FISICA" ? "blue" : "purple"
-            }
+          </AppTag>
+          <AppTag
+            tone={usuario.persona.tipo_persona === "FISICA" ? "blue" : "purple"}
           >
             {usuario.persona.tipo_texto}
-          </Tag>
+          </AppTag>
         </div>
       )}
 

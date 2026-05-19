@@ -1,10 +1,11 @@
 // src/features/usuarios/components/detalle/UsuarioAuditoria.tsx
 import { useState, useEffect, useCallback, useMemo } from "react";
-import { Button, Tag } from "antd";
+import { Button } from "antd";
 import { Activity, Clock3, RotateCcw, UserCircle2 } from "lucide-react";
 import { toast } from "react-toastify";
 import { auditoriaService } from "@/features/auditoria/services/auditoria.service";
 import type { AuditoriaListItem } from "@/features/auditoria/types/auditoria.types";
+import { AppTag } from "@/shared/components/atoms/AppTag";
 
 import { AuditoriaTable } from "./Auditoria/AuditoriaTable";
 import { AuditoriaViewModal } from "./Auditoria/AuditoriaViewModal";
@@ -98,10 +99,16 @@ export const UsuarioAuditoria = ({ usuarioId }: UsuarioAuditoriaProps) => {
             }}
           >
             <div className="flex items-center justify-between">
-              <span className="text-xs" style={{ color: "var(--color-text-secondary)" }}>
+              <span
+                className="text-xs"
+                style={{ color: "var(--color-text-secondary)" }}
+              >
                 Eventos
               </span>
-              <Activity size={14} style={{ color: "var(--color-primary-500)" }} />
+              <Activity
+                size={14}
+                style={{ color: "var(--color-primary-500)" }}
+              />
             </div>
             <p className="text-lg font-semibold m-0 mt-1">{stats.total}</p>
           </div>
@@ -114,10 +121,16 @@ export const UsuarioAuditoria = ({ usuarioId }: UsuarioAuditoriaProps) => {
             }}
           >
             <div className="flex items-center justify-between">
-              <span className="text-xs" style={{ color: "var(--color-text-secondary)" }}>
+              <span
+                className="text-xs"
+                style={{ color: "var(--color-text-secondary)" }}
+              >
                 Acciones únicas
               </span>
-              <UserCircle2 size={14} style={{ color: "var(--color-primary-500)" }} />
+              <UserCircle2
+                size={14}
+                style={{ color: "var(--color-primary-500)" }}
+              />
             </div>
             <p className="text-lg font-semibold m-0 mt-1">{stats.actions}</p>
           </div>
@@ -130,14 +143,20 @@ export const UsuarioAuditoria = ({ usuarioId }: UsuarioAuditoriaProps) => {
             }}
           >
             <div className="flex items-center justify-between gap-2">
-              <span className="text-xs" style={{ color: "var(--color-text-secondary)" }}>
+              <span
+                className="text-xs"
+                style={{ color: "var(--color-text-secondary)" }}
+              >
                 Último evento
               </span>
               <Clock3 size={14} style={{ color: "var(--color-primary-500)" }} />
             </div>
             <div className="mt-1 flex flex-wrap items-center gap-2">
-              <Tag className="m-0">{stats.lastAction}</Tag>
-              <span className="text-xs" style={{ color: "var(--color-text-secondary)" }}>
+              <AppTag tone="geekblue">{stats.lastAction}</AppTag>
+              <span
+                className="text-xs"
+                style={{ color: "var(--color-text-secondary)" }}
+              >
                 {stats.lastWhen}
               </span>
             </div>

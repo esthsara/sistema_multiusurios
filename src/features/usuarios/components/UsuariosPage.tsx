@@ -193,13 +193,6 @@ const UsuariosPage = () => {
             onClick: () => form.handleEdit(record),
           },
           {
-            key: "reset-password",
-            permission: "usuarios.editar" as const,
-            label: "Resetear Contraseña",
-            icon: <Key size={14} />,
-            onClick: () => openConfirm("reset-password", record),
-          },
-          {
             key: "toggle",
             permission: "usuarios.editar" as const,
             label: record.activo ? "Desactivar" : "Activar",
