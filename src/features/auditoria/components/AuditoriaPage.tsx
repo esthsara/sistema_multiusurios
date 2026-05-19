@@ -1,27 +1,28 @@
 import { useMemo } from "react";
-import { Card, Col, Empty, Pagination, Row, Statistic, Tag } from "antd";
+import { Card, Col, Empty, Pagination, Row, Statistic } from "antd";
 import type { TableColumnsType } from "antd";
 import dayjs from "dayjs";
 import { DataTable } from "@/shared/components/organisms/DataTable";
 import { PageHeader } from "@/shared/components/molecules/PageHeader";
+import { AppTag } from "@/shared/components/atoms/AppTag";
 import { AuditoriaFiltersPanel } from "./AuditoriaFilters";
 import { AuditoriaDetailModal } from "./AuditoriaDetailModal";
 import { useAuditoria } from "../hooks/useAuditoria";
 import type { AuditoriaListItem } from "../types/auditoria.types";
 
-const actionColor = (accion: string) => {
-  if (accion.includes("CREADO") || accion.includes("LOGIN")) return "green";
+const actionTone = (accion: string) => {
+  if (accion.includes("CREADO") || accion.includes("LOGIN")) return "success";
   if (accion.includes("ACTUALIZADO") || accion.includes("SINCRONIZADOS")) {
-    return "blue";
+    return "primary";
   }
   if (
     accion.includes("ELIMINADO") ||
     accion.includes("DESACTIVADO") ||
     accion.includes("LOGOUT")
   ) {
-    return "red";
+    return "danger";
   }
-  return "default";
+  return "neutral";
 };
 
 const normalizeGroupLabel = (dateKey: string) => {
@@ -63,7 +64,7 @@ const AuditoriaPage = () => {
         key: "accion",
         width: 180,
         render: (accion: string, item) => (
-          <Tag color={actionColor(accion)}>{item.accion_texto || accion}</Tag>
+          <AppTag tone={actionTone(accion)}>{item.accion_texto || accion}</AppTag>
         ),
       },
       {
@@ -221,10 +222,10 @@ const AuditoriaPage = () => {
                               </div>
                             </div>
 
-                            <Tag color={actionColor(item.accion)}>
+                            <AppTag tone={actionTone(item.accion)}>
                               {item.accion_texto || item.accion}
-                            </Tag>
-                            <Tag>{item.entidad_nombre}</Tag>
+                            </AppTag>
+                            <AppTag tone="neutral">{item.entidad_nombre}</AppTag>
                           </div>
 
                           <div className="text-xs text-gray-500 text-right">

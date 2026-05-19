@@ -22,7 +22,6 @@ export const AppProviders = ({ children }: AppProvidersProps) => {
 
   /**
    * initializeAuth solo durante el arranque de la app.
-   * Importante: NO bloquear el árbol completo con auth.isLoading,
    * porque ese flag también se usa en login/logout y desmontaría el router.
    */
   useEffect(() => {

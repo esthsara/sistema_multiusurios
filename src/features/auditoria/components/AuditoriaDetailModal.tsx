@@ -1,4 +1,5 @@
-import { Descriptions, Modal, Spin, Tag } from "antd";
+import { Descriptions, Modal, Spin } from "antd";
+import { AppTag } from "@/shared/components/atoms/AppTag";
 import type { AuditoriaDetalle } from "../types/auditoria.types";
 
 interface AuditoriaDetailModalProps {
@@ -93,7 +94,7 @@ export const AuditoriaDetailModal = ({
           <Descriptions column={2} bordered size="small" className="mt-3">
             <Descriptions.Item label="ID">{detail.id}</Descriptions.Item>
             <Descriptions.Item label="Acción">
-              <Tag color="blue">{detail.accion}</Tag>
+              <AppTag tone="primary">{detail.accion}</AppTag>
             </Descriptions.Item>
             <Descriptions.Item label="Usuario">
               {detail.usuario.nombre}

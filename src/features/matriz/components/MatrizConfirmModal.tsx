@@ -47,9 +47,19 @@ export const MatrizConfirmModal = ({
       <Alert
         type="warning"
         showIcon
-        message={`Estás a punto de guardar ${changesCount} cambio${changesCount !== 1 ? "s" : ""} en la matriz de permisos.`}
-        description="Esta acción afectará los accesos de los usuarios en tiempo real. Los cambios tendrán efecto inmediato en todos los usuarios con esos roles."
-        style={{ marginBottom: 24 }}
+        icon={<AlertTriangle size={16} style={{ color: "var(--color-warning-600)" }} />}
+        message={<span style={{ color: "var(--color-warning-600)", fontWeight: 600 }}>{`Estás a punto de guardar ${changesCount} cambio${changesCount !== 1 ? "s" : ""} en la matriz de permisos.`}</span>}
+        description={
+          <span style={{ color: "var(--color-text-secondary)" }}>
+            Esta acción afectará los accesos de los usuarios en tiempo real. Los cambios tendrán efecto inmediato en todos los usuarios con esos roles.
+          </span>
+        }
+        style={{ 
+          marginBottom: 24,
+          borderRadius: 8,
+          backgroundColor: "var(--color-alert-warning-bg)",
+          borderColor: "var(--tag-warning-border)",
+        }}
       />
 
       <Flex justify="end" gap="small">

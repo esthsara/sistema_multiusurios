@@ -1,8 +1,9 @@
 import { Fragment, useMemo, useState } from "react";
-import { Button, Checkbox, Input, Spin, Tag, Tooltip } from "antd";
+import { Button, Checkbox, Input, Spin, Tooltip } from "antd";
 import { Save, RotateCcw, AlertTriangle, Search } from "lucide-react";
 import { PageHeader } from "@/shared/components/molecules/PageHeader";
 import { Can } from "@/shared/components/guards/Can";
+import { AppTag } from "@/shared/components/atoms/AppTag";
 import { useMatriz } from "../hooks/useMatriz";
 import { MatrizConfirmModal } from "./MatrizConfirmModal";
 
@@ -91,13 +92,13 @@ export const MatrizPage = () => {
         actions={
           <div className="matriz-page__actions">
             {matriz.hayCambios && (
-              <Tag
+              <AppTag
                 icon={<AlertTriangle size={12} />}
-                color="warning"
+                tone="warning"
                 className="matriz-changes-tag"
               >
                 {matriz.cambios.length} cambios sin guardar
-              </Tag>
+              </AppTag>
             )}
             <Button
               icon={<RotateCcw size={14} />}
@@ -211,9 +212,9 @@ export const MatrizPage = () => {
                         <span className="matriz-module-name">
                           {cap(modulo)}
                         </span>
-                        <Tag bordered={false} className="matriz-module-count">
+                        <AppTag tone="neutral" className="matriz-module-count" style={{ padding: "0 6px" }}>
                           {permisos.length}
-                        </Tag>
+                        </AppTag>
                       </div>
 
                       <div className="matriz-module-meta">
