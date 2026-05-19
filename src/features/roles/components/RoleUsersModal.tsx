@@ -19,7 +19,6 @@ import {
   Select,
   Space,
   Table,
-  Tag,
   Tooltip,
   Typography,
   theme,
@@ -39,6 +38,7 @@ import { rolesService } from "../services/roles.service";
 import { usuariosService } from "@/features/usuarios/services/usuarios.service";
 import type { RolListItem, RolUsuarioItem } from "../types/rol.types";
 import { useAuthStore } from "@/features/auth/store/auth.store";
+import { AppTag } from "@/shared/components/atoms/AppTag";
 
 const { Title, Text } = Typography;
 
@@ -221,18 +221,12 @@ export const RoleUsersModal = ({
                 style={{ fontSize: 12 }}
               >{`@${user.username}`}</Text>
               {user.email && (
-                <Tag
+                <AppTag
                   icon={<Mail size={11} />}
-                  style={{
-                    fontSize: 11,
-                    borderRadius: "var(--radius-md)",
-                    background: "var(--tag-neutral-bg)",
-                    color: "var(--tag-neutral-text)",
-                    border: "1px solid var(--tag-neutral-border)",
-                  }}
+                  tone="neutral"
                 >
                   {user.email}
-                </Tag>
+                </AppTag>
               )}
             </Space>
           </Flex>
@@ -247,33 +241,19 @@ export const RoleUsersModal = ({
       align: "center",
       render: (activo?: boolean) =>
         activo !== false ? (
-          <Tag
+          <AppTag
             icon={<CheckCircle size={12} />}
-            style={{
-              background: "var(--color-alert-success-bg)",
-              color: "var(--color-success-500)",
-              border: "1px solid var(--tag-success-border)",
-              borderRadius: "var(--radius-md)",
-              padding: "2px 10px",
-              fontWeight: 600,
-            }}
+            tone="success"
           >
             Activo
-          </Tag>
+          </AppTag>
         ) : (
-          <Tag
+          <AppTag
             icon={<XCircle size={12} />}
-            style={{
-              background: "var(--color-alert-danger-bg)",
-              color: "var(--color-danger-500)",
-              border: "1px solid var(--tag-danger-border)",
-              borderRadius: "var(--radius-md)",
-              padding: "2px 10px",
-              fontWeight: 600,
-            }}
+            tone="danger"
           >
             Inactivo
-          </Tag>
+          </AppTag>
         ),
     },
   ];
@@ -405,9 +385,9 @@ export const RoleUsersModal = ({
         >
           <Text strong>
             Usuarios asignados{" "}
-            <Tag style={{ fontWeight: 700, borderRadius: "var(--radius-md)" }}>
+            <AppTag tone="neutral" style={{ fontWeight: 700, borderRadius: "var(--radius-md)" }}>
               {users.length}
-            </Tag>
+            </AppTag>
           </Text>
           <Input
             placeholder="Buscar en la lista..."

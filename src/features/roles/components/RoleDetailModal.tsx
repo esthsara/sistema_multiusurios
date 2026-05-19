@@ -2,7 +2,6 @@
 import {
   Empty,
   Modal,
-  Tag,
   Typography,
   Flex,
   Divider,
@@ -12,6 +11,7 @@ import {
   theme,
 } from "antd";
 import { ShieldCheck, Users, Calendar, Key } from "lucide-react";
+import { AppTag } from "@/shared/components/atoms/AppTag";
 import type { RolDetalle } from "../types/rol.types";
 import { agruparPermisosPorModulo } from "../utils/roles.utils";
 
@@ -39,7 +39,7 @@ export const RoleDetailModal = ({
       onCancel={onClose}
       width={820}
       centered
-      destroyOnClose
+      destroyOnHidden
       title={
         <Flex align="center" gap={12}>
           <ShieldCheck size={24} style={{ color: token.colorPrimary }} />
@@ -140,7 +140,7 @@ export const RoleDetailModal = ({
                 <Key size={18} style={{ color: token.colorPrimary }} />
                 <Text strong>Permisos del rol</Text>
               </Flex>
-              <Tag color="blue">{role.permissions.length} permisos</Tag>
+              <AppTag tone="primary">{role.permissions.length} permisos</AppTag>
             </Flex>
 
             <div
@@ -184,18 +184,13 @@ export const RoleDetailModal = ({
                       {/* PERMISOS */}
                       <Flex wrap="wrap" gap={6}>
                         {group.permissions.map((p) => (
-                          <Tag
+                          <AppTag
                             key={p.id}
-                            color="processing"
-                            style={{
-                              margin: 0,
-                              borderRadius: 6,
-                              fontSize: 12,
-                              padding: "3px 10px",
-                            }}
+                            tone="primary"
+                            style={{ margin: 0 }}
                           >
                             {p.name}
-                          </Tag>
+                          </AppTag>
                         ))}
                       </Flex>
                     </Card>

@@ -10,7 +10,6 @@ import {
   Modal,
   Row,
   Space,
-  Tag,
   Typography,
   theme,
 } from "antd";
@@ -356,16 +355,13 @@ export const RolePermissionsModal = ({
                             </Text>
                           ) : (
                             row.extras.map((e, i) => (
-                              <Tag
+                              <AppTag
                                 key={i}
-                                style={{
-                                  margin: 0,
-                                  borderRadius: 4,
-                                  fontSize: 11,
-                                }}
+                                tone="neutral"
+                                style={{ margin: 0 }}
                               >
                                 {e}
-                              </Tag>
+                              </AppTag>
                             ))
                           )}
                         </Flex>

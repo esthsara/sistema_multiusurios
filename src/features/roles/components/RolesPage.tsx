@@ -1,6 +1,6 @@
 // src/features/roles/components/RolesPage.tsx
 import { useMemo, useState } from "react";
-import { Button, Tag } from "antd";
+import { Button } from "antd";
 import type { TableColumnsType } from "antd";
 import { Copy, Eye, Pencil, Plus, Shield, Trash2, Users } from "lucide-react";
 import { PageHeader } from "@/shared/components/molecules/PageHeader";

@@ -52,7 +52,7 @@ export const RoleCopyModal = ({
       onCancel={handleCancel}
       width={640}
       centered
-      destroyOnClose
+      destroyOnHidden
       title={
         <Flex align="center" gap="middle">
           <Copy size={24} style={{ color: "var(--ant-color-primary)" }} />
@@ -79,8 +79,8 @@ export const RoleCopyModal = ({
         <Alert
           type="info"
           showIcon
-          icon={<AlertCircle size={16} />}
-          message="Clonación de rol"
+          icon={<AlertCircle size={16} style={{ color: "var(--color-primary-600)" }} />}
+          message={<span style={{ color: "var(--color-primary-600)", fontWeight: 600 }}>Clonación de rol</span>}
           description={
             <Text>
               Se creará una copia de{" "}
@@ -88,7 +88,12 @@ export const RoleCopyModal = ({
               todos sus permisos y configuración actual.
             </Text>
           }
-          style={{ marginBottom: 24, borderRadius: 8 }}
+          style={{ 
+            marginBottom: 24, 
+            borderRadius: 8,
+            backgroundColor: "var(--color-alert-primary-bg)",
+            borderColor: "var(--tag-primary-border)",
+          }}
         />
 
         <Form form={form} layout="vertical" requiredMark={false} size="middle">

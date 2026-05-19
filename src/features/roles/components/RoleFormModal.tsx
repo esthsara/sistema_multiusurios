@@ -16,7 +16,6 @@ import {
   Space,
   Spin,
   Steps,
-  Tag,
   Tooltip,
   Typography,
   theme,
@@ -332,10 +331,20 @@ export const RoleFormModal = ({
   const renderCreateOptions = () => (
     <Space direction="vertical" size="middle" style={{ width: "100%" }}>
       <Alert
-        message="¿Cómo quieres crear este rol?"
-        description="Puedes crear el rol sin permisos ahora y asignarlos después, o configurarlos en este momento."
+        message={<span style={{ color: "var(--color-primary-600)", fontWeight: 600 }}>¿Cómo quieres crear este rol?</span>}
+        description={
+          <span style={{ color: "var(--color-text-secondary)" }}>
+            Puedes crear el rol sin permisos ahora y asignarlos después, o configurarlos en este momento.
+          </span>
+        }
         type="info"
         showIcon
+        icon={<Info size={16} style={{ color: "var(--color-primary-600)" }} />}
+        style={{
+          borderRadius: 8,
+          backgroundColor: "var(--color-alert-primary-bg)",
+          borderColor: "var(--tag-primary-border)",
+        }}
       />
       <Card style={{ borderRadius: "var(--radius-md)" }}>
         <Space direction="vertical" size={12} style={{ width: "100%" }}>
@@ -482,7 +491,7 @@ export const RoleFormModal = ({
       footer={renderFooter()}
       width={900}
       centered
-      destroyOnClose
+      destroyOnHidden
       title={
         <Flex align="center" gap={12}>
           {mode === "create" ? (
