@@ -1,13 +1,12 @@
 @import "tailwindcss";
 
-@theme{
+@theme {
   /* Tonos de azules */
-/* PRIMARIO (más consistente y moderno) */
---color-primary-50: #eef4ff;
---color-primary-200: #c7d7f5;
---color-primary-400: #6b9ce6;
---color-primary-600: #3b6fcf;
---color-primary-700: #2c4fa3;
+  --color-primary-50: #eef4ff;
+  --color-primary-200: #c7d7f5;
+  --color-primary-400: #6b9ce6;
+  --color-primary-600: #3b6fcf;
+  --color-primary-700: #2c4fa3;
 
   /* Éxito */
   --color-success-500: #22c55e;
@@ -22,25 +21,114 @@
   --color-danger-600: #d61a1a;
 
   /* Alertas y fondos sutiles de estado */
-  --color-alert-danger-bg: color-mix(in srgb, var(--color-danger-500) 10%, transparent);
-  --color-alert-warning-bg: color-mix(in srgb, var(--color-warning-500) 10%, transparent);
-  --color-alert-success-bg: color-mix(in srgb, var(--color-success-500) 10%, transparent);
-  --color-alert-primary-bg: color-mix(in srgb, var(--color-primary-600) 10%, transparent);
-  
+  --color-alert-danger-bg: color-mix(
+    in srgb,
+    var(--color-danger-500) 10%,
+    transparent
+  );
+  --color-alert-warning-bg: color-mix(
+    in srgb,
+    var(--color-warning-500) 10%,
+    transparent
+  );
+  --color-alert-success-bg: color-mix(
+    in srgb,
+    var(--color-success-500) 10%,
+    transparent
+  );
+  --color-alert-primary-bg: color-mix(
+    in srgb,
+    var(--color-primary-600) 10%,
+    transparent
+  );
+
   /* Gradientes */
-  --gradient-primary: linear-gradient(135deg, color-mix(in srgb, var(--color-primary-600) 15%, transparent), color-mix(in srgb, var(--color-primary-700) 8%, transparent));
+  --gradient-primary: linear-gradient(
+    135deg,
+    color-mix(in srgb, var(--color-primary-600) 15%, transparent),
+    color-mix(in srgb, var(--color-primary-700) 8%, transparent)
+  );
 
   /* Superficies para cambiar  */
-  --color-bg-base-loader: #ffffff;
   --color-bg-base: #ffffff;
   --color-bg-base-2: #f8fafc;
   --color-bg-hero: #3b6fcf;
-  
+
   --color-bg-overlay: #eef2f7;
   --color-bg-subtle: #e2e8f0;
   --color-bg-sidebar: #0f172a;
   --color-bg-filter: #dfebf8;
   --color-bg-card: #0f172a;
+
+  /* Sidebar — modo claro */
+  --color-sidebar-surface: #f8fbff;
+  --color-sidebar-surface-elevated: color-mix(
+    in srgb,
+    var(--color-primary-600) 6%,
+    var(--color-bg-base)
+  );
+  --color-sidebar-border: color-mix(
+    in srgb,
+    var(--color-primary-600) 14%,
+    var(--color-border)
+  );
+  --color-sidebar-border-soft: color-mix(
+    in srgb,
+    var(--color-primary-600) 10%,
+    transparent
+  );
+  --color-sidebar-title: #0f172a;
+  --color-sidebar-subtitle: #64748b;
+  --color-sidebar-text: #334155;
+  --color-sidebar-text-muted: #64748b;
+  --color-sidebar-text-hover: #0f172a;
+  --color-sidebar-text-active: #0f172a;
+  --color-sidebar-accent: #3b6fcf;
+  --color-sidebar-accent-soft: color-mix(
+    in srgb,
+    var(--color-primary-400) 55%,
+    transparent
+  );
+  --color-sidebar-accent-faint: color-mix(
+    in srgb,
+    var(--color-primary-400) 18%,
+    transparent
+  );
+  --color-sidebar-item-hover-bg: color-mix(
+    in srgb,
+    var(--color-primary-600) 10%,
+    var(--color-bg-base)
+  );
+  --color-sidebar-item-active-bg: color-mix(
+    in srgb,
+    var(--color-primary-600) 16%,
+    var(--color-bg-base)
+  );
+  --color-sidebar-item-nested-hover-bg: color-mix(
+    in srgb,
+    var(--color-primary-600) 8%,
+    var(--color-bg-base)
+  );
+  --color-sidebar-item-nested-active-bg: color-mix(
+    in srgb,
+    var(--color-primary-600) 14%,
+    var(--color-bg-base)
+  );
+  --color-sidebar-scrollbar: color-mix(
+    in srgb,
+    var(--color-primary-600) 28%,
+    transparent
+  );
+  --color-sidebar-overlay: color-mix(
+    in srgb,
+    var(--color-bg-base) 55%,
+    transparent
+  );
+  --color-sidebar-shadow: color-mix(
+    in srgb,
+    var(--color-primary-700) 20%,
+    transparent
+  );
 
   /* Bordes */
   --color-border: #afbdcf;
@@ -58,12 +146,12 @@
 
   /* Radios */
 
-  --radius-sm: 0.375rem;   /* antes 0.25 */
-  --radius-md: 0.75rem;    /* antes 0.5 */
-  --radius-lg: 1rem;       /* antes 0.75 */
-  --radius-xl: 1.25rem;    /* antes 1 */
-  --radius-card: 1rem;     /* importante */
-  --radius-full: 9999px;   /* para botones pill */
+  --radius-sm: 0.375rem; /* antes 0.25 */
+  --radius-md: 0.75rem; /* antes 0.5 */
+  --radius-lg: 1rem; /* antes 0.75 */
+  --radius-xl: 1.25rem; /* antes 1 */
+  --radius-card: 1rem; /* importante */
+  --radius-full: 9999px; /* para botones pill */
 
   /* Sombras */
   --shadow-card: 0 1px 3px 0 rgb(0 0 0 / 0.1), 0 1px 2px -1px rgb(0 0 0 / 0.1);
@@ -100,16 +188,16 @@
   --tag-cyan-bg: color-mix(in srgb, #0891b2 15%, var(--color-bg-base));
   --tag-cyan-text: #164e63;
   --tag-cyan-border: #06b6d4;
-  
+
   --tag-geekblue-bg: color-mix(in srgb, #1d4ed8 15%, var(--color-bg-base));
   --tag-geekblue-text: #1e3a8a;
   --tag-geekblue-border: #3b82f6;
 
   --tag-volcano-bg: color-mix(in srgb, #ea580c 15%, var(--color-bg-base));
-  --tag-volcano-text: #7c2d12;
+  --tag-volcano-text: #b63004;
   --tag-volcano-border: #f97316;
 
---tag-lime-bg: color-mix(in srgb, #65a30d 15%, var(--color-bg-base));
+  --tag-lime-bg: color-mix(in srgb, #65a30d 15%, var(--color-bg-base));
   --tag-lime-text: #365314;
   --tag-lime-border: #84cc16;
 
@@ -118,13 +206,12 @@
   --tag-magenta-border: #ec4899;
 
   --tag-gold-bg: color-mix(in srgb, #ca8a04 15%, var(--color-bg-base));
-  --tag-gold-text: #78350f;
+  --tag-gold-text: #da5a1f;
   --tag-gold-border: #eab308;
 
   --tag-blue-bg: color-mix(in srgb, #0369a1 15%, var(--color-bg-base));
   --tag-blue-text: #082f49;
   --tag-blue-border: #0ea5e9;
-
 }
 
 .dark {
@@ -145,6 +232,80 @@
   --color-bg-hero: #486594;
   --color-bg-sidebar: #182033;
 
+  /* Sidebar — modo oscuro*/
+  --color-sidebar-surface: #182033;
+  --color-sidebar-surface-elevated: color-mix(
+    in srgb,
+    var(--color-primary-700) 14%,
+    transparent
+  );
+  --color-sidebar-border: color-mix(
+    in srgb,
+    var(--color-primary-600) 28%,
+    transparent
+  );
+  --color-sidebar-border-soft: color-mix(
+    in srgb,
+    var(--color-primary-400) 55%,
+    transparent
+  );
+  --color-sidebar-title: var(--color-primary-50);
+  --color-sidebar-subtitle: var(--color-primary-400);
+  --color-sidebar-text: var(--color-primary-200);
+  --color-sidebar-text-muted: color-mix(
+    in srgb,
+    var(--color-primary-200) 75%,
+    transparent
+  );
+  --color-sidebar-text-hover: var(--color-primary-50);
+  --color-sidebar-text-active: var(--color-primary-50);
+  --color-sidebar-accent: var(--color-primary-400);
+  --color-sidebar-accent-soft: color-mix(
+    in srgb,
+    var(--color-primary-400) 55%,
+    transparent
+  );
+  --color-sidebar-accent-faint: color-mix(
+    in srgb,
+    var(--color-primary-400) 14%,
+    transparent
+  );
+  --color-sidebar-item-hover-bg: color-mix(
+    in srgb,
+    var(--color-primary-600) 16%,
+    transparent
+  );
+  --color-sidebar-item-active-bg: color-mix(
+    in srgb,
+    var(--color-primary-600) 28%,
+    transparent
+  );
+  --color-sidebar-item-nested-hover-bg: color-mix(
+    in srgb,
+    var(--color-primary-600) 14%,
+    transparent
+  );
+  --color-sidebar-item-nested-active-bg: color-mix(
+    in srgb,
+    var(--color-primary-600) 22%,
+    transparent
+  );
+  --color-sidebar-scrollbar: color-mix(
+    in srgb,
+    var(--color-primary-600) 40%,
+    transparent
+  );
+  --color-sidebar-overlay: color-mix(
+    in srgb,
+    var(--color-bg-sidebar) 55%,
+    transparent
+  );
+  --color-sidebar-shadow: color-mix(
+    in srgb,
+    var(--color-primary-700) 35%,
+    transparent
+  );
+
   /* Bordes y focus */
   --color-border: #6a7686;
   --color-border-focus: #60a5fa;
@@ -159,38 +320,69 @@
   --shadow-card: 0 1px 3px 0 rgb(0 0 0 / 0.4);
   --shadow-modal: 0 20px 25px -5px rgb(0 0 0 / 0.5);
 
-
   /* TAGS COLORS - MODO OSCURO */
   --tag-neutral-bg: var(--color-bg-subtle);
   --tag-neutral-text: var(--color-text-secondary);
   --tag-neutral-border: var(--color-border);
 
-  --tag-primary-bg: color-mix(in srgb, var(--color-primary-600) 12%, var(--color-bg-base));
+  --tag-primary-bg: color-mix(
+    in srgb,
+    var(--color-primary-600) 12%,
+    var(--color-bg-base)
+  );
   --tag-primary-text: var(--color-primary-600);
-  --tag-primary-border: color-mix(in srgb, var(--color-primary-600) 30%, transparent);
+  --tag-primary-border: color-mix(
+    in srgb,
+    var(--color-primary-600) 30%,
+    transparent
+  );
 
-  --tag-success-bg: color-mix(in srgb, var(--color-success-500) 12%, var(--color-bg-base));
+  --tag-success-bg: color-mix(
+    in srgb,
+    var(--color-success-500) 12%,
+    var(--color-bg-base)
+  );
   --tag-success-text: var(--color-success-500);
-  --tag-success-border: color-mix(in srgb, var(--color-success-500) 30%, transparent);
+  --tag-success-border: color-mix(
+    in srgb,
+    var(--color-success-500) 30%,
+    transparent
+  );
 
-  --tag-warning-bg: color-mix(in srgb, var(--color-warning-500) 12%, var(--color-bg-base));
+  --tag-warning-bg: color-mix(
+    in srgb,
+    var(--color-warning-500) 12%,
+    var(--color-bg-base)
+  );
   --tag-warning-text: var(--color-warning-500);
-  --tag-warning-border: color-mix(in srgb, var(--color-warning-500) 30%, transparent);
+  --tag-warning-border: color-mix(
+    in srgb,
+    var(--color-warning-500) 30%,
+    transparent
+  );
 
-  --tag-danger-bg: color-mix(in srgb, var(--color-danger-500) 12%, var(--color-bg-base));
+  --tag-danger-bg: color-mix(
+    in srgb,
+    var(--color-danger-500) 12%,
+    var(--color-bg-base)
+  );
   --tag-danger-text: var(--color-danger-500);
-  --tag-danger-border: color-mix(in srgb, var(--color-danger-500) 30%, transparent);
+  --tag-danger-border: color-mix(
+    in srgb,
+    var(--color-danger-500) 30%,
+    transparent
+  );
 
   --tag-purple-bg: color-mix(in srgb, #a855f7 12%, var(--color-bg-base));
   --tag-purple-text: #d8b4fe;
   --tag-purple-border: color-mix(in srgb, #a855f7 30%, transparent);
 
   --tag-cyan-bg: color-mix(in srgb, #06b6d4 12%, var(--color-bg-base));
-  --tag-cyan-text: #67e8f9;
+  --tag-cyan-text: #9be4ee;
   --tag-cyan-border: color-mix(in srgb, #06b6d4 30%, transparent);
 
   --tag-geekblue-bg: color-mix(in srgb, #3b82f6 12%, var(--color-bg-base));
-  --tag-geekblue-text: #93c5fd;
+  --tag-geekblue-text: #8dadd3;
   --tag-geekblue-border: color-mix(in srgb, #3b82f6 35%, transparent);
 
   --tag-volcano-bg: color-mix(in srgb, #f97316 12%, var(--color-bg-base));
@@ -202,15 +394,15 @@
   --tag-lime-border: color-mix(in srgb, #84cc16 30%, transparent);
 
   --tag-magenta-bg: color-mix(in srgb, #ec4899 12%, var(--color-bg-base));
-  --tag-magenta-text: #f472b6;
+  --tag-magenta-text: #e7a2c6;
   --tag-magenta-border: color-mix(in srgb, #ec4899 30%, transparent);
 
-  --tag-gold-bg: color-mix(in srgb, #eab308 12%, var(--color-bg-base));
-  --tag-gold-text: #facc15;
-  --tag-gold-border: color-mix(in srgb, #eab308 30%, transparent);
+  --tag-gold-bg: color-mix(in srgb, #e6ea08 12%, var(--color-bg-base));
+  --tag-gold-text: #e6d389;
+  --tag-gold-border: color-mix(in srgb, #f0b70e 30%, transparent);
 
   --tag-blue-bg: color-mix(in srgb, #0ea5e9 12%, var(--color-bg-base));
-  --tag-blue-text: #7dd3fc;
+  --tag-blue-text: #92dafc;
   --tag-blue-border: color-mix(in srgb, #0ea5e9 30%, transparent);
 }
 
@@ -268,11 +460,9 @@ body {
   background: var(--color-bg-base) !important;
   border: 1px solid var(--color-border) !important;
   color: var(--color-text-primary) !important;
-  height: 32px; 
+  height: 32px;
   padding: 0 11px;
 }
-
-
 
 .persona-filters .ant-input-affix-wrapper,
 .persona-filters .ant-select .ant-select-selector,
@@ -374,7 +564,8 @@ body {
   overflow: hidden;
   transition: all var(--transition-base);
   background: var(--color-bg-base) !important;
-  box-shadow: 0 2px 8px color-mix(in srgb, var(--color-primary-600) 8%, transparent);
+  box-shadow: 0 2px 8px
+    color-mix(in srgb, var(--color-primary-600) 8%, transparent);
 }
 
 /* ─────────────────────────────────────────────────────────────
@@ -382,7 +573,11 @@ body {
 ───────────────────────────────────────────────────────────────── */
 
 .app-data-table .ant-table-thead > tr > th {
-  background: color-mix(in srgb, var(--color-primary-600) 8%, var(--color-bg-hero)) !important;
+  background: color-mix(
+    in srgb,
+    var(--color-primary-600) 8%,
+    var(--color-bg-hero)
+  ) !important;
   color: var(--color-text-inverse) !important;
   border-bottom: 1px solid var(--color-border) !important;
   font-weight: 600;
@@ -428,12 +623,17 @@ body {
 ───────────────────────────────────────────────────────────────── */
 
 .app-data-table .ant-table-tbody > tr:hover > td {
-  background: color-mix(in srgb, var(--color-primary-600) 12%, var(--color-bg-base)) !important;
+  background: color-mix(
+    in srgb,
+    var(--color-primary-600) 12%,
+    var(--color-bg-base)
+  ) !important;
   transition: background-color calc(var(--transition-base) / 2);
 }
 
 .app-data-table .ant-table-tbody > tr:hover {
-  box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--color-primary-600) 20%, transparent);
+  box-shadow: inset 0 0 0 1px
+    color-mix(in srgb, var(--color-primary-600) 20%, transparent);
 }
 
 /* ─────────────────────────────────────────────────────────────
@@ -510,8 +710,13 @@ body {
 /* Página activa */
 .app-data-table .ant-pagination-item-active {
   border-color: var(--color-primary-600) !important;
-  background: color-mix(in srgb, var(--color-primary-600) 14%, var(--color-bg-base)) !important;
-  box-shadow: 0 0 0 3px color-mix(in srgb, var(--color-primary-600) 12%, transparent);
+  background: color-mix(
+    in srgb,
+    var(--color-primary-600) 14%,
+    var(--color-bg-base)
+  ) !important;
+  box-shadow: 0 0 0 3px
+    color-mix(in srgb, var(--color-primary-600) 12%, transparent);
 }
 
 .app-data-table .ant-pagination-item-active a {
@@ -524,7 +729,11 @@ body {
 .app-data-table .ant-pagination-prev:hover .ant-pagination-item-link,
 .app-data-table .ant-pagination-next:hover .ant-pagination-item-link {
   border-color: var(--color-primary-600) !important;
-  background: color-mix(in srgb, var(--color-primary-600) 8%, var(--color-bg-base)) !important;
+  background: color-mix(
+    in srgb,
+    var(--color-primary-600) 8%,
+    var(--color-bg-base)
+  ) !important;
 }
 
 .app-data-table .ant-pagination-item:hover a {
@@ -549,18 +758,22 @@ body {
   border: 1px solid var(--color-border) !important;
   border-radius: 8px !important;
   color: var(--color-text-primary) !important;
-  min-width: 50px; 
-  height: 32px; 
+  min-width: 50px;
+  height: 32px;
   line-height: 34px;
   transition: all var(--transition-base);
 }
 
-.app-data-table .ant-pagination-options-size-changer .ant-select-selector:hover {
+.app-data-table
+  .ant-pagination-options-size-changer
+  .ant-select-selector:hover {
   border-color: var(--color-primary-600) !important;
 }
 
 .app-data-table .ant-pagination-options-size-changer .ant-select-arrow,
-.app-data-table .ant-pagination-options-size-changer .ant-select-selection-item {
+.app-data-table
+  .ant-pagination-options-size-changer
+  .ant-select-selection-item {
   color: var(--color-text-primary) !important;
 }
 
@@ -591,19 +804,39 @@ body {
 
 .row-action-btn:hover,
 .row-actions-trigger:hover {
-  background: color-mix(in srgb, var(--color-primary-600) 14%, transparent) !important;
+  background: color-mix(
+    in srgb,
+    var(--color-primary-600) 14%,
+    transparent
+  ) !important;
   color: var(--color-primary-600) !important;
-  border-color: color-mix(in srgb, var(--color-primary-600) 25%, transparent) !important;
+  border-color: color-mix(
+    in srgb,
+    var(--color-primary-600) 25%,
+    transparent
+  ) !important;
 }
 
 .row-action-btn.ant-btn-primary {
-  background: color-mix(in srgb, var(--color-primary-600) 12%, transparent) !important;
-  border-color: color-mix(in srgb, var(--color-primary-600) 25%, transparent) !important;
+  background: color-mix(
+    in srgb,
+    var(--color-primary-600) 12%,
+    transparent
+  ) !important;
+  border-color: color-mix(
+    in srgb,
+    var(--color-primary-600) 25%,
+    transparent
+  ) !important;
   color: var(--color-primary-600) !important;
 }
 
 .row-action-btn.ant-btn-primary:hover {
-  background: color-mix(in srgb, var(--color-primary-600) 18%, transparent) !important;
+  background: color-mix(
+    in srgb,
+    var(--color-primary-600) 18%,
+    transparent
+  ) !important;
   border-color: var(--color-primary-600) !important;
 }
 
@@ -693,359 +926,6 @@ body {
 }
 
 /* ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-   MATRIZ DE PERMISOS
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ */
-
-.matriz-page {
-  padding: 24px;
-}
-
-.matriz-page__actions {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  flex-wrap: wrap;
-}
-
-.matriz-changes-tag {
-  display: inline-flex;
-  align-items: center;
-  gap: 4px;
-  border-radius: 999px;
-  font-weight: 600;
-}
-
-.matriz-toolbar {
-  display: grid;
-  grid-template-columns: minmax(260px, 1fr) auto;
-  gap: 12px;
-  align-items: center;
-  margin: 20px 0 16px;
-}
-
-.matriz-search .ant-input-affix-wrapper {
-  min-height: 40px;
-  border-radius: var(--radius-md);
-  background: var(--color-bg-base);
-  border-color: var(--color-border);
-}
-
-.matriz-search .ant-input,
-.matriz-search input {
-  color: var(--color-text-primary) !important;
-}
-
-.matriz-stats {
-  display: grid;
-  grid-template-columns: repeat(4, minmax(84px, 1fr));
-  gap: 10px;
-}
-
-.matriz-stat-card {
-  min-width: 84px;
-  padding: 10px 12px;
-  border: 1px solid var(--color-border);
-  border-radius: var(--radius-md);
-  background: var(--color-bg-base);
-  box-shadow: var(--shadow-card);
-  display: flex;
-  flex-direction: column;
-  gap: 4px;
-}
-
-.matriz-stat-label {
-  font-size: 11px;
-  color: var(--color-text-secondary);
-  letter-spacing: 0.02em;
-}
-
-.matriz-stat-card strong {
-  font-size: 16px;
-  color: var(--color-text-primary);
-}
-
-.matriz-table-wrap {
-  border: 1px solid var(--color-border);
-  border-radius: var(--radius-card);
-  overflow: auto;
-  background: var(--color-bg-base);
-  box-shadow: var(--shadow-card);
-}
-
-.matriz-table {
-  width: 100%;
-  min-width: 980px;
-  border-collapse: separate;
-  border-spacing: 0;
-}
-
-.matriz-th,
-.matriz-td {
-  border-bottom: 1px solid var(--color-border);
-  border-right: 1px solid
-    color-mix(in srgb, var(--color-border) 70%, transparent);
-  padding: 12px 10px;
-  text-align: center;
-  vertical-align: middle;
-}
-
-.matriz-th {
-  position: sticky;
-  top: 0;
-  z-index: 3;
-  background: var(--color-bg-overlay);
-  color: var(--color-text-primary);
-}
-
-.matriz-th-sticky,
-.matriz-td-sticky {
-  position: sticky;
-  left: 0;
-  z-index: 2;
-  min-width: 310px;
-  text-align: left;
-  border-right: 2px solid var(--color-border);
-}
-
-.matriz-th-sticky {
-  z-index: 4;
-  text-transform: uppercase;
-  letter-spacing: 0.04em;
-}
-
-.matriz-td-sticky {
-  background: var(--color-bg-base);
-}
-
-.matriz-header-title {
-  font-size: 12px;
-  font-weight: 800;
-  text-transform: uppercase;
-  letter-spacing: 0.04em;
-}
-
-.matriz-header-subtitle {
-  margin-top: 3px;
-  font-size: 11px;
-  color: var(--color-text-secondary);
-}
-
-.matriz-th-role {
-  min-width: 140px;
-}
-
-.matriz-role-title {
-  font-weight: 700;
-  color: var(--color-text-primary);
-  line-height: 1.2;
-  font-size: 13px;
-}
-
-.matriz-role-progress {
-  margin-top: 6px;
-  display: flex;
-  flex-direction: column;
-  gap: 6px;
-  font-size: 11px;
-  color: var(--color-text-secondary);
-}
-
-.matriz-role-progress-bar {
-  width: 100%;
-  height: 6px;
-  border-radius: 999px;
-  background: color-mix(in srgb, var(--color-border) 70%, transparent);
-  overflow: hidden;
-}
-
-.matriz-role-progress-bar > span {
-  display: block;
-  height: 100%;
-  border-radius: inherit;
-  background: linear-gradient(
-    90deg,
-    var(--color-primary-600),
-    var(--color-primary-400)
-  );
-}
-
-.matriz-module-row .matriz-td,
-.matriz-module-row .matriz-td-sticky {
-  background: color-mix(in srgb, var(--color-bg-overlay) 45%, transparent);
-}
-
-.matriz-module-cell {
-  padding: 10px 12px;
-}
-
-.matriz-module-main {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  color: var(--color-text-primary);
-}
-
-.matriz-module-dot {
-  width: 9px;
-  height: 9px;
-  border-radius: 999px;
-  display: inline-block;
-  flex-shrink: 0;
-}
-
-.matriz-module-name {
-  font-weight: 700;
-  text-transform: uppercase;
-  letter-spacing: 0.03em;
-}
-
-.matriz-module-count {
-  margin-inline-start: auto;
-  font-size: 11px;
-  border-radius: 999px;
-  background: color-mix(
-    in srgb,
-    var(--color-primary-600) 12%,
-    transparent
-  ) !important;
-  color: var(--color-text-primary) !important;
-}
-
-.matriz-module-meta {
-  margin-top: 6px;
-  display: flex;
-  gap: 10px;
-  flex-wrap: wrap;
-  font-size: 11px;
-  color: var(--color-text-secondary);
-}
-
-.matriz-td .ant-checkbox-wrapper,
-.matriz-module-cell .ant-checkbox-wrapper {
-  color: var(--color-text-primary) !important;
-  font-size: 12px;
-}
-
-.matriz-checkbox .ant-checkbox-inner {
-  border-color: var(--color-border-focus);
-}
-
-.matriz-checkbox.ant-checkbox-wrapper:hover .ant-checkbox-inner,
-.matriz-checkbox .ant-checkbox-checked .ant-checkbox-inner,
-.matriz-checkbox .ant-checkbox-indeterminate .ant-checkbox-inner {
-  border-color: var(--color-primary-600) !important;
-  background-color: var(--color-primary-600) !important;
-}
-
-.matriz-perm-row:hover .matriz-td,
-.matriz-perm-row:hover .matriz-td-sticky {
-  background: color-mix(
-    in srgb,
-    var(--color-primary-600) 7%,
-    var(--color-bg-base)
-  );
-}
-
-.matriz-perm-name-cell {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  padding: 8px 12px;
-}
-
-.matriz-perm-action {
-  display: inline-flex;
-  align-items: center;
-  padding: 2px 7px;
-  border-radius: 999px;
-  font-size: 10px;
-  font-weight: 700;
-  text-transform: uppercase;
-  letter-spacing: 0.03em;
-}
-
-.matriz-perm-name {
-  color: var(--color-text-primary);
-  font-size: 12px;
-  line-height: 1.35;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-}
-
-.matriz-check-cell {
-  transition: background-color var(--transition-base);
-}
-
-.matriz-check-cell.is-added {
-  background: color-mix(in srgb, var(--color-success-500) 15%, transparent);
-}
-
-.matriz-check-cell.is-removed {
-  background: color-mix(in srgb, var(--color-danger-500) 15%, transparent);
-}
-
-.matriz-legend {
-  margin-top: 16px;
-  display: flex;
-  gap: 16px;
-  flex-wrap: wrap;
-  font-size: 12px;
-  color: var(--color-text-secondary);
-}
-
-.matriz-legend-item {
-  display: flex;
-  align-items: center;
-  gap: 6px;
-}
-
-.matriz-legend-box {
-  display: inline-block;
-  width: 12px;
-  height: 12px;
-  border-radius: 2px;
-}
-
-.matriz-legend-box--add {
-  background: color-mix(in srgb, var(--color-success-500) 20%, transparent);
-  border: 1px solid var(--color-success-600);
-}
-
-.matriz-legend-box--remove {
-  background: color-mix(in srgb, var(--color-danger-500) 20%, transparent);
-  border: 1px solid var(--color-danger-600);
-}
-
-.matriz-table tr > *:last-child {
-  border-right: none;
-}
-
-.dark .matriz-search .ant-input-affix-wrapper,
-.dark .matriz-stat-card,
-.dark .matriz-table-wrap,
-.dark .matriz-td-sticky {
-  background: var(--color-bg-base-2);
-}
-
-.dark .matriz-perm-action {
-  background: color-mix(
-    in srgb,
-    var(--color-primary-600) 16%,
-    transparent
-  ) !important;
-}
-
-@media (max-width: 1200px) {
-  .matriz-toolbar {
-    grid-template-columns: 1fr;
-  }
-
-  .matriz-stats {
-    grid-template-columns: repeat(2, minmax(84px, 1fr));
-  }
-}
-/* ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
    DATATABLE SIMPLE
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ */
 /* CONTENEDOR GENERAL */
@@ -1055,7 +935,7 @@ body {
 
 /* HEADER */
 .datatable-modern .ant-table-thead > tr > th {
-  background:"var(--color-primary-200)";
+  background: "var(--color-primary-200)";
   color: var(--color-text-primary);
   font-weight: 600;
   font-size: 13px;

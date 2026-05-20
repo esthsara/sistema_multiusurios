@@ -29,13 +29,7 @@ export const GlobalLoader: React.FC = () => {
       <div
         className="absolute inset-0"
         style={{
-          backgroundImage: `
-            radial-gradient(
-              circle,
-              color-mix(in srgb, var(--color-primary-600) 18%, transparent) 1px,
-              transparent 1px
-            )
-          `,
+
           backgroundSize: "22px 22px",
           opacity: 0.4,
         }}

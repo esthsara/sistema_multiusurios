@@ -273,7 +273,7 @@ const ChangePasswordModal = ({
       okText={loading ? "Actualizando..." : "Actualizar contraseña"}
       cancelText="Cancelar"
       width={440}
-      destroyOnClose
+      destroyOnHidden
     >
       <Alert
         type="info"

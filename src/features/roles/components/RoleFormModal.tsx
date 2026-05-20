@@ -174,8 +174,7 @@ export const RoleFormModal = ({
     }
   };
 
-  const selectAll = () =>
-    setPermissionIds(permissions.map((p) => p.id));
+  const selectAll = () => setPermissionIds(permissions.map((p) => p.id));
   const clearAll = () => setPermissionIds([]);
 
   /* ── Handlers de submit ── */
@@ -331,10 +330,15 @@ export const RoleFormModal = ({
   const renderCreateOptions = () => (
     <Space direction="vertical" size="middle" style={{ width: "100%" }}>
       <Alert
-        message={<span style={{ color: "var(--color-primary-600)", fontWeight: 600 }}>¿Cómo quieres crear este rol?</span>}
+        message={
+          <span style={{ color: "var(--color-primary-600)", fontWeight: 600 }}>
+            ¿Cómo quieres crear este rol?
+          </span>
+        }
         description={
           <span style={{ color: "var(--color-text-secondary)" }}>
-            Puedes crear el rol sin permisos ahora y asignarlos después, o configurarlos en este momento.
+            Puedes crear el rol sin permisos ahora y asignarlos después, o
+            configurarlos en este momento.
           </span>
         }
         type="info"
@@ -390,7 +394,7 @@ export const RoleFormModal = ({
               type="primary"
               onClick={() => setCurrentStep(2)}
               icon={<ChevronRight size={15} />}
-              iconPosition="end"
+              iconPlacement="end"
               style={{ borderRadius: "var(--radius-md)" }}
             >
               Continuar
@@ -429,7 +433,7 @@ export const RoleFormModal = ({
             onChange={(keys) => setActiveKeys(keys as string[])}
             size="small"
             bordered
-            expandIconPosition="end"
+            expandIconPlacement="end"
             style={{
               maxHeight: 440,
               overflowY: "auto",
@@ -469,7 +473,7 @@ export const RoleFormModal = ({
               loading={submitting}
               onClick={handleOk}
               icon={<ChevronRight size={15} />}
-              iconPosition="end"
+              iconPlacement="end"
             >
               Siguiente
             </Button>
@@ -558,12 +562,8 @@ export const RoleFormModal = ({
             {mode === "create" && currentStep === 1 && renderCreateOptions()}
 
             {/* Selección de permisos */}
-            {mode === "edit" &&
-              permissions.length > 0 &&
-              renderPermissions()}
-            {mode === "create" &&
-              currentStep === 2 &&
-              renderPermissions()}
+            {mode === "edit" && permissions.length > 0 && renderPermissions()}
+            {mode === "create" && currentStep === 2 && renderPermissions()}
           </Form>
         </div>
       </Spin>

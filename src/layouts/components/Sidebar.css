@@ -3,13 +3,26 @@
 ═══════════════════════════════════════════════════════════════ */
 
 @keyframes saas-pulse-ring {
-  0%,  100% { opacity: 0.35; transform: scale(1); }
-  50%        { opacity: 0.75; transform: scale(1.1); }
+  0%,
+  100% {
+    opacity: 0.35;
+    transform: scale(1);
+  }
+  50% {
+    opacity: 0.75;
+    transform: scale(1.1);
+  }
 }
 
 @keyframes saas-item-enter {
-  from { opacity: 0; transform: translateX(-5px); }
-  to   { opacity: 1; transform: translateX(0); }
+  from {
+    opacity: 0;
+    transform: translateX(-5px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
 }
 
 /* ═══════════════════════════════════════════════════════════════
@@ -19,7 +32,7 @@
 .saas-sidebar {
   padding: 0;
   overflow: visible;
-  background: var(--color-bg-sidebar) !important;
+  background: var(--color-sidebar-surface) !important;
   transition: width 240ms cubic-bezier(0.4, 0, 0.2, 1);
   border: none !important;
   box-shadow: none !important;
@@ -28,7 +41,7 @@
 
 .saas-sidebar.ant-layout-sider,
 .saas-sidebar.ant-layout-sider-collapsed {
-  background: var(--color-bg-sidebar) !important;
+  background: var(--color-sidebar-surface) !important;
   border: none !important;
   box-shadow: none !important;
   transition: width 240ms cubic-bezier(0.4, 0, 0.2, 1) !important;
@@ -43,19 +56,14 @@
   width: 100%;
   height: 100%;
   overflow: hidden;
-  background: var(--color-bg-sidebar);
+  background: var(--color-sidebar-surface);
 }
 
 /* Dot-grid atmosphere */
 .saas-sidebar-shell::before {
-  content: '';
+  content: "";
   position: absolute;
   inset: 0;
-  background-image: radial-gradient(
-    circle,
-    color-mix(in srgb, var(--color-primary-600) 22%, transparent) 1px,
-    transparent 1px
-  );
   background-size: 22px 22px;
   pointer-events: none;
   z-index: 0;
@@ -64,7 +72,7 @@
 
 /* Glowing right-edge strip */
 .saas-sidebar-shell::after {
-  content: '';
+  content: "";
   position: absolute;
   right: 0;
   top: 8%;
@@ -73,8 +81,8 @@
   background: linear-gradient(
     to bottom,
     transparent 0%,
-    var(--color-primary-600) 30%,
-    var(--color-primary-400) 65%,
+    var(--color-sidebar-accent) 30%,
+    var(--color-sidebar-accent-soft) 65%,
     transparent 100%
   );
   pointer-events: none;
@@ -86,8 +94,12 @@
    HEADER — suppress old decorators
 ═══════════════════════════════════════════════════════════════ */
 
-.saas-sidebar-ambient { display: none; }
-.saas-sidebar-curve   { display: none; }
+.saas-sidebar-ambient {
+  display: none;
+}
+.saas-sidebar-curve {
+  display: none;
+}
 
 .saas-sidebar-header {
   position: relative;
@@ -96,8 +108,8 @@
   display: flex;
   align-items: center;
   padding: 0 16px;
-  border-bottom: 1px solid color-mix(in srgb, var(--color-primary-600) 28%, transparent);
-  background: color-mix(in srgb, var(--color-primary-700) 14%, transparent);
+  border-bottom: 1px solid var(--color-sidebar-border);
+  background: var(--color-sidebar-surface-elevated);
   flex-shrink: 0;
 }
 
@@ -112,29 +124,30 @@
   align-items: center;
   justify-content: center;
   flex-shrink: 0;
-  background: var(--color-primary-600);
-  border: 1px solid color-mix(in srgb, var(--color-primary-400) 55%, transparent);
+  background: var(--color-sidebar-accent);
+  border: 1px solid var(--color-sidebar-accent-soft);
   z-index: 1;
 }
 
 /* Pulsing ring 1 */
 .saas-sidebar-logo-mark::before {
-  content: '';
+  content: "";
   position: absolute;
   inset: -5px;
   border-radius: 14px;
-  border: 1px solid color-mix(in srgb, var(--color-primary-400) 38%, transparent);
+  border: 1px solid
+    color-mix(in srgb, var(--color-sidebar-accent) 38%, transparent);
   animation: saas-pulse-ring 3s ease-in-out infinite;
   pointer-events: none;
 }
 
 /* Pulsing ring 2 */
 .saas-sidebar-logo-mark::after {
-  content: '';
+  content: "";
   position: absolute;
   inset: -11px;
   border-radius: 18px;
-  border: 1px solid color-mix(in srgb, var(--color-primary-400) 14%, transparent);
+  border: 1px solid var(--color-sidebar-accent-faint);
   animation: saas-pulse-ring 3s ease-in-out infinite 0.6s;
   pointer-events: none;
 }
@@ -150,7 +163,7 @@
 
 .saas-sidebar-brand-title {
   display: block;
-  color: var(--color-primary-50);
+  color: var(--color-sidebar-title);
   font-size: 0.9rem;
   font-weight: 700;
   line-height: 1.4;
@@ -160,7 +173,7 @@
 
 .saas-sidebar-brand-subtitle {
   margin: 3px 0 0;
-  color: var(--color-primary-400);
+  color: var(--color-sidebar-subtitle);
   font-size: 0.62rem;
   letter-spacing: 0.18em;
   text-transform: uppercase;
@@ -178,7 +191,7 @@
   overflow-y: auto;
   overflow-x: hidden;
   scrollbar-width: thin;
-  scrollbar-color: color-mix(in srgb, var(--color-primary-600) 40%, transparent) transparent;
+  scrollbar-color: var(--color-sidebar-scrollbar) transparent;
 }
 
 .saas-sidebar-menu.ant-menu {
@@ -198,15 +211,17 @@
   border-radius: 8px;
   margin: 3px 0;
   padding: 0 14px !important;
-  color: var(--color-primary-200);
-  transition: color 150ms ease, background 150ms ease;
+  color: var(--color-sidebar-text);
+  transition:
+    color 150ms ease,
+    background 150ms ease;
   overflow: visible;
 }
 
 /* Left accent bar — hidden by default */
 .saas-sidebar-menu.ant-menu-dark .ant-menu-item::before,
 .saas-sidebar-menu.ant-menu-dark .ant-menu-submenu-title::before {
-  content: '';
+  content: "";
   position: absolute;
   left: -12px;
   top: 50%;
@@ -214,8 +229,10 @@
   width: 3px;
   height: 55%;
   border-radius: 0 2px 2px 0;
-  background: var(--color-primary-400);
-  transition: transform 150ms ease, opacity 150ms ease;
+  background: var(--color-sidebar-accent);
+  transition:
+    transform 150ms ease,
+    opacity 150ms ease;
   opacity: 0;
   pointer-events: none;
 }
@@ -227,7 +244,7 @@
   min-width: 18px;
   display: inline-flex;
   justify-content: center;
-  color: var(--color-primary-400);
+  color: var(--color-sidebar-accent);
   margin-right: 10px;
   transition: color 150ms ease;
 }
@@ -236,8 +253,8 @@
 
 .saas-sidebar-menu.ant-menu-dark .ant-menu-item:hover,
 .saas-sidebar-menu.ant-menu-dark .ant-menu-submenu-title:hover {
-  color: var(--color-primary-50) !important;
-  background: color-mix(in srgb, var(--color-primary-600) 16%, transparent) !important;
+  color: var(--color-sidebar-text-hover) !important;
+  background: var(--color-sidebar-item-hover-bg) !important;
 }
 
 .saas-sidebar-menu.ant-menu-dark .ant-menu-item:hover::before,
@@ -247,8 +264,10 @@
 }
 
 .saas-sidebar-menu.ant-menu-dark .ant-menu-item:hover .ant-menu-item-icon,
-.saas-sidebar-menu.ant-menu-dark .ant-menu-submenu-title:hover .ant-menu-item-icon {
-  color: var(--color-primary-200);
+.saas-sidebar-menu.ant-menu-dark
+  .ant-menu-submenu-title:hover
+  .ant-menu-item-icon {
+  color: var(--color-sidebar-text-hover);
 }
 
 /* ─ Selected ──────────────────────────────────────────────────── */
@@ -257,8 +276,8 @@
 .saas-sidebar-menu.ant-menu-dark
   .ant-menu-submenu-selected
   > .ant-menu-submenu-title {
-  color: var(--color-primary-50) !important;
-  background: color-mix(in srgb, var(--color-primary-600) 28%, transparent) !important;
+  color: var(--color-sidebar-text-active) !important;
+  background: var(--color-sidebar-item-active-bg) !important;
   font-weight: 600;
 }
 
@@ -268,17 +287,17 @@
   > .ant-menu-submenu-title::before {
   transform: translateY(-50%) scaleY(1);
   opacity: 1;
-  background: var(--color-primary-400);
+  background: var(--color-sidebar-accent);
 }
 
 .saas-sidebar-menu.ant-menu-dark .ant-menu-item-selected .ant-menu-item-icon {
-  color: var(--color-primary-400);
+  color: var(--color-sidebar-accent);
 }
 
 /* ─ Submenu Arrow ─────────────────────────────────────────────── */
 
 .saas-sidebar-menu.ant-menu-dark .ant-menu-submenu-arrow {
-  color: var(--color-primary-400) !important;
+  color: var(--color-sidebar-accent) !important;
 }
 
 /* ─ Remove AntD active border ─────────────────────────────────── */
@@ -295,7 +314,7 @@
 .saas-sidebar-menu.ant-menu-dark .ant-menu-sub.ant-menu-inline {
   margin: 2px 0 6px 8px;
   padding: 2px 0 2px 8px;
-  border-left: 1px solid color-mix(in srgb, var(--color-primary-600) 45%, transparent);
+  border-left: 1px solid var(--color-sidebar-border-soft);
   background: transparent;
 }
 
@@ -305,21 +324,21 @@
   font-size: 0.8rem;
   border-radius: 6px;
   margin: 2px 0;
-  color: color-mix(in srgb, var(--color-primary-200) 75%, transparent);
+  color: var(--color-sidebar-text-muted);
 }
 
 .saas-sidebar-menu.ant-menu-dark
   .ant-menu-sub.ant-menu-inline
   .ant-menu-item:hover {
-  color: var(--color-primary-50);
-  background: color-mix(in srgb, var(--color-primary-600) 14%, transparent) !important;
+  color: var(--color-sidebar-text-hover);
+  background: var(--color-sidebar-item-nested-hover-bg) !important;
 }
 
 .saas-sidebar-menu.ant-menu-dark
   .ant-menu-sub.ant-menu-inline
   .ant-menu-item-selected {
-  background: color-mix(in srgb, var(--color-primary-600) 22%, transparent) !important;
-  color: var(--color-primary-50) !important;
+  background: var(--color-sidebar-item-nested-active-bg) !important;
+  color: var(--color-sidebar-text-active) !important;
   font-weight: 600;
 }
 
@@ -331,8 +350,8 @@
   position: relative;
   z-index: 2;
   padding: 12px;
-  border-top: 1px solid color-mix(in srgb, var(--color-primary-600) 28%, transparent);
-  background: color-mix(in srgb, var(--color-primary-700) 10%, transparent);
+  border-top: 1px solid var(--color-sidebar-border);
+  background: var(--color-sidebar-surface-elevated);
   flex-shrink: 0;
 }
 
@@ -372,7 +391,7 @@
   position: fixed;
   inset: 0;
   z-index: 40;
-  background: color-mix(in srgb, var(--color-bg-sidebar) 55%, transparent);
+  background: var(--color-sidebar-overlay);
   backdrop-filter: blur(3px);
 }
 
@@ -388,7 +407,7 @@
 
 .saas-sidebar-shell.is-mobile {
   border-radius: 0;
-  box-shadow: 4px 0 32px color-mix(in srgb, var(--color-primary-700) 35%, transparent);
+  box-shadow: 4px 0 32px var(--color-sidebar-shadow);
 }
 
 @media (max-width: 768px) {

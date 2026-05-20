@@ -49,7 +49,6 @@ const filterNavItems = (
       const visibleChildren = filterNavItems(item.children, hasAnyPerm);
       const canSeeSelf = userCanSee(item, hasAnyPerm);
 
-      // Show group if it has visible children OR if parent itself is visible
       if (visibleChildren.length === 0 && !canSeeSelf) return acc;
 
       if (visibleChildren.length > 0) {
@@ -197,9 +196,7 @@ const SidebarHeader = ({ isCollapsed }: SidebarHeaderProps) => (
   </div>
 );
 
-/* ═══════════════════════════════════════════════════════════════
-   COMPONENT: Sidebar Curve Decoration
-═══════════════════════════════════════════════════════════════ */
+
 
 const SidebarCurve = () => (
   <div className="saas-sidebar-curve" aria-hidden>

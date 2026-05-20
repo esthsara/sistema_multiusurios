@@ -98,7 +98,7 @@ const AuditoriaPage = () => {
 
   return (
     <div className="p-6">
-      {/* SARA areglar color de audittoria y actividades, filtros activos*/}
+
       <PageHeader
         title="Auditoría"
         description="Registro completo de todas las acciones realizadas en el sistema"

@@ -221,10 +221,7 @@ export const RoleUsersModal = ({
                 style={{ fontSize: 12 }}
               >{`@${user.username}`}</Text>
               {user.email && (
-                <AppTag
-                  icon={<Mail size={11} />}
-                  tone="neutral"
-                >
+                <AppTag icon={<Mail size={11} />} tone="neutral">
                   {user.email}
                 </AppTag>
               )}
@@ -241,17 +238,11 @@ export const RoleUsersModal = ({
       align: "center",
       render: (activo?: boolean) =>
         activo !== false ? (
-          <AppTag
-            icon={<CheckCircle size={12} />}
-            tone="success"
-          >
+          <AppTag icon={<CheckCircle size={12} />} tone="success">
             Activo
           </AppTag>
         ) : (
-          <AppTag
-            icon={<XCircle size={12} />}
-            tone="danger"
-          >
+          <AppTag icon={<XCircle size={12} />} tone="danger">
             Inactivo
           </AppTag>
         ),
@@ -296,7 +287,7 @@ export const RoleUsersModal = ({
       onCancel={onClose}
       width={860}
       centered
-      destroyOnClose
+      destroyOnHidden
       title={
         <Flex align="center" gap={12}>
           <Users size={22} style={{ color: token.colorPrimary }} />
@@ -385,7 +376,10 @@ export const RoleUsersModal = ({
         >
           <Text strong>
             Usuarios asignados{" "}
-            <AppTag tone="neutral" style={{ fontWeight: 700, borderRadius: "var(--radius-md)" }}>
+            <AppTag
+              tone="neutral"
+              style={{ fontWeight: 700, borderRadius: "var(--radius-md)" }}
+            >
               {users.length}
             </AppTag>
           </Text>

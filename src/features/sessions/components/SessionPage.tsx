@@ -1,5 +1,5 @@
 import { useMemo, useState } from "react";
-import { Card, Row, Col, Empty, Pagination, Tag } from "antd";
+import { Card, Empty, Pagination } from "antd";
 import type { TableColumnsType } from "antd";
 import dayjs from "dayjs";
 import { Monitor, Smartphone, Cpu, Box, Globe } from "lucide-react";
@@ -24,9 +24,10 @@ const deviceIcon = (device: string) => {
 
 const SessionCard = ({ session }: { session: SessionItem }) => (
   <Card
-    className="shadow-sm"
-    style={{ borderColor: "var(--color-border)" }}
-    bodyStyle={{ padding: 16 }}
+    className="shadow-sm border-[var(--color-border)]" 
+    styles={{
+      body: { padding: "16px" },
+    }}
   >
     <div className="flex items-start gap-3">
       <div className="h-10 w-10 rounded-md bg-gray-100 flex items-center justify-center text-blue-700">
@@ -84,18 +85,10 @@ const SessionCard = ({ session }: { session: SessionItem }) => (
 );
 
 const SessionsPage = () => {
-  console.log("[SessionsPage] COMPONENT MOUNTED");
+ 
   const sessions = useSessions();
-  console.log("[SessionsPage] Hook called, got:", sessions);
   const [viewMode, setViewMode] = useState<"cards" | "table">("cards");
   const [confirmOpen, setConfirmOpen] = useState(false);
-
-  console.log("[SessionsPage] Render state:", {
-    dataLength: sessions.data.length,
-    filteredLength: sessions.filtered.length,
-    loading: sessions.loading,
-    data: sessions.data,
-  });
 
   const columns: TableColumnsType<SessionItem> = useMemo(
     () => [

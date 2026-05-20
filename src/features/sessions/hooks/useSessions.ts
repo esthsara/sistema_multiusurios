@@ -21,41 +21,36 @@ export const useSessions = () => {
 
   const fetchSessions = useCallback(async () => {
     const reqId = ++requestIdRef.current;
-    console.log(`[useSessions] fetchSessions START (reqId=${reqId})`);
+    
     setLoading(true);
     try {
-      console.log(`[useSessions] Calling API...`);
+      
       const res = await sessionsService.getAll();
-      console.log("[useSessions] API Response:", res);
-      console.log("[useSessions] res.data:", res.data);
 
       if (reqId !== requestIdRef.current) {
-        console.log("[useSessions] Request outdated, skipping");
         return;
       }
 
       const items = res.data ?? [];
-      console.log(`[useSessions] Extracted ${items.length} items:`, items);
       setData(items);
     } catch (err) {
-      console.error("[useSessions] CATCH ERROR:", err);
+     
       if (reqId === requestIdRef.current)
         toast.error("Error al cargar sesiones");
     } finally {
       if (reqId === requestIdRef.current) setLoading(false);
-      console.log(`[useSessions] fetchSessions END (reqId=${reqId})`);
     }
   }, []);
 
   useEffect(() => {
-    console.log("[useSessions] useEffect hook triggered");
+   
     const timer = window.setTimeout(() => {
-      console.log("[useSessions] Timer fired, calling fetchSessions()");
+      
       fetchSessions();
     }, 250);
 
     return () => {
-      console.log("[useSessions] Cleanup: clearing timer");
+      
       window.clearTimeout(timer);
     };
   }, [fetchSessions]);

@@ -129,7 +129,7 @@ export const RolePermissionsModal = ({
       onCancel={onClose}
       width={900}
       centered
-      destroyOnClose
+      destroyOnHidden
       title={
         <Flex align="center" gap="middle">
           <ShieldCheck size={24} style={{ color: token.colorPrimary }} />

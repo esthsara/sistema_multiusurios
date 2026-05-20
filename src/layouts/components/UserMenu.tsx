@@ -90,13 +90,13 @@ export const UserMenu = ({ collapsed }: UserMenuProps) => {
           <div className="flex-1 min-w-0">
             <p
               className="text-xs font-semibold m-0 truncate"
-              style={{ color: "var(--color-text-inverse)" }}
+              style={{ color: "var(--color-primary-600)" }}
             >
               {safeName}
             </p>
             <p
               className="text-xs m-0 truncate"
-              style={{ color: "var(--color-primary-200)" }}
+              style={{ color: "var(--color-primary-400)" }}
             >
               {safeRole}
             </p>

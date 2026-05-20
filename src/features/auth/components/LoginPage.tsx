@@ -126,7 +126,7 @@ const LoginPage = () => {
               />
             </Form.Item>
 
-            <div className="text-right mb-3">
+            {/*<div className="text-right mb-3">
               <a
                 href="/recuperar-password"
                 className="text-xs hover:underline"
@@ -134,8 +134,7 @@ const LoginPage = () => {
               >
                 ¿Olvidaste tu contraseña?
               </a>
-            </div>
-            {/* SARA  */}
+            </div>*/}
 
             <Form.Item className="mb-0">
               <Button

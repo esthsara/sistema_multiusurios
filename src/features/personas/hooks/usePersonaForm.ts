@@ -134,9 +134,6 @@ export const usePersonaForm = (onSuccess: () => void) => {
       // modal.openEdit setea selectedItem y abre el modal
       modal.openEdit(response.data);
     } catch (error) {
-      if (import.meta.env.DEV) {
-        console.error("[usePersonaForm.handleEdit]", error);
-      }
       toast.error("No se pudo cargar la información de la persona");
       // Resetear tipo en caso de error
       setTipoSeleccionado(null);
@@ -166,10 +163,6 @@ export const usePersonaForm = (onSuccess: () => void) => {
       modal.close();
       onSuccess();
     } catch (error) {
-      // Log para debugging en desarrollo
-      if (import.meta.env.DEV) {
-        console.error("[usePersonaForm.handleSubmit]", error);
-      }
       toast.error(
         modal.isEditMode
           ? "Error al actualizar persona"
