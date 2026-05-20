@@ -79,25 +79,44 @@ export const getConfirmConfig = (
   type: "toggle" | "delete",
   estado?: EstadoPersona,
   displayName?: string | null,
+  tieneUsuario?: boolean,
 ): ConfirmConfig => {
   if (type === "toggle") {
     const isActive = estado === "ACTIVO";
     return {
       title: isActive
         ? `Desactivar a ${displayName ?? "esta persona"}`
-        : `Activar a ${displayName ?? "esta persona"}`,
+        : `Reactivar a ${displayName ?? "esta persona"}`,
       description: isActive
-        ? "Esta persona dejará de tener acceso al sistema."
-        : "La persona podrá volver a utilizar el sistema.",
-      confirmText: isActive ? "Desactivar" : "Activar",
+        ? tieneUsuario
+          ? "La persona pasará a estado INACTIVO y su usuario asociado será desactivado automáticamente, bloqueando el acceso al sistema."
+          : "La persona pasará a estado INACTIVO y no podrá participar en operaciones del sistema."
+        : "La persona volverá a estado ACTIVO. El usuario asociado (si existe) permanecerá inactivo hasta que un administrador lo habilite manualmente.",
+      confirmText: isActive ? "Desactivar" : "Reactivar",
       danger: isActive,
       iconType: isActive ? "poweroff" : "rotateccw",
     };
   }
 
+  // type === "delete"
+  if (tieneUsuario) {
+    const isActivo = estado === "ACTIVO";
+    return {
+      title: "No se puede eliminar esta persona",
+      description: isActivo
+        ? `"${displayName ?? "Esta persona"}" tiene un usuario relacionado. No es posible eliminarla físicamente.\n\nPuede desactivarla en su lugar para bloquear el acceso al sistema sin perder el historial.`
+        : `"${displayName ?? "Esta persona"}" tiene un usuario relacionado. No es posible eliminarla físicamente.`,
+      confirmText: isActivo ? "Desactivar en su lugar" : "Entendido",
+      danger: false,
+      iconType: "poweroff",
+      blockDelete: true,
+    };
+  }
+
   return {
-    title: "Eliminar persona",
-    description: `Se eliminará a ${displayName ?? "esta persona"}. No podrás restaurarla más adelante.`,
+    title: `Eliminar a ${displayName ?? "esta persona"}`,
+    description:
+      "Esta acción aplicará una baja lógica. La persona quedará inactiva y podrás restaurarla si es necesario.",
     confirmText: "Eliminar",
     danger: true,
     iconType: "trash2",

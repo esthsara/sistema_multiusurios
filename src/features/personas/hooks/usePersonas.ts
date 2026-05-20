@@ -2,6 +2,7 @@
 import { useState, useEffect, useCallback } from "react";
 import { toast } from "react-toastify";
 import { personasService } from "../services/personas.service";
+import { usuariosService } from "@/features/usuarios/services/usuarios.service";
 import { useTableState } from "@/shared/hooks/useTableState";
 import type {
   PersonaListItem,
@@ -120,6 +121,19 @@ export const usePersonas = () => {
     const nuevoEstado = persona.estado === "ACTIVO" ? "INACTIVO" : "ACTIVO";
     try {
       await personasService.toggleEstado(persona.id, nuevoEstado);
+      
+      // Si se desactiva la persona y tiene usuario, desactivar usuario también
+      if (nuevoEstado === "INACTIVO" && persona.usuario_asociado) {
+        try {
+          await usuariosService.toggleStatus(persona.usuario_asociado.id, {
+            activo: false,
+            motivo: "Desactivación automática al desactivar la persona",
+          });
+        } catch (error) {
+          console.error("Error al desactivar el usuario asociado", error);
+        }
+      }
+
       toast.success(
         nuevoEstado === "ACTIVO"
           ? "Persona activada correctamente"

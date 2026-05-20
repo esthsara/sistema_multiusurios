@@ -29,7 +29,7 @@ export const UsuarioRol = ({ usuario, onRolesChanged }: UsuarioRolProps) => {
   const { token } = theme.useToken();
   const hasPermission = useAuthStore((state) => state.hasPermission);
   const canGestionarRoles =
-    hasPermission("roles.ver") && hasPermission("usuarios.editar");
+    hasPermission("roles.ver") && hasPermission("usuarios.editar") && usuario.activo;
 
   const [modalOpen, setModalOpen] = useState(false);
   const [rolesActuales, setRolesActuales] = useState<RolDetalleSimple[]>(

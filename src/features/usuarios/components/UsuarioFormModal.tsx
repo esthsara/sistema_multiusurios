@@ -37,7 +37,7 @@ export const UsuarioFormModal = ({
       .then((res) => {
         setPersonas(
           Array.isArray(res.data)
-            ? res.data.filter((p) => !p.usuario_asociado)
+            ? res.data.filter((p) => !p.usuario_asociado && p.estado === "ACTIVO")
             : [],
         );
       })
@@ -222,12 +222,18 @@ export const UsuarioFormModal = ({
               <div>
                 <p className="text-sm font-semibold m-0">Estado de la cuenta</p>
                 <p className="text-xs text-[var(--color-text-secondary)] m-0">
-                  Permitir acceso al sistema
+                  {isEditMode && selectedItem?.persona.estado === "INACTIVO"
+                    ? "Persona inactiva. No se puede activar."
+                    : "Permitir acceso al sistema"}
                 </p>
               </div>
 
               <Form.Item name="activo" valuePropName="checked" className="m-0">
-                <Switch checkedChildren="Activo" unCheckedChildren="Inactivo" />
+                <Switch 
+                  checkedChildren="Activo" 
+                  unCheckedChildren="Inactivo" 
+                  disabled={isEditMode && selectedItem?.persona.estado === "INACTIVO"}
+                />
               </Form.Item>
             </div>
           </div>

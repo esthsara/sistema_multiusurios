@@ -105,5 +105,6 @@ export interface ConfirmConfig {
   confirmText: string
   danger: boolean
   iconType: IconType
+  blockDelete?: boolean
 }
 

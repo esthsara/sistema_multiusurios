@@ -105,7 +105,7 @@ export const AsignacionesPage = () => {
           sucursalesService.getById(selectedSucursal),
         ]);
 
-        const allUsers = allUsersRes.data ?? [];
+        const allUsers = (allUsersRes.data ?? []).filter((u) => u.activo === true);
         const asignados = sucursalRes.data.usuarios ?? [];
 
         setUsuarios(allUsers);

@@ -150,13 +150,15 @@ const PersonaDetallePage = () => {
               Volver
             </Button>
             <Can permission="personas.editar">
-              <Button
-                type="primary"
-                icon={<Pencil size={15} />}
-                onClick={() => setEditOpen(true)}
-              >
-                Editar Perfil
-              </Button>
+              {persona?.estado === "ACTIVO" && (
+                <Button
+                  type="primary"
+                  icon={<Pencil size={15} />}
+                  onClick={() => setEditOpen(true)}
+                >
+                  Editar Perfil
+                </Button>
+              )}
             </Can>
           </div>
         }

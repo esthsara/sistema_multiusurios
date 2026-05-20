@@ -58,7 +58,13 @@ const PersonasPage = () => {
       if (confirmState.type === "toggle") {
         await personas.toggleEstado(confirmState.item);
       } else {
-        await personas.remove(confirmState.item.id);
+        if (currentConfirm?.blockDelete) {
+          if (confirmState.item.estado === "ACTIVO") {
+            await personas.toggleEstado(confirmState.item);
+          }
+        } else {
+          await personas.remove(confirmState.item.id);
+        }
       }
     } finally {
       closeConfirm();
@@ -167,13 +173,17 @@ const PersonasPage = () => {
             onClick: () =>
               navigate(APP_ROUTES.DASHBOARD.PERSONAS.DETALLE(record.id)),
           },
-          {
-            key: "edit",
-            permission: "personas.editar" as const,
-            label: "Editar",
-            icon: <Pencil size={14} />,
-            onClick: () => form.handleEdit(record),
-          },
+          ...(record.estado === "ACTIVO"
+            ? [
+                {
+                  key: "edit",
+                  permission: "personas.editar" as const,
+                  label: "Editar",
+                  icon: <Pencil size={14} />,
+                  onClick: () => form.handleEdit(record),
+                },
+              ]
+            : []),
           {
             key: "toggle",
             permission: "personas.editar" as const,
@@ -216,6 +226,7 @@ const PersonasPage = () => {
           confirmState.type,
           confirmState.item.estado,
           getDisplayName(confirmState.item),
+          !!confirmState.item.usuario_asociado,
         )
       : null;
 
