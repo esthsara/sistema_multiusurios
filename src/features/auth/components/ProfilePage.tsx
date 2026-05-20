@@ -274,12 +274,13 @@ const ChangePasswordModal = ({
       cancelText="Cancelar"
       width={440}
       destroyOnHidden
+
     >
       <Alert
         type="info"
         showIcon
         style={{ marginBottom: 18, marginTop: 8 }}
-        message="Al cambiar tu contraseña, la sesión actual se cerrará automáticamente."
+        title="Al cambiar tu contraseña, la sesión actual se cerrará automáticamente."
       />
       <Form
         form={form}
