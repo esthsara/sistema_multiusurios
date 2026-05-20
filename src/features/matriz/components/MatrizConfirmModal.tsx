@@ -24,7 +24,7 @@ export const MatrizConfirmModal = ({
       footer={null}
       onCancel={onCancel}
       centered
-      destroyOnClose
+      destroyOnHidden
       width={520}
       title={
         <Flex align="center" gap="middle">
