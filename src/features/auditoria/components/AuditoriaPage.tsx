@@ -117,7 +117,11 @@ const AuditoriaPage = () => {
             <Statistic
               title="Actividades"
               value={auditoria.total}
-              valueStyle={{ color: "var(--color-primary-600)" }}
+              styles={{
+                content: {
+                  color: "var(--color-primary-600)"
+                }
+              }}
             />
           </div>
         </Col>
