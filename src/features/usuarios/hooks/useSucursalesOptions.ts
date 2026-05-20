@@ -16,10 +16,12 @@ export const useSucursalesOptions = () => {
 
   const branchOptions: SucursalOption[] = useMemo(
     () =>
-      sucursales.map((sucursal) => ({
-        label: sucursal.nombre,
-        value: sucursal.id,
-      })),
+      sucursales
+        .filter((sucursal) => sucursal.activa)
+        .map((sucursal) => ({
+          label: sucursal.nombre,
+          value: sucursal.id,
+        })),
     [sucursales],
   );
 

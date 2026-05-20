@@ -87,6 +87,7 @@ export interface BackendSucursal {
   clave?: string;
   codigo?: string;
   es_actual?: boolean;
+  activa?: boolean;
 }
 
 export interface BackendRoleObject {
@@ -188,6 +189,7 @@ export interface Sucursal {
   id: number;
   nombre: string;
   clave: string;
+  activa: boolean;
 }
 
 export interface Role {

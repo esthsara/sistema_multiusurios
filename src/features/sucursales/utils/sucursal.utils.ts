@@ -22,6 +22,7 @@ export interface ConfirmConfig {
   confirmText: string;
   danger: boolean;
   icon: ReactNode;
+  blockDelete?: boolean;
 }
 
 export const getConfirmConfig = (
@@ -42,6 +43,18 @@ export const getConfirmConfig = (
       icon: isActive
         ? createElement(PowerOff, { size: 22, className: "text-yellow-400" })
         : createElement(RotateCcw, { size: 22, className: "text-green-400" }),
+    };
+  }
+
+  const hasUsers = sucursal && (sucursal.usuarios_count ?? 0) > 0;
+  if (hasUsers) {
+    return {
+      title: "No se puede eliminar la sucursal",
+      description: `No se puede eliminar la sucursal porque tiene usuarios asignados. Debe desvincular los usuarios antes de eliminarla.`,
+      confirmText: "Entendido",
+      danger: false,
+      icon: createElement(PowerOff, { size: 22, className: "text-yellow-400" }),
+      blockDelete: true,
     };
   }
 

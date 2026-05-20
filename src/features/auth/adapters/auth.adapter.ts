@@ -86,6 +86,7 @@ export const adaptSucursal = (
   id: sucursal.id,
   nombre: sucursal.nombre,
   clave: resolveSucursalClave(sucursal),
+  activa: sucursal.activa ?? true,
 });
 
 const adaptBusinessActual = (
@@ -143,7 +144,8 @@ export const adaptBackendUser = (
      */
     permisos: user.permisos ?? [],
 
-    sucursales: (user.sucursales ?? []).map(adaptSucursal),
+    sucursales: (user.sucursales ?? [])
+      .map(adaptSucursal),
 
     /**
      * sucursalActiva — normalizamos ambos nombres del backend:

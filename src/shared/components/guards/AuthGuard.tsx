@@ -44,9 +44,9 @@ export const AuthGuard = () => {
     );
   }
 
-  // Autenticado pero sin sucursal asignada → página informativa
-  // Evita que el usuario navegue la app con X-Sucursal-ID vacío
-  if (user && user.sucursales.length === 0) {
+  // Autenticado pero sin sucursal asignada o sin sucursales activas → página informativa
+  const hasActiveBranch = user?.sucursales.some((s) => s.activa);
+  if (user && (!hasActiveBranch || user.sucursales.length === 0)) {
     return <Navigate to={APP_ROUTES.NO_BRANCH} replace />;
   }
 

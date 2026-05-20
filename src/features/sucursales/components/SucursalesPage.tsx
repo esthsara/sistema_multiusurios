@@ -59,6 +59,10 @@ const SucursalesPage = () => {
       if (confirmState.type === "toggle") {
         await sucursales.toggleEstado(confirmState.item);
       } else {
+        if (currentConfirm?.blockDelete) {
+          closeConfirm();
+          return;
+        }
         await sucursales.remove(confirmState.item);
       }
     } finally {
@@ -151,21 +155,25 @@ const SucursalesPage = () => {
       width: 170,
       render: (_, record) => {
         const actions = [
-          {
-            key: "view",
-            permission: "sucursales.ver" as const,
-            label: "Ver",
-            icon: <Eye size={14} />,
-            onClick: () =>
-              navigate(APP_ROUTES.DASHBOARD.SUCURSALES.DETALLE(record.id)),
-          },
-          {
-            key: "edit",
-            permission: "sucursales.editar" as const,
-            label: "Editar",
-            icon: <Pencil size={14} />,
-            onClick: () => form.handleEdit(record),
-          },
+          ...(record.activa
+            ? [
+                {
+                  key: "view",
+                  permission: "sucursales.ver" as const,
+                  label: "Ver",
+                  icon: <Eye size={14} />,
+                  onClick: () =>
+                    navigate(APP_ROUTES.DASHBOARD.SUCURSALES.DETALLE(record.id)),
+                },
+                {
+                  key: "edit",
+                  permission: "sucursales.editar" as const,
+                  label: "Editar",
+                  icon: <Pencil size={14} />,
+                  onClick: () => form.handleEdit(record),
+                },
+              ]
+            : []),
           {
             key: "toggle",
             permission: "sucursales.editar" as const,
@@ -183,14 +191,18 @@ const SucursalesPage = () => {
             ),
             onClick: () => openConfirm("toggle", record),
           },
-          {
-            key: "delete",
-            permission: "sucursales.eliminar" as const,
-            label: "Enviar a papelera",
-            icon: <Trash2 size={14} />,
-            danger: true,
-            onClick: () => openConfirm("delete", record),
-          },
+          ...(record.activa
+            ? [
+                {
+                  key: "delete",
+                  permission: "sucursales.eliminar" as const,
+                  label: "Enviar a papelera",
+                  icon: <Trash2 size={14} />,
+                  danger: true,
+                  onClick: () => openConfirm("delete", record),
+                },
+              ]
+            : []),
         ];
 
         return <RowActions actions={actions} />;

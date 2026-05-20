@@ -65,7 +65,7 @@ export const BranchSelector = ({ collapsed }: BranchSelectorProps) => {
               toast.error("No se pudo cambiar la sucursal activa");
             }
           }}
-          options={sucursales.map((s: Sucursal) => ({
+          options={sucursales.filter((s: Sucursal) => s.activa).map((s: Sucursal) => ({
             value: s.id,
             label: safeText(s.nombre, "Sucursal", 80),
           }))}

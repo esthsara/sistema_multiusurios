@@ -349,14 +349,16 @@ export const useAuthStore = create<AuthStore>()(
           const response = await authService.getUserBranches();
           const payload = response.data;
 
-          const sucursales = (payload.items ?? []).map((item) =>
-            adaptSucursal({
-              id: item.id,
-              nombre: item.nombre,
-              clave: item.clave,
-              codigo: item.codigo,
-            }),
-          );
+          const sucursales = (payload.items ?? [])
+            .map((item) =>
+              adaptSucursal({
+                id: item.id,
+                nombre: item.nombre,
+                clave: item.clave,
+                codigo: item.codigo,
+                activa: item.activa,
+              }),
+            );
 
           const activeBranchId = payload.sucursal_actual;
           const sucursalActiva =

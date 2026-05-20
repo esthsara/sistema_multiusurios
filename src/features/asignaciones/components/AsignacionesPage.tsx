@@ -70,6 +70,7 @@ const matchesSearch = (usuario: UsuarioListItem, search: string): boolean => {
 export const AsignacionesPage = () => {
   const { asignar, quitar } = useAsignaciones();
   const { sucursales: misSucursales } = useAuth();
+  const activeSucursales = misSucursales.filter(s => s.activa);
 
   // Estado esencial
   const [usuarios, setUsuarios] = useState<UsuarioListItem[]>([]);
@@ -85,10 +86,10 @@ export const AsignacionesPage = () => {
   ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ */
 
   useEffect(() => {
-    if (misSucursales.length > 0 && !selectedSucursal) {
-      setSelectedSucursal(misSucursales[0].id);
+    if (activeSucursales.length > 0 && !selectedSucursal) {
+      setSelectedSucursal(activeSucursales[0].id);
     }
-  }, [misSucursales, selectedSucursal]);
+  }, [activeSucursales, selectedSucursal]);
 
   /* ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
      CARGA DE DATOS AL CAMBIAR SUCURSAL
@@ -293,7 +294,7 @@ export const AsignacionesPage = () => {
     );
   }
 
-  const sucursalSeleccionada = misSucursales.find(
+  const sucursalSeleccionada = activeSucursales.find(
     (s) => s.id === selectedSucursal,
   );
 
@@ -336,7 +337,7 @@ export const AsignacionesPage = () => {
               onChange={setSelectedSucursal}
               style={{ width: "100%", maxWidth: "400px" }}
               placeholder="Selecciona una sucursal"
-              options={misSucursales.map((s) => ({
+              options={activeSucursales.map((s) => ({
                 label: `${s.nombre} ${s.clave ? `(${s.clave})` : ""}`,
                 value: s.id,
               }))}
