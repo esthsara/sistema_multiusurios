@@ -165,16 +165,16 @@ const PersonasPage = () => {
       width: 180,
       render: (_, record) => {
         const actions = [
-          {
-            key: "view",
-            permission: "personas.ver" as const,
-            label: "Ver",
-            icon: <Eye size={14} />,
-            onClick: () =>
-              navigate(APP_ROUTES.DASHBOARD.PERSONAS.DETALLE(record.id)),
-          },
           ...(record.estado === "ACTIVO"
             ? [
+                {
+                  key: "view",
+                  permission: "personas.ver" as const,
+                  label: "Ver",
+                  icon: <Eye size={14} />,
+                  onClick: () =>
+                    navigate(APP_ROUTES.DASHBOARD.PERSONAS.DETALLE(record.id)),
+                },
                 {
                   key: "edit",
                   permission: "personas.editar" as const,
@@ -202,14 +202,18 @@ const PersonasPage = () => {
               ),
             onClick: () => openConfirm("toggle", record),
           },
-          {
-            key: "delete",
-            permission: "personas.eliminar" as const,
-            label: "Eliminar",
-            icon: <Trash2 size={14} />,
-            danger: true,
-            onClick: () => openConfirm("delete", record),
-          },
+          ...(record.estado === "ACTIVO"
+            ? [
+                {
+                  key: "delete",
+                  permission: "personas.eliminar" as const,
+                  label: "Eliminar",
+                  icon: <Trash2 size={14} />,
+                  danger: true,
+                  onClick: () => openConfirm("delete", record),
+                },
+              ]
+            : []),
         ];
 
         return <RowActions actions={actions} />;

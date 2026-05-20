@@ -177,21 +177,25 @@ const UsuariosPage = () => {
       width: 140,
       render: (_, record) => {
         const actions = [
-          {
-            key: "view",
-            permission: "usuarios.ver" as const,
-            label: "Ver",
-            icon: <Eye size={14} />,
-            onClick: () =>
-              navigate(APP_ROUTES.DASHBOARD.USUARIOS.DETALLE(record.id)),
-          },
-          {
-            key: "edit",
-            permission: "usuarios.editar" as const,
-            label: "Editar",
-            icon: <Pencil size={14} />,
-            onClick: () => form.handleEdit(record),
-          },
+          ...(record.activo
+            ? [
+                {
+                  key: "view",
+                  permission: "usuarios.ver" as const,
+                  label: "Ver",
+                  icon: <Eye size={14} />,
+                  onClick: () =>
+                    navigate(APP_ROUTES.DASHBOARD.USUARIOS.DETALLE(record.id)),
+                },
+                {
+                  key: "edit",
+                  permission: "usuarios.editar" as const,
+                  label: "Editar",
+                  icon: <Pencil size={14} />,
+                  onClick: () => form.handleEdit(record),
+                },
+              ]
+            : []),
           {
             key: "toggle",
             permission: "usuarios.editar" as const,
@@ -209,14 +213,18 @@ const UsuariosPage = () => {
             ),
             onClick: () => openConfirm("toggle", record),
           },
-          {
-            key: "delete",
-            permission: "usuarios.eliminar" as const,
-            label: "Eliminar",
-            icon: <Trash2 size={14} />,
-            danger: true,
-            onClick: () => openConfirm("delete", record),
-          },
+          ...(record.activo
+            ? [
+                {
+                  key: "delete",
+                  permission: "usuarios.eliminar" as const,
+                  label: "Eliminar",
+                  icon: <Trash2 size={14} />,
+                  danger: true,
+                  onClick: () => openConfirm("delete", record),
+                },
+              ]
+            : []),
         ];
 
         return <RowActions actions={actions} />;
