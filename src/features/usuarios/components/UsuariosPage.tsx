@@ -8,7 +8,6 @@ import {
   RotateCcw,
   PowerOff,
   Eye,
-  Key,
 } from "lucide-react";
 import type { TableColumnsType } from "antd";
 
@@ -179,22 +178,22 @@ const UsuariosPage = () => {
         const actions = [
           ...(record.activo
             ? [
-                {
-                  key: "view",
-                  permission: "usuarios.ver" as const,
-                  label: "Ver",
-                  icon: <Eye size={14} />,
-                  onClick: () =>
-                    navigate(APP_ROUTES.DASHBOARD.USUARIOS.DETALLE(record.id)),
-                },
-                {
-                  key: "edit",
-                  permission: "usuarios.editar" as const,
-                  label: "Editar",
-                  icon: <Pencil size={14} />,
-                  onClick: () => form.handleEdit(record),
-                },
-              ]
+              {
+                key: "view",
+                permission: "usuarios.ver" as const,
+                label: "Ver",
+                icon: <Eye size={14} />,
+                onClick: () =>
+                  navigate(APP_ROUTES.DASHBOARD.USUARIOS.DETALLE(record.id)),
+              },
+              {
+                key: "edit",
+                permission: "usuarios.editar" as const,
+                label: "Editar",
+                icon: <Pencil size={14} />,
+                onClick: () => form.handleEdit(record),
+              },
+            ]
             : []),
           {
             key: "toggle",
@@ -215,15 +214,15 @@ const UsuariosPage = () => {
           },
           ...(record.activo
             ? [
-                {
-                  key: "delete",
-                  permission: "usuarios.eliminar" as const,
-                  label: "Eliminar",
-                  icon: <Trash2 size={14} />,
-                  danger: true,
-                  onClick: () => openConfirm("delete", record),
-                },
-              ]
+              {
+                key: "delete",
+                permission: "usuarios.eliminar" as const,
+                label: "Eliminar",
+                icon: <Trash2 size={14} />,
+                danger: true,
+                onClick: () => openConfirm("delete", record),
+              },
+            ]
             : []),
         ];
 

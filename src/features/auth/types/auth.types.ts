@@ -28,6 +28,7 @@ export interface UserBranchItem {
   codigo?: string;
   clave?: string;
   es_actual?: boolean;
+  activa?: boolean;
 }
 
 export interface UserBranchesResponseData {
