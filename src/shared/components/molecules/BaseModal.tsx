@@ -1,4 +1,17 @@
 import { Modal, Button } from "antd";
+import type { ReactNode } from "react";
+
+interface BaseModalProps {
+  open: boolean;
+  title: string;
+  subtitle?: string;
+  onCancel: () => void;
+  onSubmit?: () => void;
+  loading?: boolean;
+  submitText?: string;
+  children: ReactNode;
+  width?: number | string;
+}
 
 export const BaseModal = ({
   open,
@@ -9,9 +22,10 @@ export const BaseModal = ({
   loading,
   submitText = "Guardar",
   children,
-}: any) => {
+  width = 720,
+}: BaseModalProps) => {
   return (
-    <Modal open={open} footer={null} onCancel={onCancel} centered width={720}>
+    <Modal open={open} footer={null} onCancel={onCancel} centered width={width}>
       <div className="space-y-5">
         <div>
           <h2 className="text-base font-semibold">{title}</h2>

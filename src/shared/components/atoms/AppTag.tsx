@@ -26,7 +26,7 @@ const TONE_STYLES: Record<
   AppTagTone,
   { backgroundColor: string; color: string; borderColor: string }
 > = {
-  // NEUTRAL - gris suave
+  // NEUTRAL - gris suave  cuando no es importnate
   neutral: {
     backgroundColor: "var(--tag-neutral-bg)",
     color: "var(--tag-neutral-text)",
@@ -40,28 +40,28 @@ const TONE_STYLES: Record<
     borderColor: "var(--color-primary-400)",
   },
 
-  // SUCCESS - verde vibrante
+  // SUCCESS - verde vibrante  para hechos suces
   success: {
     backgroundColor: "var(--color-alert-success-bg)",
     color: "var(--color-success-500)",
     borderColor: "var(--color-success-600)",
   },
 
-  // WARNING - naranja vibrante
+  // WARNING - naranja vibrante hay un posible poblema
   warning: {
     backgroundColor: "var(--color-alert-warning-bg)",
     color: "var(--color-warning-500)",
     borderColor: "var(--color-warning-600)",
   },
 
-  // DANGER - rojo vibrante
+  // DANGER - rojo vibrante hay un problema
   danger: {
     backgroundColor: "var(--color-alert-danger-bg)",
     color: "var(--color-danger-500)",
     borderColor: "var(--color-danger-600)",
   },
 
-  // PURPLE - morado vibrante
+  // PURPLE - morado vibrante  morado por  
   purple: {
     backgroundColor: "var(--tag-purple-bg)",
     color: "var(--tag-purple-text)",
@@ -81,6 +81,7 @@ const TONE_STYLES: Record<
     color: "var(--tag-geekblue-text)",
     borderColor: "var(--tag-geekblue-border)",
   },
+
   volcano: {
     backgroundColor: "var(--tag-volcano-bg)",
     color: "var(--tag-volcano-text)",
@@ -101,7 +102,7 @@ const TONE_STYLES: Record<
     borderColor: "var(--tag-magenta-border)",
   },
 
-  // GOLD - dorado vibrante
+  // GOLD - dorado vibrante para que sea importante y resalte tipo dorado
   gold: {
     backgroundColor: "var(--tag-gold-bg)",
     color: "var(--tag-gold-text)",

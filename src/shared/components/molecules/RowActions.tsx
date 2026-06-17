@@ -1,3 +1,4 @@
+import { useMemo, useCallback } from "react";
 import { Button, Dropdown, Grid, Tooltip } from "antd";
 import type { MenuProps } from "antd";
 import { Ellipsis } from "lucide-react";
@@ -27,36 +28,49 @@ export const RowActions = ({
   const { can } = usePermissions();
   const screens = Grid.useBreakpoint();
 
-  const allowedActions = actions.filter(
-    (action) => !action.permission || can(action.permission),
-  );
+  const allowedActions = useMemo(() => {
+    return actions.filter(
+      (action) => !action.permission || can(action.permission),
+    );
+  }, [actions, can]);
 
   if (!allowedActions.length) return null;
 
   const forceCollapse =
     allowedActions.length > collapseWhenMoreThan || !screens.lg;
 
-  const visibleActions = forceCollapse
-    ? []
-    : allowedActions.slice(0, maxVisible);
+  const visibleActions = useMemo(() => {
+    return forceCollapse ? [] : allowedActions.slice(0, maxVisible);
+  }, [forceCollapse, allowedActions, maxVisible]);
 
-  const hiddenActions = forceCollapse
-    ? allowedActions
-    : allowedActions.slice(maxVisible);
+  const hiddenActions = useMemo(() => {
+    return forceCollapse ? allowedActions : allowedActions.slice(maxVisible);
+  }, [forceCollapse, allowedActions, maxVisible]);
 
-  const dropdownItems: MenuProps["items"] = hiddenActions.map((action) => ({
-    key: action.key,
-    danger: action.danger,
-    label: (
-      <span className="row-actions-dropdown-item">
-        {action.icon}
-        <span>{action.label}</span>
-      </span>
-    ),
-  }));
+  const dropdownItems: MenuProps["items"] = useMemo(() => {
+    return hiddenActions.map((action) => ({
+      key: action.key,
+      danger: action.danger,
+      label: (
+        <span className="row-actions-dropdown-item flex items-center gap-2">
+          {action.icon}
+          <span>{action.label}</span>
+        </span>
+      ),
+    }));
+  }, [hiddenActions]);
+
+  const handleDropdownClick: MenuProps["onClick"] = useCallback(
+    ({ key }: { key: string | number }) => {
+      const keyStr = String(key);
+      const action = hiddenActions.find((item) => item.key === keyStr);
+      action?.onClick();
+    },
+    [hiddenActions],
+  );
 
   return (
-    <div className="row-actions-wrap">
+    <div className="row-actions-wrap flex items-center gap-1">
       {visibleActions.map((action) => (
         <Tooltip key={action.key} title={action.label}>
           <Button
@@ -75,10 +89,7 @@ export const RowActions = ({
           trigger={["hover", "click"]}
           menu={{
             items: dropdownItems,
-            onClick: ({ key }) => {
-              const action = hiddenActions.find((item) => item.key === key);
-              action?.onClick();
-            },
+            onClick: handleDropdownClick,
           }}
         >
           <Button

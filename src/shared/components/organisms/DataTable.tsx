@@ -1,8 +1,13 @@
 // src/shared/components/organisms/DataTable.tsx
+import { useCallback, useMemo } from "react";
 import { Table, Empty } from "antd";
-import type { TableProps } from "antd";
+import type {
+  TablePaginationConfig,
+  FilterValue,
+  SorterResult,
+  TableCurrentDataSource,
+} from "antd/es/table/interface";
 import type { DataTableProps } from "@/shared/types/table.types";
-
 
 /**
  * DataTable<T> — Tabla genérica reutilizable con soporte light/dark mode
@@ -30,32 +35,65 @@ export const DataTable = <T extends object>({
 }: DataTableProps<T>) => {
   const safeData = Array.isArray(data) ? data : [];
 
-  const handleTableChange: TableProps<T>["onChange"] = (
-    _pagination,
-    _filters,
-    sorter,
-    extra,
-  ) => {
-    if (!onSortChange) return;
-    if (extra.action !== "sort") return;
+  const handleTableChange = useCallback(
+    (
+      _pagination: TablePaginationConfig,
+      _filters: Record<string, FilterValue | null>,
+      sorter: SorterResult<T> | SorterResult<T>[],
+      extra: TableCurrentDataSource<T>,
+    ) => {
+      if (!onSortChange) return;
+      if (extra.action !== "sort") return;
 
-    const currentSorter = Array.isArray(sorter) ? sorter[0] : sorter;
-    if (!currentSorter?.order) {
-      onSortChange(null);
-      return;
-    }
+      const currentSorter = Array.isArray(sorter) ? sorter[0] : sorter;
+      if (!currentSorter?.order) {
+        onSortChange(null);
+        return;
+      }
 
-    const field = String(currentSorter.field ?? currentSorter.columnKey ?? "");
-    if (!field) {
-      onSortChange(null);
-      return;
-    }
+      const field = String(
+        currentSorter.field ?? currentSorter.columnKey ?? "",
+      );
+      if (!field) {
+        onSortChange(null);
+        return;
+      }
 
-    onSortChange({
-      field,
-      direction: currentSorter.order === "ascend" ? "asc" : "desc",
-    });
-  };
+      onSortChange({
+        field,
+        direction: currentSorter.order === "ascend" ? "asc" : "desc",
+      });
+    },
+    [onSortChange],
+  );
+
+  const rowProps = useCallback(
+    (record: T) => ({
+      onClick: () => onRowClick?.(record),
+      className: "cursor-pointer",
+      style: {
+        transition: "all var(--transition-base)",
+      },
+    }),
+    [onRowClick],
+  );
+
+  const paginationConfig = useMemo(() => {
+    if (!pagination) return false;
+    return {
+      current: pagination.current,
+      pageSize: pagination.pageSize,
+      total: pagination.total,
+      onChange: pagination.onChange,
+      onShowSizeChange: pagination.onChange,
+      showSizeChanger: true,
+      responsive: true,
+      showLessItems: true,
+      showTotal: (total: number, range: [number, number]) =>
+        `${range[0]}-${range[1]} de ${total} registros`,
+      pageSizeOptions: ["6", "12", "24", "48"],
+    };
+  }, [pagination]);
 
   return (
     <Table<T>
@@ -67,34 +105,8 @@ export const DataTable = <T extends object>({
       size="middle"
       scroll={{ x: scrollX }}
       onChange={handleTableChange}
-      onRow={
-        onRowClick
-          ? (record) => ({
-              onClick: () => onRowClick(record),
-              className: "cursor-pointer",
-              style: {
-                transition: "all var(--transition-base)",
-              },
-            })
-          : undefined
-      }
-      pagination={
-        pagination
-          ? {
-              current: pagination.current,
-              pageSize: pagination.pageSize,
-              total: pagination.total,
-              onChange: pagination.onChange,
-              onShowSizeChange: pagination.onChange,
-              showSizeChanger: true,
-              responsive: true,
-              showLessItems: true,
-              showTotal: (total, range) =>
-                `${range[0]}-${range[1]} de ${total} registros`,
-              pageSizeOptions: ["6", "12", "24", "48"],
-            }
-          : false
-      }
+      onRow={onRowClick ? rowProps : undefined}
+      pagination={paginationConfig}
       locale={{
         emptyText: (
           <Empty description={emptyText} image={Empty.PRESENTED_IMAGE_SIMPLE} />

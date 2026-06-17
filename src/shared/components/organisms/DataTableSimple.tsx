@@ -1,3 +1,4 @@
+import { useMemo } from "react";
 import { Table } from "antd";
 import type { TableProps } from "antd";
 
@@ -9,6 +10,15 @@ export const DataTableSimple = <T extends object>({
   card = true,
   ...props
 }: DataTableSimpleProps<T>) => {
+  const paginationConfig = useMemo(() => {
+    if (props.pagination === false) return false;
+    return {
+      pageSize: 6,
+      showSizeChanger: false,
+      ...props.pagination,
+    };
+  }, [props.pagination]);
+
   return (
     <div
       style={
@@ -26,11 +36,7 @@ export const DataTableSimple = <T extends object>({
     >
       <Table
         {...props}
-        pagination={{
-          pageSize: 6,
-          showSizeChanger: false,
-          ...props.pagination,
-        }}
+        pagination={paginationConfig}
         size="middle"
         className="datatable-modern"
       />
