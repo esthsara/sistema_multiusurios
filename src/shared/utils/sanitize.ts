@@ -37,7 +37,7 @@ export const sanitizeInput = (
   return next;
 };
 
-/**texto seguro*/
+/** Devuelve texto sanitizado o el fallback si el resultado queda vacío. */
 export const safeText = (
   value: unknown,
   fallback = "",

@@ -1,14 +1,14 @@
-// src/shared/hooks/useAuth.ts  — ahora es un selector del store
+// src/shared/hooks/useAuth.ts
 import { useAuthStore } from "@/features/auth/store/auth.store";
 import { useShallow } from "zustand/react/shallow";
 
 const EMPTY_SUCURSALES = [] as const;
 
 /**
-Para saber quien esta conectado, sus permisos, etc. Es un selector del store de auth, no hace nada más.
+ * useAuth — Selector del store de autenticación.
+ * Expone identidad, permisos y sucursales del usuario conectado.
  */
 export const useAuth = () => {
-  
   return useAuthStore(
     useShallow((state) => ({
       user: state.user,

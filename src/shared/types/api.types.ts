@@ -68,8 +68,3 @@ export interface RequestParams {
    */
 }
 
-/**
- * HttpMethod — Union Type para los métodos HTTP.
- * Usado internamente en el servicio base.
- */
-export type HttpMethod = "GET" | "POST" | "PUT" | "PATCH" | "DELETE";

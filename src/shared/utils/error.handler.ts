@@ -8,11 +8,11 @@ const normalizeBackendMessage = (message: string): string => {
   const normalized = message.trim();
 
   if (/SQLSTATE\[23000\]/i.test(normalized)) {
-    return "No se pudo completar la operación crendenciales incorrectas";
+    return "No se pudo completar la operación. Credenciales incorrectas.";
   }
 
   if (/Integrity constraint violation/i.test(normalized)) {
-    return "No se pudo completar la operación ingrese nuevamente";
+    return "No se pudo completar la operación. Ingrese nuevamente.";
   }
 
   if (/Column '.*' cannot be null/i.test(normalized)) {
@@ -51,7 +51,7 @@ const ERROR_MESSAGES: Record<number, string> = {
 };
 
 /**
- * Aqui me mostraran el error que me devuelve el backend, lo parseo y lo normalizo a un formato común (ApiError)
+ * parseApiError — Parsea cualquier error y lo normaliza a ApiError.
  *
  * AxiosError<ApiError>: Generic que le dice a TypeScript
  * cómo luce el body del error que devuelve nuestro backend.
@@ -110,9 +110,6 @@ export const handleHttpError = (error: unknown, silent = false): ApiError => {
       toast.error(safeText(firstError ?? parsed.message, parsed.message, 300));
     } else {
       toast.error(parsed.message);
-      /*toast.error(
-        safeText(parsed.message, "Ocurrió un error inesperado.", 300),
-      );*/
     }
   }
 

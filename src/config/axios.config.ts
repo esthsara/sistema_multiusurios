@@ -1,6 +1,5 @@
 // src/config/axios.config.ts
 import axios, {
-  type AxiosInstance,
   type InternalAxiosRequestConfig,
   type AxiosResponse,
   type AxiosError,
@@ -13,12 +12,10 @@ import { storageManager } from "@/shared/utils/storageManager";
 import { useAuthStore } from "@/features/auth/store/auth.store";
 
 /**
- * Creamos una instancia nombrada en lugar de usar axios directamente.
- * Esto es el principio Open/Closed de SOLID.
- * AxiosInstance es la interfaz que define los métodos HTTP (get, post, etc.)
+ * Instancia centralizada de Axios.
+ * Todas las peticiones al backend pasan por aquí.
  */
-/*Todas las peticiones al backend pasan por aquí*/
-const apiClient: AxiosInstance = axios.create({
+const apiClient = axios.create({
   baseURL: import.meta.env.VITE_API_URL,
   timeout: Number(import.meta.env.VITE_API_TIMEOUT) || 15000,
   headers: {

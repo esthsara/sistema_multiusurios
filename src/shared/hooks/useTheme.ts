@@ -1,10 +1,7 @@
 // src/shared/hooks/useTheme.ts
 import { useCallback, useSyncExternalStore } from "react";
 
-/**
- * 'light' | 'dark' controlamos 
-
- */
+/** Tema de la aplicación: 'light' o 'dark'. */
 type Theme = "light" | "dark";
 
 const THEME_KEY = "app-theme";
