@@ -30,8 +30,6 @@ const apiClient: AxiosInstance = axios.create({
 /* INTERCEPTOR DE REQUEST — */
 apiClient.interceptors.request.use(
   (config: InternalAxiosRequestConfig) => {
-    //const token = tokenManager.getToken();
-    //accedo al zustand para el token
     const authStore = useAuthStore.getState();
     const token = authStore.accessToken ?? tokenManager.getToken();
 
@@ -65,8 +63,7 @@ apiClient.interceptors.request.use(
   (error: AxiosError) => Promise.reject(error),
 );
 
-/* ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
- */
+/* ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ */
 
 //evitamos multiples redirecciones a login si varias peticiones fallan con 401 al mismo tiempo
 let isRedirectingToLogin = false;
@@ -76,7 +73,7 @@ let redirectResetTimer: ReturnType<typeof setTimeout> | null = null;
 let unauthorizedPromise: Promise<void> | null = null;
 //evita mostrar múltiples toasts de sesión expirada
 let hasNotifiedSessionExpired = false;
-//para borrar
+/** Limpia tokens y caché de usuario como fallback cuando el logout del store falla. */
 const hardResetSession = () => {
   tokenManager.removeToken();
   storageManager.removeCachedUser();
@@ -155,7 +152,8 @@ apiClient.interceptors.response.use(
       return Promise.reject(error);
     }
 
-    const isSilentError = error.config?.headers?.["X-Silent-Error"] === "true" || error.config?.headers?.["x-silent-error"] === "true";
+    const silentHeader = error.config?.headers?.["X-Silent-Error"] ?? error.config?.headers?.["x-silent-error"];
+    const isSilentError = silentHeader === "true";
 
     /* 403 — Sin permisos  */
     if (status === 403) {

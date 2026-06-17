@@ -1,9 +1,7 @@
 // src/config/theme.config.ts
 import type { ThemeConfig } from "antd";
 
-/**
-colores de los items de ant desing
- */
+/** Tokens base y paletas de color para los temas claro/oscuro de Ant Design. */
 
 const baseTokens: ThemeConfig["token"] = {
   fontFamily: "'Inter', system-ui, -apple-system, sans-serif",
@@ -19,7 +17,7 @@ export const lightTheme: ThemeConfig = {
     colorSuccess: "#22c55e",
     colorWarning: "#f59e0b",
     colorError: "#ef4444",
-    // 🎨 FONDOS (neutros, no azulados)
+    //  FONDOS (neutros, no azulados)
     colorBgBase: "#ffffff",
     colorBgContainer: "#ffffff",
     colorBgLayout: "#f8fafc",
@@ -79,7 +77,7 @@ export const darkTheme: ThemeConfig = {
     colorWarning: "#f59e0b",
     colorError: "#ef4444",
 
-    // 🌑 FONDOS (gris oscuro elegante)
+    // FONDOS (gris oscuro elegante)
     colorBgBase: "#0f172a",
     colorBgContainer: "#1e293b",
     colorBgLayout: "#0f172a",
