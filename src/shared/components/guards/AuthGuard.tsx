@@ -6,7 +6,7 @@ import { APP_ROUTES } from "@/shared/constants/routes.constants";
 import { useUIStore } from "@/shared/store/ui.store";
 
 /**
- * AuthGuard — Protege rutas que requieren autenticación.Para ver si el usurio esta autenticado
+ * AuthGuard — Protege rutas que requieren autenticación.
  *
  * Validaciones en orden:
  * 1. Si está cargando → mostrar GlobalLoader (sin redirigir prematuramente)
@@ -44,9 +44,9 @@ export const AuthGuard = () => {
     );
   }
 
-  // Autenticado pero sin sucursal asignada o sin sucursales activas → página informativa
-  const hasActiveBranch = user?.sucursales.some((s) => s.activa);
-  if (user && (!hasActiveBranch || user.sucursales.length === 0)) {
+  // Autenticado pero sin sucursal activa → página informativa
+  // Solo redirige si no está ya en la ruta NO_BRANCH para evitar bucles infinitos
+  if (!user?.sucursales.some((s) => s.activa) && location.pathname !== APP_ROUTES.NO_BRANCH) {
     return <Navigate to={APP_ROUTES.NO_BRANCH} replace />;
   }
 

@@ -22,7 +22,7 @@ import type {
 } from "@/shared/types/auth.types";
 
 /**
- nos sirve para definir qué acciones y estado tiene nuestro store.
+ * Interfaz que define las acciones disponibles en el store de autenticación.
  */
 interface AuthActions {
   // Auth
@@ -45,17 +45,14 @@ interface AuthActions {
   _setUser: (user: AuthUser | null, token: string | null) => void;
   _reset: () => void;
 }
-//conbinamos tipos
+// Combinamos tipos
 type AuthStore = AuthState & AuthActions;
+
+import { isSuperAdminRole } from "@/shared/utils/role.utils";
 
 //guardamos una promesa para no reutilizarla y evitar llamadas concurrentes a initializeAuth o logout
 let initializeAuthPromise: Promise<void> | null = null;
 let logoutPromise: Promise<void> | null = null;
-
-//para verificar si el rol es super-admin, con normalización de espacios y mayúsculas " Super Admin " → "super-admin"
-const isSuperAdminRole = (roleName: string) => {
-  return roleName.trim().toLowerCase().replace(/\s+/g, "-") === "super-admin";
-};
 
 //para leer el usuario en sessionStorage al iniciar la app, si existe
 const readCachedUser = (): AuthUser | null => {

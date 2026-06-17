@@ -179,7 +179,7 @@ export interface Persona {
   identificacionPrincipal: string;
   fechaNacimiento: string | null;
   genero: string | null;
-  fotoPatch: string | null;
+  fotoPath: string | null;
   estado: EstadoPersona;
   estadoTexto?: string | null;
   nombreCompleto: string; // calculado en el adapter

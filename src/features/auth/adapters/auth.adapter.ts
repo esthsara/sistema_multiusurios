@@ -46,7 +46,7 @@ const adaptPersona = (persona: BackendPersona): Persona => ({
   identificacionPrincipal: persona.identificacion_principal,
   fechaNacimiento: persona.fecha_nacimiento,
   genero: persona.genero,
-  fotoPatch: persona.foto_path ?? persona.foto ?? null,
+  fotoPath: persona.foto_path ?? persona.foto ?? null,
   estado: persona.estado,
   estadoTexto: persona.estado_texto,
   nombreCompleto: getNombreCompleto(persona),
@@ -103,7 +103,6 @@ const adaptBusinessActual = (
  *
  * Register → string directo
  * Login    → objeto con plainTextToken
- * esto es del backend no lo invente
  *
  * Union Type: string | AccessTokenObject
  * TypeScript nos obliga a manejar ambos casos.

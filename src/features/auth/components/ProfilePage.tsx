@@ -6,11 +6,9 @@ import {
   Button,
   Card,
   Descriptions,
-  Divider,
   Empty,
   Form,
   Input,
-  List,
   Modal,
   Space,
   Tag,
@@ -48,7 +46,7 @@ import { safeText } from "@/shared/utils/sanitize";
 import { sanitizeInput } from "@/shared/utils/sanitize";
 import { tokenManager } from "@/shared/utils/tokenManager";
 
-const { Title, Text, Paragraph } = Typography;
+const { Title, Text } = Typography;
 
 const formatDateTime = (value: string | number | null | undefined) => {
   if (value === null || value === undefined || value === "")
@@ -605,9 +603,9 @@ const ProfilePage = () => {
                     </>
                   }
                 >
-                  {user?.persona.fotoPatch
-                    ? safeText(user.persona.fotoPatch, "Sin foto", 120)
-                    : "Sin foto"}
+                  {user?.persona.fotoPath
+                    ? safeText(user.persona.fotoPath, "Sin foto", 120)
+                    : "No disponible"}
                 </Descriptions.Item>
               </Descriptions>
             </Card>

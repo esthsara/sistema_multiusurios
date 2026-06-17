@@ -1,4 +1,4 @@
-// src/shared/components/atoms/Can.tsx
+// src/shared/components/guards/Can.tsx
 import { usePermissions } from "@/shared/hooks/usePermissions";
 import type { PermissionString } from "@/shared/types/auth.types";
 

@@ -1,18 +1,9 @@
 // src/shared/constants/navigation.constants.ts
-/*
-* Definimos la estructura de navegación
-* Aquí es donde configuramos el menú de navegación , incluyendo qué ítems mostrar y qué permisos se requieren para cada uno.
-* Esto es crucial para controlar el acceso a diferentes partes de la aplicación según los roles y permisos del usuario.
-* Cada ítem del menú tiene las siguientes propiedades:
-*
-* | Propiedad   | Significado               |
-| ----------- | ------------------------- |
-| key         | identificador interno     |
-| label       | texto que verá el usuario |
-| icon        | ícono                     |
-| path        | ruta a la página          |
-| permissions | permisos necesarios       |
-
+/**
+ * NAV_CONFIG — Estructura de navegación del sidebar.
+ *
+ * Cada ítem define: key, label, icon, path y permissions.
+ * 'permissions' controla la visibilidad según los permisos del usuario.
  */
 import type { PermissionString } from "@/shared/types/auth.types";
 import type { LucideIcon } from "lucide-react";

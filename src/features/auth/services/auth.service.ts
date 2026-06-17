@@ -1,127 +1,38 @@
 // src/features/auth/services/auth.service.ts
-import apiClient from "@/config/axios.config";
-import { handleHttpError } from "@/shared/utils/error.handler";
+import { http } from "@/shared/services/http.service";
 import type {
   LoginDto,
   RegisterDto,
   ChangePasswordDto,
-
 } from "@/shared/types/auth.types";
-import type { ApiResponse } from "@/shared/types/api.types";
-
 import type {
   LoginResponseData,
   RegisterResponseData,
   MeResponseData,
   UserBranchesResponseData,
   SwitchBranchResponseData,
-} from "../types/auth.types";
+} from "@/features/auth/types/auth.types";
 
 export const authService = {
-  login: async (dto: LoginDto) => {
-    try {
-      const res = await apiClient.post<ApiResponse<LoginResponseData>>(
-        "/auth/login",
-        dto,
-      );
-      return res.data;
-    } catch (error) {
-      throw handleHttpError(error, true);
-    }
-  },
+  login: (dto: LoginDto) =>
+    http.post<LoginResponseData, LoginDto>("/auth/login", dto),
 
-  register: async (dto: RegisterDto) => {
-    try {
-      const res = await apiClient.post<ApiResponse<RegisterResponseData>>(
-        "/auth/register",
-        dto,
-      );
-      return res.data;
-    } catch (error) {
-      throw handleHttpError(error, true);
-    }
-  },
+  register: (dto: RegisterDto) =>
+    http.post<RegisterResponseData, RegisterDto>("/auth/register", dto),
 
-  me: async () => {
-    try {
-      const res = await apiClient.get<ApiResponse<MeResponseData>>("/auth/me");
-      return res.data;
-    } catch (error) {
-      throw handleHttpError(error, true);
-    }
-  },
+  me: () => http.get<MeResponseData>("/auth/me"),
 
-  getUserBranches: async () => {
-    try {
-      const res =
-        await apiClient.get<ApiResponse<UserBranchesResponseData>>(
-          "/users/branches",
-        );
-      return res.data;
-    } catch (error) {
-      throw handleHttpError(error, true);
-    }
-  },
+  getUserBranches: () =>
+    http.get<UserBranchesResponseData>("/users/branches"),
 
-  switchBranch: async (sucursalId: number) => {
-    try {
-      const res = await apiClient.put<ApiResponse<SwitchBranchResponseData>>(
-        `/users/switch-branch/${sucursalId}`,
-        { sucursal_id: sucursalId },
-      );
-      return res.data;
-    } catch (error) {
-      throw handleHttpError(error, true);
-    }
-  },
+  switchBranch: (sucursalId: number) =>
+    http.put<SwitchBranchResponseData, { sucursal_id: number }>(
+      `/users/switch-branch/${sucursalId}`,
+      { sucursal_id: sucursalId }
+    ),
 
-  logout: async () => {
-    try {
-      const res = await apiClient.post<ApiResponse<void>>("/auth/logout");
-      return res.data;
-    } catch (error) {
-      throw handleHttpError(error, true);
-    }
-  },
+  logout: () => http.post<void, Record<string, never>>("/auth/logout", {}),
 
-  getSessions: async () => {
-    try {
-      const res = await apiClient.get<ApiResponse<unknown[]>>("/auth/sessions");
-      return res.data;
-    } catch (error) {
-      throw handleHttpError(error, true);
-    }
-  },
-
-  closeSession: async (sessionId: number) => {
-    try {
-      const res = await apiClient.delete<ApiResponse<void>>(
-        `/auth/sessions/${sessionId}`,
-      );
-      return res.data;
-    } catch (error) {
-      throw handleHttpError(error, true);
-    }
-  },
-
-  closeAllSessions: async () => {
-    try {
-      const res = await apiClient.delete<ApiResponse<void>>("/auth/sessions");
-      return res.data;
-    } catch (error) {
-      throw handleHttpError(error, true);
-    }
-  },
-
-  changePassword: async (dto: ChangePasswordDto) => {
-    try {
-      const res = await apiClient.post<ApiResponse<void>>(
-        "/auth/change-password",
-        dto,
-      );
-      return res.data;
-    } catch (error) {
-      throw handleHttpError(error, true);
-    }
-  },
+  changePassword: (dto: ChangePasswordDto) =>
+    http.post<void, ChangePasswordDto>("/auth/change-password", dto),
 };

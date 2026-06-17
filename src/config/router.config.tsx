@@ -106,23 +106,18 @@ export const router = createBrowserRouter([
     children: [{ path: APP_ROUTES.LOGIN, element: withSuspense(LoginPage) }],
   },
 
-  /* Ruta semi-pública: usuario autenticado pero sin sucursal asignada.
-   * Fuera del AuthGuard para evitar bucle de redirección. */
-  {
-    path: APP_ROUTES.NO_BRANCH,
-    element: withSuspense(NoBranchPage),
-  },
-
-  /* ── Página 403 ─── fuera del layout pero accesible tras login ── */
-  {
-    path: APP_ROUTES.UNAUTHORIZED,
-    element: withSuspense(UnauthorizedPage),
-  },
-
   /* ── Rutas privadas — requieren autenticación ── */
   {
     element: <AuthGuard />,
     children: [
+      {
+        path: APP_ROUTES.NO_BRANCH,
+        element: withSuspense(NoBranchPage),
+      },
+      {
+        path: APP_ROUTES.UNAUTHORIZED,
+        element: withSuspense(UnauthorizedPage),
+      },
       {
         element: withSuspense(DashboardLayout),
         children: [

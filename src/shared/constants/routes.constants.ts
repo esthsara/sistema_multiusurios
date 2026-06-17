@@ -1,10 +1,7 @@
 // src/shared/constants/routes.constants.ts
 /**
- * Aqui Definimos todas las rutas.
- * Son las direcciones URL que verás en la barra de tu navegador cuando navegues por la web. 
- * Por ejemplo,si quieres cambiar la ruta de "Personas" de "/dashboard/personas" a "/dashboard/people", solo tendrías que actualizarla aquí y no en cada lugar donde se use esa ruta.
- * Además, al usar funciones para rutas dinámicas (como el detalle de una persona).
- s
+ * APP_ROUTES — Mapa centralizado de todas las rutas de la aplicación.
+ * Cualquier cambio de URL se realiza aquí y se propaga automáticamente.
  */
 export const APP_ROUTES = {
   ROOT: "/",

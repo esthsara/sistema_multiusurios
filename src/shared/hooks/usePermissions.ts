@@ -1,5 +1,6 @@
 // src/shared/hooks/usePermissions.ts
 import { useAuthStore } from "@/features/auth/store/auth.store";
+import { isSuperAdminRole } from "@/shared/utils/role.utils";
 import type { PermissionString, RoleName } from "@/shared/types/auth.types";
 
 /**
@@ -40,10 +41,6 @@ export const usePermissions = (): PermissionsApi => {
   const hasAnyPermission = useAuthStore((s) => s.hasAnyPermission);
   const hasRole = useAuthStore((s) => s.hasRole);
   const user = useAuthStore((s) => s.user);
-
-  const isSuperAdminRole = (roleName: string) => {
-    return roleName.trim().toLowerCase().replace(/\s+/g, "-") === "super-admin";
-  };
 
   const isSuperAdmin =
     user?.roles.some((r) => isSuperAdminRole(r.name)) ?? false;

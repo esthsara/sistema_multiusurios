@@ -1,6 +1,6 @@
 // src/shared/components/guards/PermissionGuard.tsx
 import { Navigate, Outlet } from "react-router-dom";
-import { useAuthStore } from "@/features/auth/store/auth.store";
+import { usePermissions } from "@/shared/hooks/usePermissions";
 import { APP_ROUTES } from "@/shared/constants/routes.constants";
 import type { PermissionString } from "@/shared/types/auth.types";
 
@@ -27,8 +27,7 @@ export const PermissionGuard = ({
   permissions,
   operator = "OR",
 }: PermissionGuardProps) => {
-  const hasPermission = useAuthStore((s) => s.hasPermission);
-  const hasAnyPermission = useAuthStore((s) => s.hasAnyPermission);
+  const { can, canAll, canAny } = usePermissions();
 
   // Normalizar: siempre trabajamos con un array
   const required: PermissionString[] = permission
@@ -40,8 +39,8 @@ export const PermissionGuard = ({
 
   const granted =
     operator === "AND"
-      ? required.every((p) => hasPermission(p))
-      : hasAnyPermission(required);
+      ? canAll(required)
+      : canAny(required);
 
   if (!granted) {
     return <Navigate to={APP_ROUTES.UNAUTHORIZED} replace />;
