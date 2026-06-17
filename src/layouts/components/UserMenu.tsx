@@ -1,4 +1,5 @@
 // src/layouts/components/UserMenu.tsx
+import { useMemo } from "react";
 import { Avatar, Dropdown } from "antd";
 import { LogOut, UserRound } from "lucide-react";
 import type { MenuProps } from "antd";
@@ -7,7 +8,7 @@ import { useAuth } from "@/shared/hooks/useAuth";
 import { useAuthActions } from "@/features/auth/hooks/useAuthActions";
 import { APP_ROUTES } from "@/shared/constants/routes.constants";
 import { safeText } from "@/shared/utils/sanitize";
-
+import { getAvatarUrl } from "@/shared/utils/avatar";
 /* Componente para el menú del usuario en la barra de navegación  este junta las iniciales y lo covierte en uno solo*/
 interface UserMenuProps {
   collapsed?: boolean;
@@ -22,15 +23,16 @@ export const UserMenu = ({ collapsed }: UserMenuProps) => {
   const safeEmail = safeText(user?.email, "Sin email", 120);
   const safeRole = safeText(user?.roles[0]?.name, "Sin rol", 80);
 
-  const initials =
-    safeName
+  const initials = useMemo(() => {
+    return safeName
       .split(" ")
       .slice(0, 2)
       .map((w) => w[0])
       .join("")
-      .toUpperCase() ?? "U";
+      .toUpperCase() || "U";
+  }, [safeName]);
 
-  const items: MenuProps["items"] = [
+  const items: MenuProps["items"] = useMemo(() => [
     {
       key: "info",
       label: (
@@ -65,7 +67,7 @@ export const UserMenu = ({ collapsed }: UserMenuProps) => {
       danger: true,
       onClick: logout,
     },
-  ];
+  ], [safeName, safeEmail, navigate, logout]);
 
   return (
     <Dropdown menu={{ items }} trigger={["click"]} placement="topLeft">
@@ -77,6 +79,7 @@ export const UserMenu = ({ collapsed }: UserMenuProps) => {
       >
         <Avatar
           size={32}
+          src={getAvatarUrl(user)}
           style={{
             backgroundColor: "var(--color-primary-600)",
             fontSize: "0.75rem",

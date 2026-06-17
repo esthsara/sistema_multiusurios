@@ -45,6 +45,7 @@ import type { ChangePasswordDto } from "@/shared/types/auth.types";
 import { safeText } from "@/shared/utils/sanitize";
 import { sanitizeInput } from "@/shared/utils/sanitize";
 import { tokenManager } from "@/shared/utils/tokenManager";
+import { getAvatarUrl } from "@/shared/utils/avatar";
 
 const { Title, Text } = Typography;
 
@@ -427,6 +428,7 @@ const ProfilePage = () => {
               >
                 <Avatar
                   size={72}
+                  src={getAvatarUrl(user)}
                   style={{
                     backgroundColor: "var(--color-primary-600)",
                     color: "var(--color-text-inverse)",

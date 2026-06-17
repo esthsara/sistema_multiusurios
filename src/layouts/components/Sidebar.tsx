@@ -167,11 +167,19 @@ const getRootSubmenuKeys = (items: NavItem[]): string[] => {
 ═══════════════════════════════════════════════════════════════ */
 
 const LogoMark = () => (
-  <div className="saas-sidebar-logo-mark" aria-label="Logo">
-    <span className="text-white font-bold text-sm">P</span>
+  <div 
+    className="saas-sidebar-logo-mark" 
+    aria-label="Logo"
+    style={{ background: 'transparent', border: 'none' }}
+  >
+    <img 
+      src="/image/icon/icon.png" 
+      alt="Logo" 
+      className="w-full h-full object-contain"
+      style={{ borderRadius: '10px' }}
+    />
   </div>
 );
-
 /* ═══════════════════════════════════════════════════════════════
    COMPONENT: Sidebar Header
 ═══════════════════════════════════════════════════════════════ */
@@ -390,7 +398,7 @@ export const Sidebar = ({
 }: SidebarProps) => {
   const navigate = useNavigate();
   const location = useLocation();
-  const { hasAnyPermission } = useAuth();
+  const { hasAnyPermission, user } = useAuth();
   const [hoverExpanded, setHoverExpanded] = useState(false);
 
   /* ──────────────────────────────────────────
@@ -399,7 +407,7 @@ export const Sidebar = ({
 
   const filteredNav = useMemo(() => {
     return filterNavItems(NAV_CONFIG, hasAnyPermission);
-  }, [hasAnyPermission]);
+  }, [hasAnyPermission, user]);
 
   const menuItems = useMemo(() => buildMenuItems(filteredNav), [filteredNav]);
 

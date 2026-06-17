@@ -1,4 +1,5 @@
 // src/layouts/components/BranchSelector.tsx
+import { useMemo } from "react";
 import { Select } from "antd";
 import { Building2 } from "lucide-react";
 import { toast } from "react-toastify";
@@ -15,6 +16,15 @@ export const BranchSelector = ({ collapsed }: BranchSelectorProps) => {
   const { sucursales, sucursalActiva } = useAuth();
   const isLoading = useAuthStore((s) => s.isLoading);
   const setSucursalActiva = useAuthStore((s) => s.setSucursalActiva);
+
+  const options = useMemo(() => {
+    return sucursales
+      .filter((s: Sucursal) => s.activa)
+      .map((s: Sucursal) => ({
+        value: s.id,
+        label: safeText(s.nombre, "Sucursal", 80),
+      }));
+  }, [sucursales]);
 
   // Si solo tiene una sucursal, mostramos solo el nombre
   if (sucursales.length <= 1) {
@@ -65,10 +75,7 @@ export const BranchSelector = ({ collapsed }: BranchSelectorProps) => {
               toast.error("No se pudo cambiar la sucursal activa");
             }
           }}
-          options={sucursales.filter((s: Sucursal) => s.activa).map((s: Sucursal) => ({
-            value: s.id,
-            label: safeText(s.nombre, "Sucursal", 80),
-          }))}
+          options={options}
           style={{
             minWidth: 140,
             color: "var(--color-text-primary)",

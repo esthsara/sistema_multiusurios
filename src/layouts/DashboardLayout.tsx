@@ -1,6 +1,6 @@
 // src/layouts/DashboardLayout.tsx
 
-import { useState } from "react";
+import { useState, useCallback } from "react";
 import { Outlet } from "react-router-dom";
 import { Layout } from "antd";
 import { Sidebar } from "./components/Sidebar";
@@ -12,6 +12,10 @@ const DashboardLayout = () => {
   const [collapsed, setCollapsed] = useState(false);
   const [mobileOpen, setMobileOpen] = useState(false);
 
+  const toggleCollapse = useCallback(() => setCollapsed((prev) => !prev), []);
+  const openMobile = useCallback(() => setMobileOpen(true), []);
+  const closeMobile = useCallback(() => setMobileOpen(false), []);
+
   return (
     <Layout style={{ minHeight: "100vh" }}>
       {/* Sidebar */}
@@ -19,7 +23,7 @@ const DashboardLayout = () => {
         collapsed={collapsed}
         onCollapse={setCollapsed}
         mobileOpen={mobileOpen}
-        onMobileClose={() => setMobileOpen(false)}
+        onMobileClose={closeMobile}
       />
 
       {/* Área principal */}
@@ -27,8 +31,8 @@ const DashboardLayout = () => {
         {/* Header */}
         <Header
           collapsed={collapsed}
-          onToggle={() => setCollapsed((prev) => !prev)}
-          onMobileOpen={() => setMobileOpen(true)}
+          onToggle={toggleCollapse}
+          onMobileOpen={openMobile}
         />
 
         {/* Contenido */}
