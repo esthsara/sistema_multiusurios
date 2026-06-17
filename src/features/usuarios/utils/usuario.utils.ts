@@ -59,13 +59,7 @@ export const getAvatarStyle = (usuario: UsuarioListItem): CSSProperties => {
 /* ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
    CONFIRM MODAL CONFIG */
 
-export interface ConfirmConfig {
-  title: string;
-  description: string;
-  confirmText: string;
-  danger: boolean;
-  icon: ReactNode;
-}
+import type { ConfirmConfig } from "@/shared/types/ui.types";
 
 export const getConfirmConfig = (
   type: "toggle" | "delete" | "reset-password",

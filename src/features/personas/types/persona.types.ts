@@ -1,5 +1,6 @@
 // src/features/personas/types/persona.types.ts
 import type { TipoPersona, EstadoPersona } from "@/shared/types/auth.types";
+import type { RequestParams } from "@/shared/types/api.types";
 
 /* ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
    RESPUESTAS DEL BACKEND */
@@ -74,14 +75,7 @@ export interface PersonaFilters {
   fecha_hasta?: string;
 }
 
-export interface PersonaQueryParams extends PersonaFilters {
-  page?: number;
-  per_page?: number;
-  search?: string;
-  sort_by?: string;
-  sort_dir?: "asc" | "desc";
-  [key: string]: string | number | boolean | undefined;
-}
+export interface PersonaQueryParams extends PersonaFilters, RequestParams {}
 
 /* ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
    ESTADOS DE UI */
@@ -94,17 +88,4 @@ export interface ConfirmState {
 }
 
 
-/* ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-   CONFIRM MODAL CONFIG */
-
-export type IconType = "poweroff" | "rotateccw" | "trash2"
-
-export interface ConfirmConfig {
-  title: string
-  description: string
-  confirmText: string
-  danger: boolean
-  iconType: IconType
-  blockDelete?: boolean
-}
 

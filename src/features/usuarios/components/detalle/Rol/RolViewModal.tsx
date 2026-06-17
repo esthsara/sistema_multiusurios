@@ -3,9 +3,9 @@ import { UserCog } from "lucide-react";
 import { Flex } from "antd";
 import { AppTag } from "@/shared/components/atoms/AppTag";
 import type { RolListItem } from "@/features/roles/types/rol.types";
-import type { RolDetalle as UsuarioRolDetalle } from "../../../types/usuario.types";
+import type { UsuarioRolDetalle } from "../../../types/usuario.types";
 
-type RolDetalleSimple = UsuarioRolDetalle;
+
 
 const { Text, Title } = Typography;
 
@@ -13,7 +13,7 @@ interface RolViewModalProps {
   open: boolean;
   username: string;
   roles: RolListItem[];
-  rolesActuales: RolDetalleSimple[];
+  rolesActuales: UsuarioRolDetalle[];
   selectedRoleIds: number[];
   loading: boolean;
   submitting: boolean;

@@ -1,14 +1,14 @@
 import { Flex, Typography } from "antd";
 import { ShieldCheck, ShieldOff } from "lucide-react";
 import { AppTag } from "@/shared/components/atoms/AppTag";
-import type { RolDetalle as UsuarioRolDetalle } from "../../../types/usuario.types";
+import type { UsuarioRolDetalle } from "../../../types/usuario.types";
 
-type RolDetalleSimple = UsuarioRolDetalle;
+
 
 const { Text } = Typography;
 
 interface RolTableProps {
-  roles: RolDetalleSimple[];
+  roles: UsuarioRolDetalle[];
 }
 
 export const RolTable = ({ roles }: RolTableProps) => {

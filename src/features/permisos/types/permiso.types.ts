@@ -21,7 +21,7 @@ export interface PermisoItemGrupado {
   accion: string;
 }
 
-export interface PermisoListItem extends PermisoItem {}
+
 
 /* ── DTOs ── */
 

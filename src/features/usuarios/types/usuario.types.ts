@@ -4,6 +4,7 @@ import type {
   EstadoPersona,
   PermissionString,
 } from "@/shared/types/auth.types";
+import type { RequestParams } from "@/shared/types/api.types";
 
 /* ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
    BACKEND TYPES */
@@ -24,7 +25,7 @@ export interface UsuarioSucursalBackend {
   created_at_humano: string;
 }
 
-export interface RolDetalle {
+export interface UsuarioRolDetalle {
   id: number;
   name: string;
   guard_name: string;
@@ -95,7 +96,7 @@ export interface UsuarioListItem {
   sucursales_count?: number;
   ultimo_acceso?: string | null;
   roles: string[];
-  roles_detalle: RolDetalle[];
+  roles_detalle: UsuarioRolDetalle[];
   sucursales: UsuarioSucursalBackend[];
   created_at: string;
   updated_at: string;
@@ -154,14 +155,7 @@ export interface UsuarioFilters {
   fecha_hasta?: string;
 }
 
-export interface UsuarioQueryParams extends UsuarioFilters {
-  page?: number;
-  per_page?: number;
-  search?: string;
-  sort_by?: string;
-  sort_dir?: "asc" | "desc";
-  [key: string]: string | number | boolean | undefined;
-}
+export interface UsuarioQueryParams extends UsuarioFilters, RequestParams {}
 
 /* ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
    ESTADOS DE UI */

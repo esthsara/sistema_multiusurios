@@ -16,14 +16,7 @@ export const getSucursalInitials = (nombre: string): string => {
 export const normalizeLogoUrl = (logo: string): string =>
   getResolvedFileUrl(logo);
 
-export interface ConfirmConfig {
-  title: string;
-  description: string;
-  confirmText: string;
-  danger: boolean;
-  icon: ReactNode;
-  blockDelete?: boolean;
-}
+import type { ConfirmConfig } from "@/shared/types/ui.types";
 
 export const getConfirmConfig = (
   type: "toggle" | "delete",

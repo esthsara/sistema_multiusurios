@@ -8,7 +8,7 @@ import { useRolesUsuario } from "@/features/roles/hooks/useRolesUsuario";
 import type { UsuarioConRoles } from "@/features/roles/types/rol.types";
 
 import type {
-  RolDetalle as UsuarioRolDetalle,
+  UsuarioRolDetalle,
   UsuarioDetalle,
 } from "../../types/usuario.types";
 
@@ -16,13 +16,13 @@ import { PermisosView } from "./Rol/PermisosView";
 import { RolTable } from "./Rol/RolTable";
 import { RolViewModal } from "./Rol/RolViewModal";
 
-type RolDetalleSimple = UsuarioRolDetalle;
+
 
 const { Title } = Typography;
 
 interface UsuarioRolProps {
   usuario: UsuarioDetalle;
-  onRolesChanged?: (rolesDetalle: RolDetalleSimple[]) => void;
+  onRolesChanged?: (rolesDetalle: UsuarioRolDetalle[]) => void;
 }
 
 export const UsuarioRol = ({ usuario, onRolesChanged }: UsuarioRolProps) => {
@@ -32,7 +32,7 @@ export const UsuarioRol = ({ usuario, onRolesChanged }: UsuarioRolProps) => {
     hasPermission("roles.ver") && hasPermission("usuarios.editar") && usuario.activo;
 
   const [modalOpen, setModalOpen] = useState(false);
-  const [rolesActuales, setRolesActuales] = useState<RolDetalleSimple[]>(
+  const [rolesActuales, setRolesActuales] = useState<UsuarioRolDetalle[]>(
     usuario.roles_detalle ?? [],
   );
   const [permisosActuales, setPermisosActuales] = useState<string[]>(

@@ -1,6 +1,7 @@
 /* ── Tipos de respuesta crudos del backend  ── */
 import type {
   BackendUser,
+  BackendSucursal,
   AccessTokenObject,
 } from "@/shared/types/auth.types";
 
@@ -8,7 +9,7 @@ export interface LoginResponseData {
   user: BackendUser;
   access_token: AccessTokenObject; // Login siempre devuelve objeto
   token_type: string;
-  sucursal_actual: unknown | null;
+  sucursal_actual: BackendSucursal | null;
   session_id: number;
 }
 
@@ -16,7 +17,7 @@ export interface RegisterResponseData {
   user: BackendUser;
   access_token: string; // Register devuelve string
   token_type: string;
-  sucursal_asignada: unknown | null;
+  sucursal_asignada: BackendSucursal | null;
   session_id: number;
 }
 

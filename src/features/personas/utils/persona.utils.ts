@@ -4,7 +4,7 @@ import React from "react";
 import type { ReactNode } from "react";
 import type { PersonaListItem } from "../types/persona.types";
 import type { EstadoPersona } from "@/shared/types/auth.types";
-import type { ConfirmConfig, IconType } from "../types/persona.types";
+import type { ConfirmConfig, IconType } from "@/shared/types/ui.types";
 
 const CONFIRM_ICON_MAP: Record<
   IconType,
