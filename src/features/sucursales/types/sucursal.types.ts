@@ -1,5 +1,5 @@
 import type { RequestParams } from "@/shared/types/api.types";
-import type { TipoArchivo } from "@/features/personas/components/detalle/Archivo/archivo.constants";
+
 
 /* ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
    BACKEND TYPES
@@ -63,6 +63,8 @@ export type TipoDomicilioSucursal =
   | "ENTREGA"
   | "OTRO";
 
+export type TipoArchivoSucursal = "CI" | "CONTRATO" | "CERTIFICADO" | "FOTO" | "OTRO";
+
 export interface SucursalContacto {
   id: number;
   tipo: TipoContactoSucursal;
@@ -91,7 +93,7 @@ export interface SucursalArchivo {
   nombre_original: string | null;
   ruta: string;
   url: string;
-  tipo: TipoArchivo;
+  tipo: TipoArchivoSucursal;
   tipo_texto: string;
   fecha_expiracion: string | null;
   mime_type?: string | null;

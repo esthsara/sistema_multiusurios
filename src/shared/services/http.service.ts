@@ -1,5 +1,6 @@
 // src/shared/services/http.service.ts
 import apiClient from "@/config/axios.config";
+import type { AxiosResponse } from "axios";
 import { handleHttpError } from "@/shared/utils/error.handler";
 import type {
   ApiResponse,
@@ -246,13 +247,13 @@ export const http = {
     url: string,
     params?: RequestParams,
     options?: { silent?: boolean },
-  ): Promise<Blob> {
+  ): Promise<AxiosResponse<Blob>> {
     try {
       const response = await apiClient.get<Blob>(url, {
         params,
         responseType: "blob",
       });
-      return response.data;
+      return response;
     } catch (error) {
       throw handleHttpError(error, options?.silent ?? false);
     }

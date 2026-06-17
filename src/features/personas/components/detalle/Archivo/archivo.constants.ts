@@ -77,7 +77,7 @@ export const isPdfArchivo = (
   return extension === "pdf" || mimeType === "application/pdf";
 };
 
-export { getResolvedFileUrl };
+
 
 export const ARCHIVO_BASE_COLUMNS: TableColumnsType<ArchivoResource> = [
   {

@@ -2,7 +2,6 @@ import { Input, Select, Button, DatePicker } from "antd";
 import { Search, RotateCcw } from "lucide-react";
 import dayjs from "dayjs";
 import type { PersonaFilters } from "../types/persona.types";
-import "@/index.css";
 interface PersonaFiltersProps {
   filters: PersonaFilters;
   search: string;

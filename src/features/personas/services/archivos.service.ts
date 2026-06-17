@@ -5,7 +5,7 @@ import type {
   ArchivoResource,
   TipoArchivo,
 } from "../components/detalle/Archivo/archivo.constants";
-import { getResolvedFileUrl } from "../components/detalle/Archivo/archivo.constants";
+import { getResolvedFileUrl } from "@/shared/utils/file-url.utils";
 
 
 export const archivosService = {

@@ -1,23 +1,23 @@
 // src/features/personas/components/detalle/PersonaDetallePage.tsx
-import { useState } from "react";
+
 import { useParams, useNavigate, Navigate } from "react-router-dom";
 import { Button, Tabs, Skeleton } from "antd";
 import { ArrowLeft, Pencil } from "lucide-react";
-import { toast } from "react-toastify";
+
 import { PageHeader } from "@/shared/components/molecules/PageHeader";
 import { Can } from "@/shared/components/guards/Can";
 import { AppTag } from "@/shared/components/atoms/AppTag";
 import { APP_ROUTES } from "@/shared/constants/routes.constants";
 import { useAuthStore } from "@/features/auth/store/auth.store";
-import { personasService } from "../../services/personas.service";
 import { usePersonaDetalle } from "../../hooks/usePersonaDetalle";
+import { usePersonaForm } from "../../hooks/usePersonaForm";
 import { PersonaFormModal } from "../PersonaFormModal";
 import { PersonaInfoGeneral } from "./PersonaInfoGeneral";
 import { PersonaContactos } from "./PersonaContactos";
 import { PersonaDomicilios } from "./PersonaDomicilios";
 import { PersonaArchivos } from "./PersonaArchivos";
 import { PersonaAuditoria } from "./PersonaAuditoria";
-import type { UpdatePersonaDto } from "../../types/persona.types";
+
 
 const PersonaDetallePage = () => {
   const { id, tab } = useParams<{ id: string; tab?: string }>();
@@ -26,48 +26,9 @@ const PersonaDetallePage = () => {
   const hasAnyPermission = useAuthStore((s) => s.hasAnyPermission);
 
   const { persona, loading, refetch } = usePersonaDetalle(personaId);
-  const [editOpen, setEditOpen] = useState(false);
-  const [isSubmittingEdit, setIsSubmittingEdit] = useState(false);
+  const form = usePersonaForm(refetch);
 
-  const normalizeText = (value: unknown) => {
-    if (typeof value !== "string") return undefined;
-    const trimmed = value.trim();
-    return trimmed.length ? trimmed : undefined;
-  };
 
-  const handleEditSubmit = async (values: UpdatePersonaDto) => {
-    if (!persona) return;
-
-    setIsSubmittingEdit(true);
-    try {
-      const payload: UpdatePersonaDto =
-        persona.tipo_persona === "FISICA"
-          ? {
-              nombre: normalizeText(values.nombre),
-              apellido: normalizeText(values.apellido),
-              identificacion_principal: normalizeText(
-                values.identificacion_principal,
-              ),
-              fecha_nacimiento: normalizeText(values.fecha_nacimiento),
-              genero: values.genero,
-            }
-          : {
-              razon_social: normalizeText(values.razon_social),
-              identificacion_principal: normalizeText(
-                values.identificacion_principal,
-              ),
-            };
-
-      await personasService.update(persona.id, payload);
-      toast.success("Perfil actualizado correctamente");
-      setEditOpen(false);
-      refetch();
-    } catch {
-      toast.error("No se pudo actualizar el perfil");
-    } finally {
-      setIsSubmittingEdit(false);
-    }
-  };
 
   const nombreDisplay = persona
     ? persona.tipo_persona === "FISICA"
@@ -154,7 +115,7 @@ const PersonaDetallePage = () => {
                 <Button
                   type="primary"
                   icon={<Pencil size={15} />}
-                  onClick={() => setEditOpen(true)}
+                  onClick={() => form.handleEdit(persona as any)}
                 >
                   Editar Perfil
                 </Button>
@@ -191,13 +152,13 @@ const PersonaDetallePage = () => {
 
       {persona && (
         <PersonaFormModal
-          open={editOpen}
-          tipo={persona.tipo_persona}
-          selectedItem={persona}
-          isEditMode
-          isSubmitting={isSubmittingEdit}
-          onSubmit={(values) => handleEditSubmit(values as UpdatePersonaDto)}
-          onCancel={() => setEditOpen(false)}
+          open={form.modal.isOpen}
+          tipo={form.tipoSeleccionado || persona.tipo_persona}
+          selectedItem={form.modal.selectedItem}
+          isEditMode={form.modal.isEditMode}
+          isSubmitting={form.modal.isSubmitting}
+          onSubmit={form.handleSubmit}
+          onCancel={form.modal.close}
         />
       )}
     </div>

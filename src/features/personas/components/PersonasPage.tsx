@@ -25,6 +25,7 @@ import {
   getConfirmIcon,
   getDisplayName,
 } from "../utils/persona.utils";
+import { getAvatarUrl } from "@/shared/utils/avatar";
 
 import { useNavigate } from "react-router-dom";
 import { APP_ROUTES } from "@/shared/constants/routes.constants";
@@ -80,7 +81,7 @@ const PersonasPage = () => {
       key: "foto",
       width: 60,
       render: (_, r) => (
-        <Avatar src={r.foto ?? undefined} style={getAvatarStyle(r)}>
+        <Avatar src={getAvatarUrl(r)} style={getAvatarStyle(r)}>
           {getPersonaInitials(r)}
         </Avatar>
       ),
@@ -310,7 +311,7 @@ const PersonasPage = () => {
           loading={confirmState.loading}
           onConfirm={handleConfirm}
           onCancel={closeConfirm}
-          icon={getConfirmIcon(currentConfirm.iconType)}
+          icon={getConfirmIcon(currentConfirm.iconType!)}
         />
       )}
     </div>

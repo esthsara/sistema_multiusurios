@@ -129,8 +129,10 @@ export const usePersonas = () => {
             activo: false,
             motivo: "Desactivación automática al desactivar la persona",
           });
-        } catch (error) {
-          console.error("Error al desactivar el usuario asociado", error);
+        } catch {
+          // El error del usuario se ignora intencionalmente:
+          // la persona ya fue desactivada exitosamente y el toast
+          // global del http.service notifica del error secundario.
         }
       }
 

@@ -3,7 +3,7 @@ import { User, Building2, ExternalLink } from "lucide-react";
 import type { PersonaDetalle } from "../../types/persona.types";
 import { useNavigate } from "react-router-dom";
 import { APP_ROUTES } from "@/shared/constants/routes.constants";
-
+import { getAvatarUrl } from "@/shared/utils/avatar";
 interface PersonaInfoGeneralProps {
   persona: PersonaDetalle;
 }
@@ -67,7 +67,7 @@ export const PersonaInfoGeneral = ({ persona }: PersonaInfoGeneralProps) => {
 
             <Avatar
               size={88}
-              src={persona.foto}
+              src={getAvatarUrl(persona)}
               icon={isFisica ? <User size={36} /> : <Building2 size={36} />}
               style={{
                 backgroundColor: "var(--color-primary-600)",
