@@ -41,7 +41,7 @@ import { toast } from "react-toastify";
 import { useAuth } from "@/shared/hooks/useAuth";
 import { useAuthActions } from "@/features/auth/hooks/useAuthActions";
 import { authService } from "@/features/auth/services/auth.service";
-import type { ChangePasswordDto } from "@/shared/types/auth.types";
+
 import { safeText } from "@/shared/utils/sanitize";
 import { sanitizeInput } from "@/shared/utils/sanitize";
 import { tokenManager } from "@/shared/utils/tokenManager";
@@ -231,123 +231,12 @@ const BranchCard = ({
   </div>
 );
 
-// ─── Change Password Modal ────────────────────────────────────────────────────
-const ChangePasswordModal = ({
-  open,
-  onClose,
-  onSubmit,
-  loading,
-}: {
-  open: boolean;
-  onClose: () => void;
-  onSubmit: (values: ChangePasswordDto) => Promise<void>;
-  loading: boolean;
-}) => {
-  const [form] = Form.useForm<ChangePasswordDto>();
-
-  const handleOk = async () => {
-    try {
-      const values = await form.validateFields();
-      await onSubmit(values);
-      form.resetFields();
-    } catch {
-      // validation errors handled by form
-    }
-  };
-
-  return (
-    <Modal
-      open={open}
-      onCancel={onClose}
-      onOk={handleOk}
-      confirmLoading={loading}
-      title={
-        <Space>
-          <Lock size={16} style={{ color: "var(--color-primary-600)" }} />
-          <span style={{ color: "var(--color-text-primary)" }}>
-            Cambiar contraseña
-          </span>
-        </Space>
-      }
-      okText={loading ? "Actualizando..." : "Actualizar contraseña"}
-      cancelText="Cancelar"
-      width={440}
-      destroyOnHidden
-
-    >
-      <Alert
-        type="info"
-        showIcon
-        style={{ marginBottom: 18, marginTop: 8 }}
-        title="Al cambiar tu contraseña, la sesión actual se cerrará automáticamente."
-      />
-      <Form
-        form={form}
-        layout="vertical"
-        requiredMark={false}
-        autoComplete="off"
-      >
-        <Form.Item
-          name="current_password"
-          label="Contraseña actual"
-          rules={[{ required: true, message: "Ingresa tu contraseña actual" }]}
-        >
-          <Input.Password
-            size="large"
-            placeholder="••••••••"
-            prefix={<KeyRound size={16} />}
-          />
-        </Form.Item>
-        <Form.Item
-          name="new_password"
-          label="Nueva contraseña"
-          rules={[
-            { required: true, message: "Ingresa la nueva contraseña" },
-            { min: 8, message: "Debe tener al menos 8 caracteres" },
-          ]}
-        >
-          <Input.Password
-            size="large"
-            placeholder="Nueva contraseña"
-            prefix={<KeyRound size={16} />}
-          />
-        </Form.Item>
-        <Form.Item
-          name="new_password_confirmation"
-          label="Confirmar nueva contraseña"
-          dependencies={["new_password"]}
-          rules={[
-            { required: true, message: "Confirma la nueva contraseña" },
-            ({ getFieldValue }) => ({
-              validator(_, value) {
-                if (!value || getFieldValue("new_password") === value)
-                  return Promise.resolve();
-                return Promise.reject(
-                  new Error("Las contraseñas no coinciden"),
-                );
-              },
-            }),
-          ]}
-        >
-          <Input.Password
-            size="large"
-            placeholder="Repite la nueva contraseña"
-            prefix={<Shield size={16} />}
-          />
-        </Form.Item>
-      </Form>
-    </Modal>
-  );
-};
 
 // ─── Main Page ────────────────────────────────────────────────────────────────
 const ProfilePage = () => {
   const navigate = useNavigate();
   const { user, sucursalActiva, isAuthenticated } = useAuth();
   const { logout } = useAuthActions();
-  const [isChangingPassword, setIsChangingPassword] = useState(false);
-  const [passwordModalOpen, setPasswordModalOpen] = useState(false);
-
   const displayName = safeText(user?.persona.nombreCompleto, "Usuario", 140);
   const email = safeText(user?.email, "Sin email", 140);
   const username = safeText(user?.username, "Sin usuario", 140);
@@ -367,48 +256,6 @@ const ProfilePage = () => {
   const branchList = useMemo(() => user?.sucursales ?? [], [user?.sucursales]);
   const loginTime = tokenManager.getLoginTime();
 
-  const handleChangePassword = async (values: ChangePasswordDto) => {
-    setIsChangingPassword(true);
-    try {
-      const dto: ChangePasswordDto = {
-        current_password: sanitizeInput(values.current_password, {
-          trim: false,
-          maxLength: 256,
-          stripTags: false,
-        }),
-        new_password: sanitizeInput(values.new_password, {
-          trim: false,
-          maxLength: 256,
-          stripTags: false,
-        }),
-        new_password_confirmation: sanitizeInput(
-          values.new_password_confirmation,
-          { trim: false, maxLength: 256, stripTags: false },
-        ),
-      };
-      await authService.changePassword(dto);
-      setPasswordModalOpen(false);
-      toast.success("Contraseña actualizada. Debes iniciar sesión nuevamente.");
-      await logout();
-    } catch (error) {
-      const apiError = error as {
-        errors?: Record<string, string[]>;
-        message?: string;
-      };
-      const firstError = apiError.errors
-        ? Object.values(apiError.errors)[0]?.[0]
-        : null;
-      toast.error(
-        safeText(
-          firstError ?? apiError.message,
-          "No se pudo cambiar la contraseña",
-          200,
-        ),
-      );
-    } finally {
-      setIsChangingPassword(false);
-    }
-  };
 
   return (
     <div className="min-h-screen px-4 py-6 md:px-6 md:py-8 lg:px-8">
@@ -477,12 +324,7 @@ const ProfilePage = () => {
               >
                 Refrescar
               </Button>
-              <Button
-                icon={<Lock size={16} />}
-                onClick={() => setPasswordModalOpen(true)}
-              >
-                Cambiar contraseña
-              </Button>
+
               <Button danger onClick={logout}>
                 Cerrar sesión
               </Button>
@@ -619,15 +461,7 @@ const ProfilePage = () => {
                 </span>
               }
               style={cardBase}
-              extra={
-                <Button
-                  size="small"
-                  icon={<Lock size={13} />}
-                  onClick={() => setPasswordModalOpen(true)}
-                >
-                  Cambiar contraseña
-                </Button>
-              }
+
             >
               <Descriptions column={1} bordered size="middle">
                 <Descriptions.Item
@@ -843,13 +677,6 @@ const ProfilePage = () => {
         </Card>
       </div>
 
-      {/* ── Password Modal ───────────────────────────────────────────────── */}
-      <ChangePasswordModal
-        open={passwordModalOpen}
-        onClose={() => setPasswordModalOpen(false)}
-        onSubmit={handleChangePassword}
-        loading={isChangingPassword}
-      />
     </div>
   );
 };

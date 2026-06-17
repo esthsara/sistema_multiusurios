@@ -4,7 +4,7 @@ import { useEffect, useState } from "react";
 import { Button, ConfigProvider, Modal, Spin, theme } from "antd";
 import { Image as ImageIcon } from "lucide-react";
 
-import { sucursalArchivosService } from "../../../services/sucursal-archivos.service";
+import { sucursalArchivosService } from "@/features/sucursales/services/sucursal-archivos.service";
 import {
   getArchivoDisplayName,
   type ArchivoResource,

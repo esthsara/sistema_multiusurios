@@ -4,8 +4,8 @@ import { Plus } from "lucide-react";
 import { Can } from "@/shared/components/guards/Can";
 import { ConfirmModal } from "@/shared/components/organisms/ConfirmModal";
 
-import { useSucursalContactos } from "../../hooks/useSucursalContactos";
-import type { SucursalContacto as SucursalContactoItem } from "../../types/sucursal.types";
+import { useSucursalContactos } from "@/features/sucursales/hooks/useSucursalContactos";
+import type { SucursalContacto as SucursalContactoItem } from "@/features/sucursales/types/sucursal.types";
 
 import { ContactoFormModal } from "./contacto/ContactoFormModal";
 import { ContactoViewModal } from "./contacto/ContactoViewModal";

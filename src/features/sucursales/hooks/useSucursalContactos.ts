@@ -1,12 +1,12 @@
 import { useCallback, useEffect, useState } from "react";
 import { toast } from "react-toastify";
-import { sucursalContactosService } from "../services/sucursal-contactos.service";
+import { sucursalContactosService } from "@/features/sucursales/services/sucursal-contactos.service";
 import { useFormModal } from "@/shared/hooks/useFormModal";
 import type {
   SucursalContacto,
   CreateSucursalContactoDto,
   UpdateSucursalContactoDto,
-} from "../types/sucursal.types";
+} from "@/features/sucursales/types/sucursal.types";
 
 export const useSucursalContactos = (sucursalId: number) => {
   const [contactos, setContactos] = useState<SucursalContacto[]>([]);

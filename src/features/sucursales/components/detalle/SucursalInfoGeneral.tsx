@@ -11,7 +11,7 @@ import {
 } from "lucide-react";
 import { Can } from "@/shared/components/guards/Can";
 import { getResolvedFileUrl } from "@/shared/utils/file-url.utils";
-import type { SucursalDetalle } from "../../types/sucursal.types";
+import type { SucursalDetalle } from "@/features/sucursales/types/sucursal.types";
 import { AppTag } from "@/shared/components/atoms/AppTag";
 
 interface Props {

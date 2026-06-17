@@ -2,7 +2,7 @@
 import { http } from "@/shared/services/http.service";
 import type { ApiResponse } from "@/shared/types/api.types";
 import { getResolvedFileUrl } from "@/shared/utils/file-url.utils";
-import type { SucursalArchivo } from "../types/sucursal.types";
+import type { SucursalArchivo } from "@/features/sucursales/types/sucursal.types";
 
 export const sucursalArchivosService = {
   getBySucursal: (sucursalId: number) =>

@@ -3,7 +3,7 @@ import type {
   CreateSucursalContactoDto,
   SucursalContacto,
   UpdateSucursalContactoDto,
-} from "../types/sucursal.types";
+} from "@/features/sucursales/types/sucursal.types";
 
 export const sucursalContactosService = {
   getBySucursal: (sucursalId: number) =>

@@ -1,7 +1,7 @@
 import { Modal, Button, Tooltip, message, ConfigProvider, theme } from "antd";
 import { Copy, Mail, Phone, Calendar, Info, Check } from "lucide-react";
 import { useState } from "react";
-import type { Contacto } from "../../detalle/contacto/contacto.constants";
+import type { Contacto } from "@/features/sucursales/detalle/contacto/contacto.constants";
 import { AppTag } from "@/shared/components/atoms/AppTag";
 
 interface Props {

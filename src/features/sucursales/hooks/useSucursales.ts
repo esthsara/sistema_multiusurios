@@ -1,13 +1,13 @@
 // src/features/sucursales/hooks/useSucursales.ts
 import { useState, useEffect, useCallback } from "react";
 import { toast } from "react-toastify";
-import { sucursalesService } from "../services/sucursales.service";
+import { sucursalesService } from "@/features/sucursales/services/sucursales.service";
 import { useTableState } from "@/shared/hooks/useTableState";
 import type {
   SucursalListItem,
   SucursalFilters,
   SucursalQueryParams,
-} from "../types/sucursal.types";
+} from "@/features/sucursales/types/sucursal.types";
 
 export const useSucursales = () => {
   const [data, setData] = useState<SucursalListItem[]>([]);

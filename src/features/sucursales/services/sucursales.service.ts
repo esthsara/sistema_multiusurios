@@ -10,7 +10,7 @@ import type {
   CreateSucursalDto,
   UpdateSucursalDto,
   ToggleSucursalStatusDto,
-} from "../types/sucursal.types";
+} from "@/features/sucursales/types/sucursal.types";
 
 /* ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
    TIPOS INTERNOS */

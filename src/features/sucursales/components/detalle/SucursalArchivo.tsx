@@ -13,9 +13,9 @@ import {
   tryOpenBlobInNewTab,
 } from "@/shared/utils/file-download.utils";
 
-import { useSucursalArchivos } from "../../hooks/useSucursalArchivos";
+import { useSucursalArchivos } from "@/features/sucursales/hooks/useSucursalArchivos";
 import { ConfirmModal } from "@/shared/components/organisms/ConfirmModal";
-import { sucursalArchivosService } from "../../services/sucursal-archivos.service";
+import { sucursalArchivosService } from "@/features/sucursales/services/sucursal-archivos.service";
 
 import { ArchivoTable } from "./Archivo/ArchivoTable";
 import { ArchivoViewImage } from "./Archivo/ArchivoViewImage";

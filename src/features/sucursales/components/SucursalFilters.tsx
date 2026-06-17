@@ -1,6 +1,6 @@
 import { Button, Input, Select } from "antd";
 import { RotateCcw, Search } from "lucide-react";
-import type { SucursalFilters } from "../types/sucursal.types";
+import type { SucursalFilters } from "@/features/sucursales/types/sucursal.types";
 
 interface SucursalFiltersProps {
   filters: SucursalFilters;

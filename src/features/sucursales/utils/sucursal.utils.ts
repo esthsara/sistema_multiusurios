@@ -1,7 +1,7 @@
 // src/features/sucursales/utils/sucursal.utils.ts
 import { createElement, type ReactNode } from "react";
 import { PowerOff, RotateCcw, Trash2 } from "lucide-react";
-import type { SucursalListItem } from "../types/sucursal.types";
+import type { SucursalListItem } from "@/features/sucursales/types/sucursal.types";
 import { getResolvedFileUrl } from "@/shared/utils/file-url.utils";
 
 const TIME_24H_REGEX = /^([01]\d|2[0-3]):([0-5]\d)$/;

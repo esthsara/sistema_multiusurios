@@ -1,13 +1,13 @@
 // src/features/sucursales/hooks/useSucursalForm.ts
 import { toast } from "react-toastify";
 import { useFormModal } from "@/shared/hooks/useFormModal";
-import { sucursalesService } from "../services/sucursales.service";
+import { sucursalesService } from "@/features/sucursales/services/sucursales.service";
 import type {
   SucursalListItem,
   SucursalDetalle,
   CreateSucursalDto,
   UpdateSucursalDto,
-} from "../types/sucursal.types";
+} from "@/features/sucursales/types/sucursal.types";
 
 /* ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
    NORMALIZACIÓN */

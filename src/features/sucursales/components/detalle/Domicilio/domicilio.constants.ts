@@ -3,7 +3,7 @@ import type {
   SucursalDomicilio,
   CreateSucursalDomicilioDto,
   UpdateSucursalDomicilioDto,
-} from "../../../types/sucursal.types";
+} from "@/features/sucursales/types/sucursal.types";
 
 export type TipoDomicilio = TipoDomicilioSucursal;
 

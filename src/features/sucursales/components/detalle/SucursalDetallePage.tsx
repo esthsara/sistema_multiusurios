@@ -4,7 +4,7 @@ import { useNavigate, useParams, Navigate } from "react-router-dom";
 import { PageHeader } from "@/shared/components/molecules/PageHeader";
 import { APP_ROUTES } from "@/shared/constants/routes.constants";
 import { useAuthStore } from "@/features/auth/store/auth.store";
-import { useSucursalDetalle } from "../../hooks/useSucursalDetalle";
+import { useSucursalDetalle } from "@/features/sucursales/hooks/useSucursalDetalle";
 import { SucursalInfoGeneral } from "./SucursalInfoGeneral";
 import { SucursalContacto } from "./SucursalContacto";
 import { SucursalDomicilio } from "./SucursalDomicilio";

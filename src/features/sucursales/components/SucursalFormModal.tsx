@@ -6,7 +6,7 @@ import type {
   CreateSucursalDto,
   SucursalListItem,
   UpdateSucursalDto,
-} from "../types/sucursal.types";
+} from "@/features/sucursales/types/sucursal.types";
 import {
   VALIDATION_RULES,
   DEFAULT_VALUES,

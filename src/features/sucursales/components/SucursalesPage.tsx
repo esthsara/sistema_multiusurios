@@ -12,18 +12,18 @@ import { Can } from "@/shared/components/guards/Can";
 import { useNavigate } from "react-router-dom";
 import { APP_ROUTES } from "@/shared/constants/routes.constants";
 
-import { useSucursales } from "../hooks/useSucursales";
-import { useSucursalForm } from "../hooks/useSucursalForm";
-import { SucursalFiltersBar } from "../components/SucursalFilters";
-import { SucursalStatusBadge } from "../components/SucursalStatusBadge";
-import { SucursalFormModal } from "../components/SucursalFormModal";
+import { useSucursales } from "@/features/sucursales/hooks/useSucursales";
+import { useSucursalForm } from "@/features/sucursales/hooks/useSucursalForm";
+import { SucursalFiltersBar } from "@/features/sucursales/components/SucursalFilters";
+import { SucursalStatusBadge } from "@/features/sucursales/components/SucursalStatusBadge";
+import { SucursalFormModal } from "@/features/sucursales/components/SucursalFormModal";
 
-import type { SucursalListItem, ConfirmState } from "../types/sucursal.types";
+import type { SucursalListItem, ConfirmState } from "@/features/sucursales/types/sucursal.types";
 import {
   getSucursalInitials,
   getConfirmConfig,
   getHorarioDisplay,
-} from "../utils/sucursal.utils";
+} from "@/features/sucursales/utils/sucursal.utils";
 import { getResolvedFileUrl } from "@/shared/utils/file-url.utils";
 
 const SucursalesPage = () => {

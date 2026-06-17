@@ -4,7 +4,7 @@ import { Button } from "antd";
 import { Plus } from "lucide-react";
 import { ConfirmModal } from "@/shared/components/organisms/ConfirmModal";
 import { Can } from "@/shared/components/guards/Can";
-import { useSucursalDomicilios } from "../../hooks/useSucursalDomicilios";
+import { useSucursalDomicilios } from "@/features/sucursales/hooks/useSucursalDomicilios";
 import type { Domicilio } from "./Domicilio/domicilio.constants";
 
 import { DomicilioTable } from "./Domicilio/DomicilioTable";

@@ -3,7 +3,7 @@
  * Separadas de la lógica del hook para mejor mantenibilidad
  */
 
-import type { SucursalListItem } from "../types/sucursal.types";
+import type { SucursalListItem } from "@/features/sucursales/types/sucursal.types";
 
 /**
  * Aplica búsqueda local en las sucursales

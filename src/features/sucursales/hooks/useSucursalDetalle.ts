@@ -1,7 +1,7 @@
 import { useState, useEffect, useCallback } from "react";
 import { toast } from "react-toastify";
-import { sucursalesService } from "../services/sucursales.service";
-import type { SucursalDetalle } from "../types/sucursal.types";
+import { sucursalesService } from "@/features/sucursales/services/sucursales.service";
+import type { SucursalDetalle } from "@/features/sucursales/types/sucursal.types";
 
 export const useSucursalDetalle = (id: number) => {
   const [sucursal, setSucursal] = useState<SucursalDetalle | null>(null);

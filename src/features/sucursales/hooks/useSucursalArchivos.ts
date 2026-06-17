@@ -1,7 +1,7 @@
 // src/features/sucursales/hooks/useSucursalArchivos.ts
 import { useCallback, useEffect, useState } from "react";
 import { toast } from "react-toastify";
-import { sucursalArchivosService } from "../services/sucursal-archivos.service";
+import { sucursalArchivosService } from "@/features/sucursales/services/sucursal-archivos.service";
 import {
   downloadBlobUrl,
   getFileExtension,
@@ -10,7 +10,7 @@ import {
   revokeBlobUrlLater,
   toBlobUrlFromResponse,
 } from "@/shared/utils/file-download.utils";
-import type { SucursalArchivo } from "../types/sucursal.types";
+import type { SucursalArchivo } from "@/features/sucursales/types/sucursal.types";
 
 export const useSucursalArchivos = (sucursalId: number) => {
   const [archivos, setArchivos] = useState<SucursalArchivo[]>([]);

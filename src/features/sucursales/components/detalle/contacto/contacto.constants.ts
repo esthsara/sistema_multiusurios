@@ -2,7 +2,7 @@ import type {
   SucursalContacto,
   CreateSucursalContactoDto,
   UpdateSucursalContactoDto,
-} from "../../../types/sucursal.types";
+} from "@/features/sucursales/types/sucursal.types";
 
 /* ── Contacto ── */
 
