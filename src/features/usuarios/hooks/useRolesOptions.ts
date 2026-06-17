@@ -1,5 +1,5 @@
 // src/features/usuarios/hooks/useRolesOptions.ts
-import { useState, useEffect, useCallback } from "react";
+import { useState, useEffect, useCallback, useMemo } from "react";
 import { rolesService } from "@/features/roles/services/roles.service";
 import type { RolListItem } from "@/features/roles/types/rol.types";
 
@@ -33,10 +33,14 @@ export const useRolesOptions = () => {
     fetchRoles();
   }, [fetchRoles]);
 
-  const roleOptions: RoleOption[] = roles.map((role) => ({
-    label: role.name,
-    value: role.name,
-  }));
+  const roleOptions: RoleOption[] = useMemo(
+    () =>
+      roles.map((role) => ({
+        label: role.name,
+        value: role.name,
+      })),
+    [roles],
+  );
 
   return { roleOptions, roles, loading, refetch: fetchRoles };
 };

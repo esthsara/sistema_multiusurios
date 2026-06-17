@@ -51,9 +51,6 @@ const UsuarioDetallePage = () => {
         usuario={usuario}
         onToggleBloqueo={toggleBloqueo}
         onCerrarSesiones={cerrarSesiones}
-        onResetPassword={() => {
-          // TODO: Implementar reset password desde aquí
-        }}
       />
     ),
   });

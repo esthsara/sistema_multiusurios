@@ -3,7 +3,7 @@ import { Search, RotateCcw } from "lucide-react";
 import dayjs from "dayjs";
 import type { UsuarioFilters } from "../types/usuario.types";
 import { useAuthStore } from "@/features/auth/store/auth.store";
-import "@/index.css";
+
 
 interface UsuarioFiltersProps {
   filters: UsuarioFilters;

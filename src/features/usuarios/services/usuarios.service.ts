@@ -35,18 +35,7 @@ export const usuariosService = {
       {},
     ),
 
-  resetPassword: (
-    id: number,
-    data: {
-      new_password: string;
-      password_confirmation?: string;
-      new_password_confirmation?: string;
-      temporary?: boolean;
-      must_change_password?: boolean;
-      force_password_change?: boolean;
-      motivo?: string;
-    },
-  ) => http.post<UsuarioDetalle>(`/users/${id}/reset-password`, data),
+
 
   getByBranch: (branchId: number) =>
     http.getPaginated<UsuarioListItem>(`/sucursales/${branchId}/usuarios`),

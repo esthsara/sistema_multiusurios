@@ -62,7 +62,7 @@ export const getAvatarStyle = (usuario: UsuarioListItem): CSSProperties => {
 import type { ConfirmConfig } from "@/shared/types/ui.types";
 
 export const getConfirmConfig = (
-  type: "toggle" | "delete" | "reset-password",
+  type: "toggle" | "delete",
   usuario?: UsuarioListItem | null,
 ): ConfirmConfig => {
   if (type === "toggle") {
@@ -79,17 +79,6 @@ export const getConfirmConfig = (
       icon: isActive
         ? createElement(PowerOff, { size: 22, className: "text-yellow-400" })
         : createElement(RotateCcw, { size: 22, className: "text-green-400" }),
-    };
-  }
-
-  if (type === "reset-password") {
-    return {
-      title: `¿Resetear contraseña de ${usuario?.username ?? "este usuario"}?`,
-      description:
-        "Se generará una contraseña temporal y se copiará automáticamente al portapapeles.",
-      confirmText: "Resetear",
-      danger: false,
-      icon: createElement(Key, { size: 22, className: "text-blue-400" }),
     };
   }
 

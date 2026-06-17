@@ -6,12 +6,12 @@ import { AppTag } from "@/shared/components/atoms/AppTag";
 import { Can } from "@/shared/components/guards/Can";
 import { APP_ROUTES } from "@/shared/constants/routes.constants";
 import type { UsuarioDetalle } from "../../types/usuario.types";
+import { getAvatarUrl } from "@/shared/utils/avatar";
 
 interface Props {
   usuario: UsuarioDetalle;
   onToggleBloqueo: () => void;
   onCerrarSesiones: () => void;
-  onResetPassword: () => void;
 }
 
 const getDeviceIcon = (d: string) =>
@@ -54,7 +54,7 @@ export const UsuarioDatosGenerales = ({ usuario, onCerrarSesiones }: Props) => {
             <div className="relative">
               <Avatar
                 size={80}
-                src={usuario.persona.foto ?? undefined}
+                src={getAvatarUrl(usuario)}
                 icon={<User size={32} />}
                 style={{
                   backgroundColor: "var(--color-primary-600)",

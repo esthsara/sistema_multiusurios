@@ -162,7 +162,7 @@ export interface UsuarioQueryParams extends UsuarioFilters, RequestParams {}
 
 export interface ConfirmState {
   open: boolean;
-  type: "toggle" | "delete" | "reset-password" | null;
+  type: "toggle" | "delete" | null;
   item: UsuarioListItem | null;
   loading: boolean;
 }

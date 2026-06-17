@@ -4,7 +4,6 @@ import { Button, Avatar, Tooltip } from "antd";
 import {
   Plus,
   Pencil,
-  Trash2,
   RotateCcw,
   PowerOff,
   Eye,
@@ -24,7 +23,7 @@ import { toast } from "react-toastify";
 import { useUsuarios } from "../hooks/useUsuarios";
 import { useUsuarioForm } from "../hooks/useUsuarioForm";
 import { useRolesOptions } from "../hooks/useRolesOptions";
-import { useResetPassword } from "../hooks/useResetPassword";
+
 import { useSucursalesOptions } from "../hooks/useSucursalesOptions";
 import { UsuarioStatusBadge } from "../components/UsuarioStatusBadge";
 import { UsuarioFormModal } from "../components/UsuarioFormModal";
@@ -37,6 +36,7 @@ import {
   getAvatarStyle,
   getConfirmConfig,
 } from "../utils/usuario.utils";
+import { getAvatarUrl } from "@/shared/utils/avatar";
 
 const UsuariosPage = () => {
   const navigate = useNavigate();
@@ -44,7 +44,7 @@ const UsuariosPage = () => {
   const usuarios = useUsuarios();
   const form = useUsuarioForm(usuarios.fetchUsuarios);
   const { roleOptions } = useRolesOptions();
-  const resetPassword = useResetPassword();
+
   const { branchOptions } = useSucursalesOptions();
 
   /* ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
@@ -58,7 +58,7 @@ const UsuariosPage = () => {
   });
 
   const openConfirm = (
-    type: "toggle" | "delete" | "reset-password",
+    type: "toggle" | "delete",
     item: UsuarioListItem,
   ) => setConfirmState({ open: true, type, item, loading: false });
 
@@ -74,17 +74,6 @@ const UsuariosPage = () => {
         await usuarios.toggleEstado(confirmState.item);
       } else if (confirmState.type === "delete") {
         await usuarios.remove(confirmState.item.id);
-      } else if (confirmState.type === "reset-password") {
-        const result = await resetPassword.generateAndResetPassword(
-          confirmState.item.id,
-          "Reset de contraseña desde panel de administración",
-        );
-        if (result.success && result.temporaryPassword) {
-          await navigator.clipboard.writeText(result.temporaryPassword);
-          toast.info(
-            `Contraseña temporal copiada al portapapeles: ${result.temporaryPassword}`,
-          );
-        }
       }
     } finally {
       closeConfirm();
@@ -100,7 +89,7 @@ const UsuariosPage = () => {
       key: "foto",
       width: 84,
       render: (_, r) => (
-        <Avatar src={r.persona.foto ?? undefined} style={getAvatarStyle(r)}>
+        <Avatar src={getAvatarUrl(r)} style={getAvatarStyle(r)}>
           {getUsuarioInitials(r)}
         </Avatar>
       ),
@@ -212,18 +201,7 @@ const UsuariosPage = () => {
             ),
             onClick: () => openConfirm("toggle", record),
           },
-          ...(record.activo
-            ? [
-              {
-                key: "delete",
-                permission: "usuarios.eliminar" as const,
-                label: "Eliminar",
-                icon: <Trash2 size={14} />,
-                danger: true,
-                onClick: () => openConfirm("delete", record),
-              },
-            ]
-            : []),
+          
         ];
 
         return <RowActions actions={actions} />;
