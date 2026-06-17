@@ -1,5 +1,4 @@
 // src/features/usuarios/services/usuarios.service.ts
-import apiClient from "@/config/axios.config";
 import { http } from "@/shared/services/http.service";
 import type { ApiResponse, RequestParams } from "@/shared/types/api.types";
 import type {
@@ -71,11 +70,6 @@ export const usuariosService = {
   ): Promise<ApiResponse<{ url: string }>> => {
     const formData = new FormData();
     formData.append("foto", file);
-    const res = await apiClient.post<ApiResponse<{ url: string }>>(
-      `/users/${userId}/foto`,
-      formData,
-      { headers: { "Content-Type": "multipart/form-data" } },
-    );
-    return res.data;
+    return http.upload<{ url: string }>(`/users/${userId}/foto`, formData);
   },
 };

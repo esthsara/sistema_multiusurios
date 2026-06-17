@@ -1,5 +1,4 @@
 // src/features/sucursales/services/sucursales.service.ts
-import apiClient from "@/config/axios.config";
 import { http } from "@/shared/services/http.service";
 import type { ApiResponse, RequestParams } from "@/shared/types/api.types";
 import type {
@@ -63,12 +62,7 @@ export const sucursalesService = {
     data: CreateSucursalDto,
   ): Promise<ApiResponse<SucursalMutationResponse>> => {
     const formData = toFormData(data);
-    const res = await apiClient.post<ApiResponse<SucursalMutationResponse>>(
-      "/sucursales",
-      formData,
-      { headers: { "Content-Type": "multipart/form-data" } },
-    );
-    return res.data;
+    return http.upload<SucursalMutationResponse>("/sucursales", formData);
   },
 
   update: async (
@@ -76,12 +70,7 @@ export const sucursalesService = {
     data: UpdateSucursalDto,
   ): Promise<ApiResponse<SucursalMutationResponse>> => {
     const formData = toFormData(data);
-    const res = await apiClient.put<ApiResponse<SucursalMutationResponse>>(
-      `/sucursales/${id}`,
-      formData,
-      { headers: { "Content-Type": "multipart/form-data" } },
-    );
-    return res.data;
+    return http.uploadPut<SucursalMutationResponse>(`/sucursales/${id}`, formData);
   },
 
   toggleStatus: (id: number, data: ToggleSucursalStatusDto) =>

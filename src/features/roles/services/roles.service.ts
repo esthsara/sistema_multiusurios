@@ -118,6 +118,7 @@ export const rolesService = {
         return await http.post<RolDetalle, typeof payload>(
           `/roles/${id}/sync-permissions`,
           payload,
+          { silent: true }
         );
       } catch (error) {
         const apiError = error as Partial<ApiError>;

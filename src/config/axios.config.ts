@@ -157,7 +157,6 @@ apiClient.interceptors.response.use(
       if (isAuthRequest || isSilentError) {
         return Promise.reject(error);
       }
-      handleHttpError(error);
       return Promise.reject(error);
     }
 
@@ -166,7 +165,6 @@ apiClient.interceptors.response.use(
       if (isAuthRequest) {
         return Promise.reject(error);
       }
-      handleHttpError(error);
       return Promise.reject(error);
     }
     return Promise.reject(error);

@@ -1,5 +1,4 @@
 // src/features/personas/services/archivos.service.ts
-import apiClient from "@/config/axios.config";
 import { http } from "@/shared/services/http.service";
 import type { ApiResponse } from "@/shared/types/api.types";
 import type {
@@ -41,12 +40,7 @@ export const archivosService = {
       formData.append("fecha_expiracion", fechaExpiracion);
     }
 
-    const res = await apiClient.post<ApiResponse<ArchivoResource>>(
-      "/archivos",
-      formData,
-      { headers: { "Content-Type": "multipart/form-data" } },
-    );
-    return res.data;
+    return http.upload<ArchivoResource>("/archivos", formData);
   },
 
   getPublicUrl: async (id: number) => {
@@ -54,8 +48,7 @@ export const archivosService = {
     return getResolvedFileUrl(response.data.url ?? response.data.ruta ?? "");
   },
 
-  download: (id: number) =>
-    apiClient.get<Blob>(`/archivos/${id}/download`, { responseType: "blob" }),
+  download: (id: number) => http.download(`/archivos/${id}/download`),
 
   getBlob: (id: number) => archivosService.download(id),
   remove: (id: number) => http.delete(`/archivos/${id}`),

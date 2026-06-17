@@ -38,11 +38,7 @@ export const http = {
       });
       return response.data;
     } catch (error) {
-      throw handleHttpError(error, true);
-      /**
-       * silent: true → no mostramos toast aquí.
-       * El componente decide si mostrar el error o manejarlo silenciosamente.
-       */
+      throw handleHttpError(error, options?.silent);
     }
   },
 
@@ -125,7 +121,7 @@ export const http = {
 
       throw new Error("Invalid paginated response format");
     } catch (error) {
-      throw handleHttpError(error, true);
+      throw handleHttpError(error, false); // paginated rarely has a silent override, default to false
     }
   },
 
@@ -137,12 +133,13 @@ export const http = {
   async post<TResponse, TBody = unknown>(
     url: string,
     body: TBody,
+    options?: { silent?: boolean },
   ): Promise<ApiResponse<TResponse>> {
     try {
       const response = await apiClient.post<ApiResponse<TResponse>>(url, body);
       return response.data;
     } catch (error) {
-      throw handleHttpError(error, true);
+      throw handleHttpError(error, options?.silent ?? false);
     }
   },
 
@@ -152,12 +149,13 @@ export const http = {
   async put<TResponse, TBody = unknown>(
     url: string,
     body: TBody,
+    options?: { silent?: boolean },
   ): Promise<ApiResponse<TResponse>> {
     try {
       const response = await apiClient.put<ApiResponse<TResponse>>(url, body);
       return response.data;
     } catch (error) {
-      throw handleHttpError(error, true);
+      throw handleHttpError(error, options?.silent ?? false);
     }
   },
 
@@ -169,12 +167,13 @@ export const http = {
   async patch<TResponse, TBody = unknown>(
     url: string,
     body?: TBody,
+    options?: { silent?: boolean },
   ): Promise<ApiResponse<TResponse>> {
     try {
       const response = await apiClient.patch<ApiResponse<TResponse>>(url, body);
       return response.data;
     } catch (error) {
-      throw handleHttpError(error, true);
+      throw handleHttpError(error, options?.silent ?? false);
     }
   },
 
@@ -185,6 +184,7 @@ export const http = {
   async delete<TResponse = void, TBody = unknown>(
     url: string,
     body?: TBody,
+    options?: { silent?: boolean },
   ): Promise<ApiResponse<TResponse>> {
     try {
       const response = await apiClient.delete<ApiResponse<TResponse>>(url, {
@@ -192,7 +192,7 @@ export const http = {
       });
       return response.data;
     } catch (error) {
-      throw handleHttpError(error, true);
+      throw handleHttpError(error, options?.silent ?? false);
     }
   },
 
@@ -203,6 +203,7 @@ export const http = {
   async upload<TResponse>(
     url: string,
     formData: FormData,
+    options?: { silent?: boolean },
   ): Promise<ApiResponse<TResponse>> {
     try {
       const response = await apiClient.post<ApiResponse<TResponse>>(
@@ -212,7 +213,48 @@ export const http = {
       );
       return response.data;
     } catch (error) {
-      throw handleHttpError(error, true);
+      throw handleHttpError(error, options?.silent ?? false);
+    }
+  },
+
+  /**
+   * PUT con FormData (Laravel a veces requiere _method='PUT' dentro del POST, 
+   * pero si el server acepta PUT multipart, usamos esta función)
+   */
+  async uploadPut<TResponse>(
+    url: string,
+    formData: FormData,
+    options?: { silent?: boolean },
+  ): Promise<ApiResponse<TResponse>> {
+    try {
+      const response = await apiClient.put<ApiResponse<TResponse>>(
+        url,
+        formData,
+        { headers: { "Content-Type": "multipart/form-data" } },
+      );
+      return response.data;
+    } catch (error) {
+      throw handleHttpError(error, options?.silent ?? false);
+    }
+  },
+
+  /**
+   * DOWNLOAD — Para descargar archivos binarios
+   * Retorna el Blob y el nombre del archivo si viene en Content-Disposition
+   */
+  async download(
+    url: string,
+    params?: RequestParams,
+    options?: { silent?: boolean },
+  ): Promise<Blob> {
+    try {
+      const response = await apiClient.get<Blob>(url, {
+        params,
+        responseType: "blob",
+      });
+      return response.data;
+    } catch (error) {
+      throw handleHttpError(error, options?.silent ?? false);
     }
   },
 };

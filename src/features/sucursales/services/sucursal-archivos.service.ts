@@ -1,5 +1,4 @@
 // src/features/sucursales/services/sucursal-archivos.service.ts
-import apiClient from "@/config/axios.config";
 import { http } from "@/shared/services/http.service";
 import type { ApiResponse } from "@/shared/types/api.types";
 import { getResolvedFileUrl } from "@/shared/utils/file-url.utils";
@@ -37,16 +36,10 @@ export const sucursalArchivosService = {
       formData.append("fecha_expiracion", fecha_expiracion);
     }
 
-    const res = await apiClient.post<ApiResponse<SucursalArchivo>>(
-      "/archivos",
-      formData,
-      { headers: { "Content-Type": "multipart/form-data" } },
-    );
-    return res.data;
+    return http.upload<SucursalArchivo>("/archivos", formData);
   },
 
-  download: (id: number) =>
-    apiClient.get<Blob>(`/archivos/${id}/download`, { responseType: "blob" }),
+  download: (id: number) => http.download(`/archivos/${id}/download`),
 
   getPublicUrl: async (id: number) => {
     const response = await sucursalArchivosService.getById(id);
