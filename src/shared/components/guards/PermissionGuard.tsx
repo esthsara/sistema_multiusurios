@@ -27,7 +27,7 @@ export const PermissionGuard = ({
   permissions,
   operator = "OR",
 }: PermissionGuardProps) => {
-  const { can, canAll, canAny } = usePermissions();
+  const { canAll, canAny } = usePermissions();
 
   // Normalizar: siempre trabajamos con un array
   const required: PermissionString[] = permission

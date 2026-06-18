@@ -8,7 +8,7 @@ import {
   Segmented,
   Space,
 } from "antd";
-import { Search, Calendar, Trash2, Monitor, Smartphone } from "lucide-react";
+import { Search, Calendar, Trash2, Monitor } from "lucide-react";
 import type { Dayjs } from "dayjs";
 import dayjs from "dayjs";
 import type { SessionsFilters } from "../types/sessions.types";

@@ -18,7 +18,7 @@ import { Can } from "@/shared/components/guards/Can";
 import { useAuth } from "@/shared/hooks/useAuth";
 import { sucursalesService } from "@/features/sucursales/services/sucursales.service";
 import { usuariosService } from "@/features/usuarios/services/usuarios.service";
-import type { SucursalListItem } from "@/features/sucursales/types/sucursal.types";
+
 import type { UsuarioListItem } from "@/features/usuarios/types/usuario.types";
 
 /* ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━

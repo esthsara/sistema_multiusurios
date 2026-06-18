@@ -5,7 +5,7 @@ import axios, {
   type AxiosError,
 } from "axios";
 import { toast } from "react-toastify";
-import { handleHttpError } from "@/shared/utils/error.handler";
+
 import { APP_ROUTES } from "@/shared/constants/routes.constants";
 import { tokenManager } from "@/shared/utils/tokenManager";
 import { storageManager } from "@/shared/utils/storageManager";

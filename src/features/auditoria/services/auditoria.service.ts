@@ -1,6 +1,6 @@
 
 import { http } from "@/shared/services/http.service";
-import type { ApiResponse, RequestParams } from "@/shared/types/api.types";
+import type { RequestParams } from "@/shared/types/api.types";
 import type {
   AuditoriaListItem,
   AuditoriaDetalle,

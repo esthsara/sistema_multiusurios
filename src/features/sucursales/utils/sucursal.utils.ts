@@ -1,5 +1,5 @@
 // src/features/sucursales/utils/sucursal.utils.ts
-import { createElement, type ReactNode } from "react";
+import { createElement } from "react";
 import { PowerOff, RotateCcw, Trash2 } from "lucide-react";
 import type { SucursalListItem } from "@/features/sucursales/types/sucursal.types";
 import { getResolvedFileUrl } from "@/shared/utils/file-url.utils";

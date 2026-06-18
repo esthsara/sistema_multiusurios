@@ -1,6 +1,6 @@
 // src/features/usuarios/utils/usuario.utils.ts
-import { createElement, type CSSProperties, type ReactNode } from "react";
-import { Key, PowerOff, RotateCcw, Trash2 } from "lucide-react";
+import { createElement, type CSSProperties } from "react";
+import { PowerOff, RotateCcw, Trash2 } from "lucide-react";
 import type { UsuarioListItem } from "../types/usuario.types";
 
 /* ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━

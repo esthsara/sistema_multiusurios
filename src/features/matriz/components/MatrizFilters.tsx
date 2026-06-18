@@ -1,5 +1,5 @@
 // src/features/matriz/components/MatrizFilters.tsx
-import { Button, Flex, Input, Select } from "antd";
+import { Button, Input, Select } from "antd";
 import { RotateCcw, Search } from "lucide-react";
 import type { MatrizFilters } from "../types/matriz.types";
 

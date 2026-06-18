@@ -16,7 +16,6 @@ import {
   Space,
   Spin,
   Steps,
-  Tooltip,
   Typography,
   theme,
 } from "antd";
@@ -39,7 +38,6 @@ import type { PermisoItem } from "@/features/permisos/types/permiso.types";
 import {
   agruparCatalogoPermisosPorModulo,
   contarSeleccionadosEnModulo,
-  getModuloStyles,
   sanitizePermissionIds,
 } from "../utils/roles.utils";
 
@@ -67,18 +65,7 @@ interface RoleFormModalProps {
   onSubmit: (values: RoleSubmitValues) => Promise<void> | void;
 }
 
-/** Mapea accion → tone para los tags de permisos */
-const accionToTone = (
-  accion: string,
-): "success" | "warning" | "danger" | "primary" | "neutral" => {
-  const a = accion.toLowerCase();
-  if (a.includes("ver") || a.includes("exportar")) return "success";
-  if (a.includes("crear") || a.includes("subir") || a.includes("asignar"))
-    return "primary";
-  if (a.includes("editar")) return "warning";
-  if (a.includes("eliminar")) return "danger";
-  return "neutral";
-};
+
 
 export const RoleFormModal = ({
   open,
@@ -262,7 +249,7 @@ export const RoleFormModal = ({
       const ids = group.items.map((i) => i.id);
       const { allSelected, someSelected, selected } =
         contarSeleccionadosEnModulo(ids, selectedPermissionIds);
-      const moduloStyles = getModuloStyles(group.module);
+
 
       const header = (
         <Flex justify="space-between" align="center" style={{ width: "100%" }}>

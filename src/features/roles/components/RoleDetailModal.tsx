@@ -159,7 +159,7 @@ export const RoleDetailModal = ({
                   image={Empty.PRESENTED_IMAGE_SIMPLE}
                 />
               ) : (
-                <Flex direction="column" gap={12}>
+                <Flex gap={12}>
                   {groupedPermissions.map((group) => (
                     <Card
                       key={group.module}

@@ -1,7 +1,7 @@
 // src/features/personas/components/detalle/Archivo/archivo.constants.ts
 
 import type { TableColumnsType } from "antd";
-import { getResolvedFileUrl } from "@/shared/utils/file-url.utils";
+
 
 export const TipoArchivo = {
   CI: "CI",

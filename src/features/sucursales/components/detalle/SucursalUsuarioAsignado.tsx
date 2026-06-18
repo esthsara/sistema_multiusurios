@@ -28,7 +28,7 @@ interface Props {
 export const SucursalUsuarioAsignado = ({ sucursal }: Props) => {
   const navigate = useNavigate();
   const hasPermission = useAuthStore((s) => s.hasPermission);
-  const canAsignar = hasPermission("asignaciones.asignar");
+
   const canQuitar = hasPermission("asignaciones.quitar");
 
   const { asignar, quitar } = useAsignaciones();

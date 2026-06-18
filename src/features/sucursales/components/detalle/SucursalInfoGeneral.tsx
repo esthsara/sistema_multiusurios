@@ -87,7 +87,7 @@ export const SucursalInfoGeneral = ({ sucursal, onToggleEstado }: Props) => {
             {/* Badge de Estado */}
             <AppTag
               className="px-3 py-1 rounded-full text-xs font-medium"
-              tone={sucursal.activa ? "success" : "muted"}
+              tone={sucursal.activa ? "success" : "neutral"}
             >
               {sucursal.activa ? "Sede Activa" : "Sede Inactiva"}
             </AppTag>

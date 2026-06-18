@@ -4,7 +4,7 @@ import { Activity, Clock3, RotateCcw, Building2 } from "lucide-react";
 import { toast } from "react-toastify";
 import { auditoriaService } from "@/features/auditoria/services/auditoria.service";
 import type { AuditoriaListItem } from "@/features/auditoria/types/auditoria.types";
-import dayjs, { type Dayjs } from "dayjs";
+import type { Dayjs } from "dayjs";
 
 import { AuditoriaTable } from "./Auditoria/AuditoriaTable";
 import { AuditoriaViewModal } from "./Auditoria/AuditoriaViewModal";

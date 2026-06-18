@@ -1,15 +1,11 @@
-import { useMemo, useState } from "react";
+import { useMemo } from "react";
 import {
-  Alert,
   Avatar,
   Badge,
   Button,
   Card,
   Descriptions,
   Empty,
-  Form,
-  Input,
-  Modal,
   Space,
   Tag,
   Tooltip,
@@ -24,7 +20,6 @@ import {
   Fingerprint,
   IdCard,
   KeyRound,
-  Lock,
   LogIn,
   MapPin,
   Phone,
@@ -37,13 +32,9 @@ import {
   ClockIcon,
 } from "lucide-react";
 import { useNavigate } from "react-router-dom";
-import { toast } from "react-toastify";
 import { useAuth } from "@/shared/hooks/useAuth";
 import { useAuthActions } from "@/features/auth/hooks/useAuthActions";
-import { authService } from "@/features/auth/services/auth.service";
-
 import { safeText } from "@/shared/utils/sanitize";
-import { sanitizeInput } from "@/shared/utils/sanitize";
 import { tokenManager } from "@/shared/utils/tokenManager";
 import { getAvatarUrl } from "@/shared/utils/avatar";
 

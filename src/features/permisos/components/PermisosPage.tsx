@@ -1,5 +1,5 @@
 import { useMemo, useState } from "react";
-import { Button, Tag, Statistic, Row, Col } from "antd";
+import { Button, Tag } from "antd";
 import type { TableColumnsType } from "antd";
 import { Pencil, Plus, Trash2 } from "lucide-react";
 import { PageHeader } from "@/shared/components/molecules/PageHeader";
